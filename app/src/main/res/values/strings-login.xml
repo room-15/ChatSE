@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign In</string>
+    <string name="action_sign_in_short">Sign In</string>
+
+    <string name="err_blank_email">Enter your email</string>
+    <string name="err_invalid_email">This email address is invalid</string>
+    <string name="err_blank_password">Enter your password</string>
+    <string name="err_incorrect_password">This password is incorrect</string>
+
+    <string name="err_malformed_data">Network Error</string>
+</resources>
