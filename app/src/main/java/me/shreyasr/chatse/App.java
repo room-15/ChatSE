@@ -3,7 +3,6 @@ package me.shreyasr.chatse;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 public class App extends Application {
 

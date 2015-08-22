@@ -17,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
@@ -28,26 +27,16 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
-import java.net.HttpCookie;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.shreyasr.chatse.App;
 import me.shreyasr.chatse.ChatActivity;
+import me.shreyasr.chatse.Client;
 import me.shreyasr.chatse.R;
 
 public class LoginActivity extends AppCompatActivity {
-
-    private static final String USER_AGENT
-            = "Mozilla/5.0 (Windows NT 6.2; WOW64)"
-            + "AppleWebKit/537.36 (KHTML, like Gecko)"
-            + "Chrome/44.0.2403.155 Safari/537.36";
-
-    private OkHttpClient client = new OkHttpClient();
-    private CookieManager cookieManager = new CookieManager();
 
     @Bind(R.id.login_email) EditText emailView;
     @Bind(R.id.login_password) EditText passwordView;
@@ -69,19 +58,6 @@ public class LoginActivity extends AppCompatActivity {
                     return true;
                 }
                 return false;
-            }
-        });
-
-        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
-        client.setCookieHandler(cookieManager);
-        client.networkInterceptors().add(new Interceptor() {
-            @Override public Response intercept(Chain chain) throws IOException {
-                Request originalRequest = chain.request();
-                Request requestWithUserAgent = originalRequest.newBuilder()
-                        .removeHeader("User-Agent")
-                        .addHeader("User-Agent", USER_AGENT)
-                        .build();
-                return chain.proceed(requestWithUserAgent);
             }
         });
 
@@ -160,26 +136,19 @@ public class LoginActivity extends AppCompatActivity {
             String password = params[1];
 
             try {
-                seOpenIdLogin(email, password);
+                OkHttpClient client = Client.get();
 
-                FormEncodingBuilder data = new FormEncodingBuilder()
-                        .add("oauth_version", "")
-                        .add("oauth_server", "")
-                        .add("openid_identifier", "https://openid.stackexchange.com/");
+                seOpenIdLogin(client, email, password);
+                loginToSE(client);
+                loginToSite(client, "https://stackoverflow.com", email, password);
 
-                loginWithFkey("http://stackexchange.com/users/login/",
-                        "https://stackexchange.com/users/authenticate/", data);
+                String soChatFkey = getChatFkey(client, "http://chat.stackoverflow.com");
+                newMessage(client, "http://chat.stackoverflow.com", 85048,
+                        soChatFkey, "Final test before commit");
 
-                loginToSite("https://stackoverflow.com", email, password);
-
-                String soChatFkey = getChatFkey("http://chat.stackoverflow.com");
-                newMessage("http://chat.stackoverflow.com", 15, soChatFkey, "test message from android");
-
-                String chatFkey = getChatFkey("http://chat.stackexchange.com/");
-                newMessage("http://chat.stackexchange.com", 16, chatFkey, "test message from android");
-
-                for (HttpCookie cookie : cookieManager.getCookieStore().getCookies())
-                    Log.e("chat message cookie", cookie.toString());
+                String chatFkey = getChatFkey(client, "http://chat.stackexchange.com/");
+                newMessage(client, "http://chat.stackexchange.com", 16,
+                        chatFkey, "Final test before commit");
                 return true;
             } catch (IOException e) {
                 Log.e(e.getClass().getSimpleName(), e.getMessage(), e);
@@ -187,8 +156,10 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
 
-        private void loginToSite(String site, String email, String password) throws IOException {
-            String soFkey = Jsoup.connect("http://stackoverflow.com" + "/users/login/").userAgent(USER_AGENT).get()
+        private void loginToSite(OkHttpClient client, String site,
+                                 String email, String password) throws IOException {
+            String soFkey = Jsoup.connect(site + "/users/login/")
+                    .userAgent(Client.USER_AGENT).get()
                     .select("input[name=fkey]").attr("value");
 
             RequestBody soLoginRequestBody = new FormEncodingBuilder()
@@ -201,10 +172,10 @@ public class LoginActivity extends AppCompatActivity {
                     .post(soLoginRequestBody)
                     .build();
             Response soLoginResponse = client.newCall(soLoginRequest).execute();
-            Log.e("so login", soLoginResponse.toString());
+            Log.i("site login", soLoginResponse.toString());
         }
 
-        private String getChatFkey(String site) throws IOException {
+        private String getChatFkey(OkHttpClient client, String site) throws IOException {
             Request chatPageRequest = new Request.Builder()
                     .url(site)
                     .build();
@@ -213,24 +184,23 @@ public class LoginActivity extends AppCompatActivity {
                     .select("input[name=fkey]").attr("value");
         }
 
-        private void newMessage(String site, int room, String fkey, String message) throws IOException {
-            RequestBody newMessageRequestBoySO = new FormEncodingBuilder()
+        private void newMessage(OkHttpClient client, String site, int room,
+                                String fkey, String message) throws IOException {
+            RequestBody newMessageRequestBody = new FormEncodingBuilder()
                     .add("text", message)
                     .add("fkey", fkey)
                     .build();
-            Request newMessageRequestSO = new Request.Builder()
+            Request newMessageRequest = new Request.Builder()
                     .url(site + "/chats/" + room + "/messages/new/")
-                    .post(newMessageRequestBoySO)
+                    .post(newMessageRequestBody)
                     .build();
-            Response newMessageResponseSO = client.newCall(newMessageRequestSO).execute();
-            Log.e("chat message", newMessageResponseSO.toString());
-            Log.e("chat message", newMessageResponseSO.body().string());
+            Response newMessageResponse = client.newCall(newMessageRequest).execute();
+            Log.v("new message", message);
         }
 
-        private void loginWithFkey(String fkeyUrl, String loginUrl,
-                                   FormEncodingBuilder data) throws IOException {
+        private void loginToSE(OkHttpClient client) throws IOException {
             Request loginPageRequest = new Request.Builder()
-                    .url(fkeyUrl)
+                    .url("http://stackexchange.com/users/login/")
                     .build();
             Response loginPageResponse = client.newCall(loginPageRequest).execute();
 
@@ -238,24 +208,27 @@ public class LoginActivity extends AppCompatActivity {
             Elements fkeyElements = doc.select("input[name=fkey]");
             String fkey = fkeyElements.attr("value");
 
-            if (fkey.equals("")) throw new IOException("Fatal: No fkey found at " + fkeyUrl);
+            if (fkey.equals("")) throw new IOException("Fatal: No fkey found.");
 
-            data.add("fkey", fkey);
+            FormEncodingBuilder data = new FormEncodingBuilder()
+                    .add("oauth_version", "")
+                    .add("oauth_server", "")
+                    .add("openid_identifier", "https://openid.stackexchange.com/")
+                    .add("fkey", fkey);
 
             Request loginRequest = new Request.Builder()
-                    .url(loginUrl)
+                    .url("https://stackexchange.com/users/authenticate/")
                     .post(data.build())
                     .build();
             Response loginResponse = client.newCall(loginRequest).execute();
-            Log.e("Login Response", loginResponse.toString());
+            Log.i("se login", loginResponse.toString());
         }
 
-        private void seOpenIdLogin(String email, String password) throws IOException {
+        private void seOpenIdLogin(OkHttpClient client, String email, String password) throws IOException {
             Request seLoginPageRequest = new Request.Builder()
                     .url("https://openid.stackexchange.com/account/login/")
                     .build();
             Response seLoginPageResponse = client.newCall(seLoginPageRequest).execute();
-            Log.e("se login page", seLoginPageResponse.toString());
 
             Document seLoginDoc = Jsoup.parse(seLoginPageResponse.body().string());
             Elements seLoginFkeyElements = seLoginDoc.select("input[name=fkey]");
@@ -271,7 +244,7 @@ public class LoginActivity extends AppCompatActivity {
                     .post(seLoginRequestBody)
                     .build();
             Response seLoginResponse = client.newCall(seLoginRequest).execute();
-            Log.e("se login", seLoginResponse.toString());
+            Log.i("se openid login", seLoginResponse.toString());
         }
 
         protected void onPostExecute(Boolean success) {
