@@ -16,7 +16,6 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         inst = this;
-        Log.d("ayyy", "inst");
     }
 
     public static SharedPreferences getPrefs() {
