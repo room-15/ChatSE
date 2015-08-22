@@ -160,87 +160,118 @@ public class LoginActivity extends AppCompatActivity {
             String password = params[1];
 
             try {
-//                for (HttpCookie cookie : cookieManager.getCookieStore().getCookies()) Log.e("tag", cookie.toString());
-//
-//                Request seLoginPageRequest = new Request.Builder()
-//                        .url("https://openid.stackexchange.com/account/login/")
-//                        .build();
-//                Response seLoginPageResponse = client.newCall(seLoginPageRequest).execute();
-//                String seFkey = getFkey(seLoginPageResponse);
-//                Log.e("se login page", seLoginPageResponse.toString());
-//
-//                for (HttpCookie cookie : cookieManager.getCookieStore().getCookies()) Log.e("se login page", cookie.toString());
-//
-//                RequestBody seLoginRequestBody = new FormEncodingBuilder()
-//                        .add("email", email)
-//                        .add("password", password)
-//                        .add("fkey", seFkey)
-//                        .build();
-//                Request seLoginRequest = new Request.Builder()
-//                        .url("https://openid.stackexchange.com/account/login/submit/")
-//                        .post(seLoginRequestBody)
-//                        .build();
-//                Response seLoginResponse = client.newCall(seLoginRequest).execute();
-//                Log.e("se login", seLoginResponse.toString());
-//                Log.e("se login", seLoginRequest.toString());
-//
-//                for (HttpCookie cookie : cookieManager.getCookieStore().getCookies()) Log.e("se login", cookie.toString());
+                seOpenIdLogin(email, password);
 
-                String soFkey = Jsoup.connect("http://stackoverflow.com/users/login/").userAgent(USER_AGENT).get()
-                        .select("input[name=fkey]").attr("value");
+                FormEncodingBuilder data = new FormEncodingBuilder()
+                        .add("oauth_version", "")
+                        .add("oauth_server", "")
+                        .add("openid_identifier", "https://openid.stackexchange.com/");
 
-//                Request soLoginPageRequest = new Request.Builder()
-//                        .url("http://stackoverflow.com/users/login/")
-//                        .build();
-//                Response soLoginPageResponse = client.newCall(soLoginPageRequest).execute();
-//                String soFkey = getFkey(soLoginPageResponse);
-//                Log.e("so login page", soLoginPageResponse.toString());
-//                for (HttpCookie cookie : cookieManager.getCookieStore().getCookies()) Log.e("so login page", cookie.toString());
+                loginWithFkey("http://stackexchange.com/users/login/",
+                        "https://stackexchange.com/users/authenticate/", data);
 
-                RequestBody soLoginRequestBody = new FormEncodingBuilder()
-                        .add("email", email)
-                        .add("password", password)
-                        .add("fkey", soFkey)
-                        .build();
-                Request soLoginRequest = new Request.Builder()
-                        .url("https://stackoverflow.com/users/login/")
-                        .post(soLoginRequestBody)
-                        .build();
-                Response soLoginResponse = client.newCall(soLoginRequest).execute();
-                Log.e("so login", soLoginResponse.toString());
-//                Log.e("so login text", soLoginResponse.body().string());
-                for (HttpCookie cookie : cookieManager.getCookieStore().getCookies()) Log.e("so login cookies: ", cookie.toString());
+                loginToSite("https://stackoverflow.com", email, password);
 
-                Request chatPageRequest = new Request.Builder()
-                        .url("http://chat.stackoverflow.com/")
-                        .build();
-                Response chatPageResponse = client.newCall(chatPageRequest).execute();
-                for (HttpCookie cookie : cookieManager.getCookieStore().getCookies()) Log.e("chat page", cookie.toString());
+                String soChatFkey = getChatFkey("http://chat.stackoverflow.com");
+                newMessage("http://chat.stackoverflow.com", 15, soChatFkey, "test message from android");
 
-                Document doc = Jsoup.parse(chatPageResponse.body().string());
-                Elements fkeyElements = doc.select("input[name=fkey]");
-                String chatFkey = fkeyElements.attr("value");
+                String chatFkey = getChatFkey("http://chat.stackexchange.com/");
+                newMessage("http://chat.stackexchange.com", 16, chatFkey, "test message from android");
 
-                Log.e("chat message chatfkey", chatFkey);
-
-                RequestBody newMessageRequestBoy = new FormEncodingBuilder()
-                        .add("text", "HELLO FROM ANDROID")
-                        .add("fkey", chatFkey)
-                        .build();
-                Request newMessageRequest = new Request.Builder()
-                        .url("http://chat.stackoverflow.com/chats/85048/messages/new/")
-                        .post(newMessageRequestBoy)
-                        .build();
-                Response newMessageResponse = client.newCall(newMessageRequest).execute();
-                Log.e("chat message", newMessageResponse.toString());
-                Log.e("chat message", newMessageResponse.body().string());
-
-                for (HttpCookie cookie : cookieManager.getCookieStore().getCookies()) Log.e("chat message cookie", cookie.toString());
+                for (HttpCookie cookie : cookieManager.getCookieStore().getCookies())
+                    Log.e("chat message cookie", cookie.toString());
                 return true;
             } catch (IOException e) {
                 Log.e(e.getClass().getSimpleName(), e.getMessage(), e);
                 return false;
             }
+        }
+
+        private void loginToSite(String site, String email, String password) throws IOException {
+            String soFkey = Jsoup.connect("http://stackoverflow.com" + "/users/login/").userAgent(USER_AGENT).get()
+                    .select("input[name=fkey]").attr("value");
+
+            RequestBody soLoginRequestBody = new FormEncodingBuilder()
+                    .add("email", email)
+                    .add("password", password)
+                    .add("fkey", soFkey)
+                    .build();
+            Request soLoginRequest = new Request.Builder()
+                    .url(site + "/users/login/")
+                    .post(soLoginRequestBody)
+                    .build();
+            Response soLoginResponse = client.newCall(soLoginRequest).execute();
+            Log.e("so login", soLoginResponse.toString());
+        }
+
+        private String getChatFkey(String site) throws IOException {
+            Request chatPageRequest = new Request.Builder()
+                    .url(site)
+                    .build();
+            Response chatPageResponse = client.newCall(chatPageRequest).execute();
+            return Jsoup.parse(chatPageResponse.body().string())
+                    .select("input[name=fkey]").attr("value");
+        }
+
+        private void newMessage(String site, int room, String fkey, String message) throws IOException {
+            RequestBody newMessageRequestBoySO = new FormEncodingBuilder()
+                    .add("text", message)
+                    .add("fkey", fkey)
+                    .build();
+            Request newMessageRequestSO = new Request.Builder()
+                    .url(site + "/chats/" + room + "/messages/new/")
+                    .post(newMessageRequestBoySO)
+                    .build();
+            Response newMessageResponseSO = client.newCall(newMessageRequestSO).execute();
+            Log.e("chat message", newMessageResponseSO.toString());
+            Log.e("chat message", newMessageResponseSO.body().string());
+        }
+
+        private void loginWithFkey(String fkeyUrl, String loginUrl,
+                                   FormEncodingBuilder data) throws IOException {
+            Request loginPageRequest = new Request.Builder()
+                    .url(fkeyUrl)
+                    .build();
+            Response loginPageResponse = client.newCall(loginPageRequest).execute();
+
+            Document doc = Jsoup.parse(loginPageResponse.body().string());
+            Elements fkeyElements = doc.select("input[name=fkey]");
+            String fkey = fkeyElements.attr("value");
+
+            if (fkey.equals("")) throw new IOException("Fatal: No fkey found at " + fkeyUrl);
+
+            data.add("fkey", fkey);
+
+            Request loginRequest = new Request.Builder()
+                    .url(loginUrl)
+                    .post(data.build())
+                    .build();
+            Response loginResponse = client.newCall(loginRequest).execute();
+            Log.e("Login Response", loginResponse.toString());
+        }
+
+        private void seOpenIdLogin(String email, String password) throws IOException {
+            Request seLoginPageRequest = new Request.Builder()
+                    .url("https://openid.stackexchange.com/account/login/")
+                    .build();
+            Response seLoginPageResponse = client.newCall(seLoginPageRequest).execute();
+            Log.e("se login page", seLoginPageResponse.toString());
+
+            Document seLoginDoc = Jsoup.parse(seLoginPageResponse.body().string());
+            Elements seLoginFkeyElements = seLoginDoc.select("input[name=fkey]");
+            String seFkey = seLoginFkeyElements.attr("value");
+
+            RequestBody seLoginRequestBody = new FormEncodingBuilder()
+                    .add("email", email)
+                    .add("password", password)
+                    .add("fkey", seFkey)
+                    .build();
+            Request seLoginRequest = new Request.Builder()
+                    .url("https://openid.stackexchange.com/account/login/submit/")
+                    .post(seLoginRequestBody)
+                    .build();
+            Response seLoginResponse = client.newCall(seLoginRequest).execute();
+            Log.e("se login", seLoginResponse.toString());
         }
 
         protected void onPostExecute(Boolean success) {
