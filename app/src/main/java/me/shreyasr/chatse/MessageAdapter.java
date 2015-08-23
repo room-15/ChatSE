@@ -1,5 +1,6 @@
 package me.shreyasr.chatse;
 
+import android.annotation.SuppressLint;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,7 +46,8 @@ public class MessageAdapter extends RecyclerView.Adapter {
         return new MessageViewHolder(view);
     }
 
-    SimpleDateFormat timestampFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm aa");
+    @SuppressLint("SimpleDateFormat")
+    SimpleDateFormat timestampFormat = new SimpleDateFormat("hh:mm aa");
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int pos) {

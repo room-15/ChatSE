@@ -33,5 +33,5 @@ dependencies {
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'com.android.support:recyclerview-v7:22.2.1'
     compile 'org.codehaus.jackson:jackson-mapper-asl:1.8.5'
-//    compile 'com.koushikdutta.async:androidasync:2.1.6'
+    compile 'org.unbescape:unbescape:1.1.1.RELEASE'
 }

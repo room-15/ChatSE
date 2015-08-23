@@ -2,6 +2,8 @@ package me.shreyasr.chatse.event.message;
 
 import android.support.annotation.NonNull;
 
+import org.unbescape.html.HtmlEscape;
+
 public class MessageEvent implements Comparable<MessageEvent> {
 
     public int event_type;
@@ -23,9 +25,10 @@ public class MessageEvent implements Comparable<MessageEvent> {
     public int message_owner_stars = 0;
     public int target_user_id = -1;
 
-//    MessageEvent(JSONObject json) {
-//
-//    }
+
+    public void setContent(String content) {
+        this.content = HtmlEscape.unescapeHtml(content);
+    }
 
     @Override public int compareTo(@NonNull MessageEvent other) {
         return -Long.valueOf(this.time_stamp).compareTo(other.time_stamp);
