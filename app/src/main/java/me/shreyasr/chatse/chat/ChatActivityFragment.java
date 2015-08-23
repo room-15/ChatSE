@@ -76,6 +76,7 @@ public class ChatActivityFragment extends Fragment {
         messageList.setLayoutManager(
                 new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, true));
         messageList.setAdapter(messageAdapter);
+        messageList.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.message_divider));
 
         input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override

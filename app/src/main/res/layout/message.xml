@@ -35,10 +35,4 @@
         android:layout_marginStart="16dp"
         android:textSize="16sp"
         tools:text="Message"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@id/message_content"
-        android:background="#E0E0E0"/>
 </RelativeLayout>
