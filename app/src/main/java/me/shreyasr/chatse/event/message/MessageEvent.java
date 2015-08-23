@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 public class MessageEvent implements Comparable<MessageEvent> {
 
     public int event_type;
-    public int time_stamp;
+    public long time_stamp;
     public int room_id;
     public int user_id;
     public String user_name;
@@ -28,6 +28,6 @@ public class MessageEvent implements Comparable<MessageEvent> {
 //    }
 
     @Override public int compareTo(@NonNull MessageEvent other) {
-        return -Integer.valueOf(this.time_stamp).compareTo(other.time_stamp);
+        return -Long.valueOf(this.time_stamp).compareTo(other.time_stamp);
     }
 }
