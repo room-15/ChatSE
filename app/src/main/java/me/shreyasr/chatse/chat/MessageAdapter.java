@@ -1,4 +1,4 @@
-package me.shreyasr.chatse;
+package me.shreyasr.chatse.chat;
 
 import android.annotation.SuppressLint;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +15,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import me.shreyasr.chatse.R;
 import me.shreyasr.chatse.event.message.MessageEvent;
 
 public class MessageAdapter extends RecyclerView.Adapter {

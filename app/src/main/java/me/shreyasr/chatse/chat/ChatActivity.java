@@ -1,9 +1,11 @@
-package me.shreyasr.chatse;
+package me.shreyasr.chatse.chat;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import me.shreyasr.chatse.R;
 
 public class ChatActivity extends AppCompatActivity {
 

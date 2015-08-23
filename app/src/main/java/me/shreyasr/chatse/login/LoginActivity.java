@@ -32,8 +32,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.shreyasr.chatse.App;
-import me.shreyasr.chatse.ChatActivity;
-import me.shreyasr.chatse.Client;
+import me.shreyasr.chatse.chat.ChatActivity;
+import me.shreyasr.chatse.network.Client;
 import me.shreyasr.chatse.R;
 
 public class LoginActivity extends AppCompatActivity {

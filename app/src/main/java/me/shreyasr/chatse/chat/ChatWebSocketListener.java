@@ -1,4 +1,4 @@
-package me.shreyasr.chatse;
+package me.shreyasr.chatse.chat;
 
 import android.util.Log;
 

@@ -1,4 +1,4 @@
-package me.shreyasr.chatse;
+package me.shreyasr.chatse.network;
 
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;

@@ -1,4 +1,4 @@
-package me.shreyasr.chatse;
+package me.shreyasr.chatse.chat;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,6 +36,8 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import me.shreyasr.chatse.network.Client;
+import me.shreyasr.chatse.R;
 import me.shreyasr.chatse.event.message.MessageEvent;
 import me.shreyasr.chatse.event.message.MessageEventGenerator;
 
