@@ -1,5 +1,6 @@
 package me.shreyasr.chatse.chat;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -17,7 +18,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
@@ -36,10 +36,12 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import me.shreyasr.chatse.network.Client;
+import me.shreyasr.chatse.App;
 import me.shreyasr.chatse.R;
 import me.shreyasr.chatse.event.message.MessageEvent;
 import me.shreyasr.chatse.event.message.MessageEventGenerator;
+import me.shreyasr.chatse.network.Client;
+import me.shreyasr.chatse.network.ClientManager;
 
 public class ChatActivityFragment extends Fragment {
 
@@ -49,18 +51,20 @@ public class ChatActivityFragment extends Fragment {
     private String chatFkey = null;
     private String site = "http://chat.stackexchange.com";
     private int roomNum = 1;
-    private OkHttpClient httpClient = Client.get();
+    private Client client = ClientManager.getClient();
 
     private Handler networkHandler;
     private Handler updateThread = new Handler();
     private MessageAdapter messageAdapter;
     private ObjectMapper mapper = new ObjectMapper();
     private MessageEventGenerator messageEventGenerator = new MessageEventGenerator();
+    private SharedPreferences prefs;
 
     private int firstMessageTime;
 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        prefs = App.getPrefs(getActivity());
         HandlerThread handlerThread = new HandlerThread("NetworkHandlerThread");
         handlerThread.start();
         networkHandler = new Handler(handlerThread.getLooper());
@@ -92,7 +96,8 @@ public class ChatActivityFragment extends Fragment {
         networkHandler.post(new Runnable() {
             @Override public void run() {
                 try {
-                    chatFkey = getChatFkey(httpClient, site);
+                    chatFkey = getChatFkey(client, site);
+                    prefs.edit().putBoolean(App.PREF_HAS_CREDS, true).apply();
                 } catch (IOException e) {
                     Log.e(e.getClass().getSimpleName(), e.getMessage(), e);
                 }
@@ -101,7 +106,7 @@ public class ChatActivityFragment extends Fragment {
         networkHandler.post(new Runnable() {
             @Override public void run() {
                 try {
-                    JsonNode messages = getMessagesObject(httpClient, site, roomNum, 100);
+                    JsonNode messages = getMessagesObject(client, site, roomNum, 100);
                     firstMessageTime = messages.get("time").getIntValue();
                     handleNewEvents(messages.get("events"));
                 } catch (IOException e) {
@@ -129,7 +134,7 @@ public class ChatActivityFragment extends Fragment {
                 .url("http://chat.stackexchange.com/ws-auth")
                 .post(wsUrlRequestBody)
                 .build();
-        Response wsUrlResponse = httpClient.newCall(wsUrlRequest).execute();
+        Response wsUrlResponse = client.newCall(wsUrlRequest).execute();
         JSONObject wsUrlJson = new JSONObject(wsUrlResponse.body().string());
         Log.e("websocket", "url: " + wsUrlJson.getString("url"));
         String wsUrl = wsUrlJson.getString("url");// + "?l=" + firstMessageTime;
@@ -140,7 +145,7 @@ public class ChatActivityFragment extends Fragment {
                 .addHeader("Origin", "http://stackexchange.com")
                 .url(wsUrl + "?l=" + firstMessageTime)
                 .build();
-        WebSocketCall wsCall = WebSocketCall.create(httpClient, wsRequest);
+        WebSocketCall wsCall = WebSocketCall.create(client.getHttpClient(), wsRequest);
         wsCall.enqueue(new ChatWebSocketListener(ChatActivityFragment.this, mapper, roomNum));
         Log.e("ws", "init");
     }
@@ -163,7 +168,7 @@ public class ChatActivityFragment extends Fragment {
         networkHandler.post(new Runnable() {
             @Override public void run() {
                 try {
-                    newMessage(httpClient, "http://chat.stackexchange.com", roomNum,
+                    newMessage(client, "http://chat.stackexchange.com", roomNum,
                             chatFkey, content);
                 } catch (IOException e) {
                     Log.e(e.getClass().getSimpleName(), e.getMessage(), e);
@@ -172,7 +177,7 @@ public class ChatActivityFragment extends Fragment {
         });
     }
 
-    private JsonNode getMessagesObject(OkHttpClient client,
+    private JsonNode getMessagesObject(Client client,
                                        String site, int room, int count) throws IOException {
         RequestBody newMessageRequestBody = new FormEncodingBuilder()
                 .add("since", String.valueOf(0))
@@ -188,7 +193,7 @@ public class ChatActivityFragment extends Fragment {
         return mapper.readTree(newMessageResponse.body().byteStream());
     }
 
-    private void newMessage(OkHttpClient client, String site, int room,
+    private void newMessage(Client client, String site, int room,
                             String fkey, String message) throws IOException {
         RequestBody newMessageRequestBody = new FormEncodingBuilder()
                 .add("text", message)
@@ -199,10 +204,11 @@ public class ChatActivityFragment extends Fragment {
                 .post(newMessageRequestBody)
                 .build();
         Response newMessageResponse = client.newCall(newMessageRequest).execute();
+        Log.e("newmssageresposne", newMessageResponse.body().string());
         Log.v("new message", message);
     }
 
-    private String getChatFkey(OkHttpClient client, String site) throws IOException {
+    private String getChatFkey(Client client, String site) throws IOException {
         Request chatPageRequest = new Request.Builder()
                 .url(site)
                 .build();

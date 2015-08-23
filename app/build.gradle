@@ -34,4 +34,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:22.2.1'
     compile 'org.codehaus.jackson:jackson-mapper-asl:1.8.5'
     compile 'org.unbescape:unbescape:1.1.1.RELEASE'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.9.5'
+    testCompile 'com.squareup.okhttp:mockwebserver:2.4.0'
 }

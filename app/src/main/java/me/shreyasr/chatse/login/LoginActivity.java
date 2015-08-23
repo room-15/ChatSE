@@ -1,6 +1,7 @@
 package me.shreyasr.chatse.login;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
@@ -32,9 +32,10 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.shreyasr.chatse.App;
+import me.shreyasr.chatse.R;
 import me.shreyasr.chatse.chat.ChatActivity;
 import me.shreyasr.chatse.network.Client;
-import me.shreyasr.chatse.R;
+import me.shreyasr.chatse.network.ClientManager;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -43,13 +44,24 @@ public class LoginActivity extends AppCompatActivity {
     @Bind(R.id.login_progress) ProgressBar progressBar;
     @Bind(R.id.login_submit) Button loginButton;
 
+    SharedPreferences prefs;
+
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        prefs = App.getPrefs(this);
+
+        if (prefs.getBoolean(App.PREF_HAS_CREDS, false)) {
+            this.startActivity(new Intent(LoginActivity.this, ChatActivity.class));
+            this.finish();
+            return;
+        }
+
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
-        emailView.setText(App.getPrefs().getString(App.PREF_EMAIL, ""));
-        passwordView.setText(App.getPrefs().getString("password", "")); // STOPSHIP
+        emailView.setText(prefs.getString(App.PREF_EMAIL, ""));
+        passwordView.setText(prefs.getString("password", "")); // STOPSHIP
         passwordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -103,8 +115,8 @@ public class LoginActivity extends AppCompatActivity {
             return emailView;
         }
 
-        App.getPrefs().edit().putString(App.PREF_EMAIL, email).apply();
-        App.getPrefs().edit().putString("password", password).apply(); // STOPSHIP
+        // STOPSHIP
+        prefs.edit().putString(App.PREF_EMAIL, email).putString("password", password).apply();
 
         return null;
     }
@@ -136,7 +148,7 @@ public class LoginActivity extends AppCompatActivity {
             String password = params[1];
 
             try {
-                OkHttpClient client = Client.get();
+                Client client = ClientManager.getClient();
 
                 seOpenIdLogin(client, email, password);
                 loginToSE(client);
@@ -148,7 +160,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
 
-        private void loginToSite(OkHttpClient client, String site,
+        private void loginToSite(Client client, String site,
                                  String email, String password) throws IOException {
             String soFkey = Jsoup.connect(site + "/users/login/")
                     .userAgent(Client.USER_AGENT).get()
@@ -167,7 +179,7 @@ public class LoginActivity extends AppCompatActivity {
             Log.i("site login", soLoginResponse.toString());
         }
 
-        private void loginToSE(OkHttpClient client) throws IOException {
+        private void loginToSE(Client client) throws IOException {
             Request loginPageRequest = new Request.Builder()
                     .url("http://stackexchange.com/users/login/")
                     .build();
@@ -193,7 +205,7 @@ public class LoginActivity extends AppCompatActivity {
             Log.i("se login", loginResponse.toString());
         }
 
-        private void seOpenIdLogin(OkHttpClient client, String email, String password) throws IOException {
+        private void seOpenIdLogin(Client client, String email, String password) throws IOException {
             Request seLoginPageRequest = new Request.Builder()
                     .url("https://openid.stackexchange.com/account/login/")
                     .build();

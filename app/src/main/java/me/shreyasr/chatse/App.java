@@ -1,12 +1,14 @@
 package me.shreyasr.chatse;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 public class App extends Application {
 
     public static final String PREF_EMAIL = "email";
+    public static final String PREF_HAS_CREDS = "creds";
 
     private static App inst;
     public static App get() { return inst; }
@@ -17,7 +19,11 @@ public class App extends Application {
         inst = this;
     }
 
-    public static SharedPreferences getPrefs() {
+    private static SharedPreferences getPrefs() {
         return PreferenceManager.getDefaultSharedPreferences(inst);
+    }
+
+    public static SharedPreferences getPrefs(Context context) {
+        return getPrefs();
     }
 }
