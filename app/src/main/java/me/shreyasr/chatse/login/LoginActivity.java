@@ -141,14 +141,6 @@ public class LoginActivity extends AppCompatActivity {
                 seOpenIdLogin(client, email, password);
                 loginToSE(client);
                 loginToSite(client, "https://stackoverflow.com", email, password);
-
-                String soChatFkey = getChatFkey(client, "http://chat.stackoverflow.com");
-                newMessage(client, "http://chat.stackoverflow.com", 85048,
-                        soChatFkey, "Final test before commit");
-
-                String chatFkey = getChatFkey(client, "http://chat.stackexchange.com/");
-                newMessage(client, "http://chat.stackexchange.com", 16,
-                        chatFkey, "Final test before commit");
                 return true;
             } catch (IOException e) {
                 Log.e(e.getClass().getSimpleName(), e.getMessage(), e);
@@ -173,29 +165,6 @@ public class LoginActivity extends AppCompatActivity {
                     .build();
             Response soLoginResponse = client.newCall(soLoginRequest).execute();
             Log.i("site login", soLoginResponse.toString());
-        }
-
-        private String getChatFkey(OkHttpClient client, String site) throws IOException {
-            Request chatPageRequest = new Request.Builder()
-                    .url(site)
-                    .build();
-            Response chatPageResponse = client.newCall(chatPageRequest).execute();
-            return Jsoup.parse(chatPageResponse.body().string())
-                    .select("input[name=fkey]").attr("value");
-        }
-
-        private void newMessage(OkHttpClient client, String site, int room,
-                                String fkey, String message) throws IOException {
-            RequestBody newMessageRequestBody = new FormEncodingBuilder()
-                    .add("text", message)
-                    .add("fkey", fkey)
-                    .build();
-            Request newMessageRequest = new Request.Builder()
-                    .url(site + "/chats/" + room + "/messages/new/")
-                    .post(newMessageRequestBody)
-                    .build();
-            Response newMessageResponse = client.newCall(newMessageRequest).execute();
-            Log.v("new message", message);
         }
 
         private void loginToSE(OkHttpClient client) throws IOException {
