@@ -8,10 +8,13 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.OkHttpClient;
@@ -43,7 +46,7 @@ public class ChatActivityFragment extends Fragment {
 
     private String chatFkey = null;
     private String site = "http://chat.stackexchange.com";
-    private int roomNum = 16;
+    private int roomNum = 1;
     private OkHttpClient httpClient = Client.get();
 
     private Handler networkHandler;
@@ -72,6 +75,17 @@ public class ChatActivityFragment extends Fragment {
                 new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, true));
         messageList.setAdapter(messageAdapter);
 
+        input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEND) {
+                    onSubmit();
+                    return true;
+                }
+                return false;
+            }
+        });
+
         networkHandler.post(new Runnable() {
             @Override public void run() {
                 try {
@@ -94,27 +108,8 @@ public class ChatActivityFragment extends Fragment {
         });
         networkHandler.post(new Runnable() {
             @Override public void run() {
-                RequestBody wsUrlRequestBody = new FormEncodingBuilder()
-                        .add("roomid", String.valueOf(roomNum))
-                        .add("fkey", chatFkey).build();
-                Request wsUrlRequest = new Request.Builder()
-                        .url("http://chat.stackexchange.com/ws-auth")
-                        .post(wsUrlRequestBody)
-                        .build();
                 try {
-                    Response wsUrlResponse = httpClient.newCall(wsUrlRequest).execute();
-                    JSONObject wsUrlJson = new JSONObject(wsUrlResponse.body().string());
-                    Log.e("websocket", "wsUrl: " + wsUrlJson.getString("url"));
-                    String wsUrl = wsUrlJson.getString("url");// + "?l=" + firstMessageTime;
-                    Request wsRequest = new Request.Builder()
-                            .addHeader("User-Agent", Client.USER_AGENT)
-                            .addHeader("Sec-WebSocket-Extensions", "permessage-deflate")
-                            .addHeader("Sec-WebSocket-Extensions", "client_max_window_bits")
-                            .url(wsUrl)
-                            .build();
-                    WebSocketCall wsCall = WebSocketCall.create(httpClient, wsRequest);
-                    wsCall.enqueue(new ChatWebSocketListener());
-                    Log.e("websocket", "Created Websocket");
+                    initWebsocket();
                 } catch (IOException | JSONException e) {
                     Log.e(e.getClass().getSimpleName(), e.getMessage(), e);
                 }
@@ -123,7 +118,31 @@ public class ChatActivityFragment extends Fragment {
         return view;
     }
 
-    private void handleNewEvents(JsonNode messages) {
+    private void initWebsocket() throws IOException, JSONException {
+        RequestBody wsUrlRequestBody = new FormEncodingBuilder()
+                .add("roomid", String.valueOf(roomNum))
+                .add("fkey", chatFkey).build();
+        Request wsUrlRequest = new Request.Builder()
+                .url("http://chat.stackexchange.com/ws-auth")
+                .post(wsUrlRequestBody)
+                .build();
+        Response wsUrlResponse = httpClient.newCall(wsUrlRequest).execute();
+        JSONObject wsUrlJson = new JSONObject(wsUrlResponse.body().string());
+        Log.e("websocket", "url: " + wsUrlJson.getString("url"));
+        String wsUrl = wsUrlJson.getString("url");// + "?l=" + firstMessageTime;
+        Request wsRequest = new Request.Builder()
+                .addHeader("User-Agent", Client.USER_AGENT)
+                .addHeader("Sec-WebSocket-Extensions", "permessage-deflate")
+                .addHeader("Sec-WebSocket-Extensions", "client_max_window_bits")
+                .addHeader("Origin", "http://stackexchange.com")
+                .url(wsUrl + "?l=" + firstMessageTime)
+                .build();
+        WebSocketCall wsCall = WebSocketCall.create(httpClient, wsRequest);
+        wsCall.enqueue(new ChatWebSocketListener(ChatActivityFragment.this, mapper, roomNum));
+        Log.e("ws", "init");
+    }
+
+    public void handleNewEvents(JsonNode messages) {
         final List<MessageEvent> events = new ArrayList<>();
         for (JsonNode message : messages) {
             events.add(messageEventGenerator.createMessageEvent(message));
@@ -141,7 +160,7 @@ public class ChatActivityFragment extends Fragment {
         networkHandler.post(new Runnable() {
             @Override public void run() {
                 try {
-                    newMessage(httpClient, "http://chat.stackexchange.com", 16,
+                    newMessage(httpClient, "http://chat.stackexchange.com", roomNum,
                             chatFkey, content);
                 } catch (IOException e) {
                     Log.e(e.getClass().getSimpleName(), e.getMessage(), e);

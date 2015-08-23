@@ -29,7 +29,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:inputType="text"
+            android:inputType="textCapSentences"
+            android:imeOptions="actionSend"
             android:hint="@string/chat_input_hint"/>
 
         <ImageButton
