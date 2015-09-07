@@ -44,11 +44,13 @@ import me.shreyasr.chatse.util.Logger;
 public class ChatFragment extends Fragment implements IncomingEventListener {
 
     private static final String EXTRA_ROOM = "room";
+    private static final String EXTRA_NAME = "name";
     private static final String EXTRA_FKEY = "fkey";
 
-    public static ChatFragment createInstance(ChatRoom room, String fkey) {
-        Bundle b = new Bundle(2);
+    public static ChatFragment createInstance(ChatRoom room, String name, String fkey) {
+        Bundle b = new Bundle(3);
         b.putParcelable(EXTRA_ROOM, room);
+        b.putString(EXTRA_NAME, name);
         b.putString(EXTRA_FKEY, fkey);
 
         ChatFragment fragment = new ChatFragment();
@@ -59,6 +61,7 @@ public class ChatFragment extends Fragment implements IncomingEventListener {
     @Bind(R.id.chat_input_text) EditText input;
     @Bind(R.id.chat_message_list) RecyclerView messageList;
 
+    private String roomName;
     private String chatFkey;
     private ChatRoom room;
 
@@ -187,6 +190,7 @@ public class ChatFragment extends Fragment implements IncomingEventListener {
     }
 
     public String getPageTitle() {
-        return room != null ? room.toString() : "null";
+        roomName = getArguments().getString(EXTRA_NAME);
+        return roomName;
     }
 }

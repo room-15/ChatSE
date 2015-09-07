@@ -15,6 +15,7 @@ import org.codehaus.jackson.JsonNode;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import java.util.Map;
 
 import me.shreyasr.chatse.chat.ChatRoom;
 import me.shreyasr.chatse.network.Client;
+import me.shreyasr.chatse.util.Logger;
 
 public class IncomingEventService extends Service
         implements ChatWebsocketListener.ServiceWebsocketListener {
@@ -80,17 +82,30 @@ public class IncomingEventService extends Service
     private enum WebsocketConnectionStatus { ESTABLISHED, CREATING, DISCONNECTED }
     private Map<String, WebsocketConnectionStatus> siteStatuses = new HashMap<>();
 
-    String joinRoom(Client client, ChatRoom room) throws IOException, JSONException {
+    RoomInfo loadRoom(Client client, ChatRoom room) throws IOException {
+        Request chatPageRequest = new Request.Builder()
+                .url(room.site + "/rooms/" + room.num)
+                .build();
+        Response chatPageResponse = client.newCall(chatPageRequest).execute();
+        Document chatPage = Jsoup.parse(chatPageResponse.body().string());
+
+        String fkey = chatPage.select("input[name=fkey]").attr("value");
+        String name = chatPage.select("span[id=roomname]").text();
+
+        Logger.message(this.getClass(), "Loaded room: " + name);
+
+        return new RoomInfo(name, fkey);
+    }
+
+    void joinRoom(Client client, ChatRoom room, String chatFkey) throws IOException, JSONException {
         if (!siteStatuses.containsKey(room.site)) {
             siteStatuses.put(room.site, WebsocketConnectionStatus.DISCONNECTED);
         }
-        String chatFkey = getChatFkey(client, room.site);
         String wsUrl = registerRoom(client, room, chatFkey);
         if (siteStatuses.get(room.site) != WebsocketConnectionStatus.ESTABLISHED) {
             siteStatuses.put(room.site, WebsocketConnectionStatus.CREATING);
             initWs(client, wsUrl, room.site);
         }
-        return chatFkey;
     }
 
     private String registerRoom(Client client, ChatRoom room, String chatFkey)
@@ -120,13 +135,15 @@ public class IncomingEventService extends Service
         wsCall.enqueue(new ChatWebsocketListener(site, this));
     }
 
-    private String getChatFkey(Client client, String site) throws IOException {
-        Request chatPageRequest = new Request.Builder()
-                .url(site)
-                .build();
-        Response chatPageResponse = client.newCall(chatPageRequest).execute();
-        return Jsoup.parse(chatPageResponse.body().string())
-                .select("input[name=fkey]").attr("value");
+    public class RoomInfo {
+
+        public final String name;
+        public final String fkey;
+
+        RoomInfo(String name, String fkey) {
+            this.name = name;
+            this.fkey = fkey;
+        }
     }
 }
 

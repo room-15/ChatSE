@@ -85,8 +85,9 @@ public class ChatActivity extends AppCompatActivity implements ServiceConnection
 
     private ChatFragment createChatFragment(ChatRoom room) throws IOException, JSONException {
         if (serviceBinder != null) {
-            String fkey = serviceBinder.joinRoom(room);
-            ChatFragment chatFragment = ChatFragment.createInstance(room, fkey);
+            IncomingEventService.RoomInfo roomInfo = serviceBinder.loadRoom(room);
+            serviceBinder.joinRoom(room, roomInfo.fkey);
+            ChatFragment chatFragment = ChatFragment.createInstance(room, roomInfo.name, roomInfo.fkey);
             serviceBinder.registerListener(room, chatFragment);
 
             return chatFragment;

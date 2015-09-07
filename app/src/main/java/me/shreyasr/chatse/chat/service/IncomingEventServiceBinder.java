@@ -25,14 +25,24 @@ public class IncomingEventServiceBinder extends Binder {
     }
 
     /**
+     * Load a specified room, getting the name of the room and the fkey.
+     *
+     * @param room The room to load
+     * @return A RoomInfo object, containing the room name and the fkey
+     * @throws IOException If the page fails to load.
+     */
+    public IncomingEventService.RoomInfo loadRoom(ChatRoom room) throws IOException {
+        return service.loadRoom(ClientManager.getClient(), room);
+    }
+
+    /**
      * Joins a specified chat room.
      *
      * @param room The chat room to join
-     * @return The fkey for that chat room
-     * @throws IOException If the page fails to load or the websocket request fails to send
+     * @throws IOException If the registration request or the websocket creation fails
      * @throws JSONException If the registration requests fails to parse the websocket url
      */
-    public String joinRoom(ChatRoom room) throws IOException, JSONException {
-        return service.joinRoom(ClientManager.getClient(), room);
+    public void joinRoom(ChatRoom room, String chatFkey) throws IOException, JSONException {
+        service.joinRoom(ClientManager.getClient(), room, chatFkey);
     }
 }
