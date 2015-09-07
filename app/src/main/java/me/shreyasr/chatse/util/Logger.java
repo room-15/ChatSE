@@ -24,7 +24,11 @@ public class Logger {
      * @param source The class the message came from.
      * @param message The content of the message.
      */
-    public static void message(Class source, String message) {
+    public static void message(Class<?> source, String message) {
         Log.d(source.getSimpleName(), message);
+    }
+
+    public static void event(Class<?> source, String message) {
+        Log.i(source.getSimpleName(), message);
     }
 }

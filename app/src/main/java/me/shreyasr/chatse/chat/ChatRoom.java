@@ -21,6 +21,10 @@ public class ChatRoom implements Parcelable {
         num = in.readInt();
     }
 
+    @Override public String toString() {
+        return "Room " + num;
+    }
+
     @Override
     public int describeContents() {
         return 0;

@@ -11,54 +11,56 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 
+import me.shreyasr.chatse.util.Logger;
 import okio.Buffer;
 import okio.BufferedSource;
 
 public class ChatWebSocketListener implements WebSocketListener {
 
-    private ServiceWebsocketListener listener;
     private final ObjectMapper mapper = new ObjectMapper();
+    private final ServiceWebsocketListener listener;
+    private final String site;
 
-    public ChatWebSocketListener(ServiceWebsocketListener listener) {
+    public ChatWebSocketListener(String site, ServiceWebsocketListener listener) {
         this.listener = listener;
+        this.site = site;
     }
 
     @Override public void onOpen(WebSocket webSocket, Response response) {
-        Log.e("ws", "ws open");
-        listener.onConnect(true);
+        Logger.event(this.getClass(), "websocket open: " + site);
+        listener.onConnect(site, true);
     }
 
     @Override public void onFailure(IOException e, Response response) {
-        Log.e("ws", "ws fail");
-        listener.onConnect(false);
+        Logger.event(this.getClass(), "websocket fail: " + site);
+        listener.onConnect(site, false);
         Log.e(e.getClass().getSimpleName(), e.getMessage(), e);
     }
 
     @Override public void onMessage(BufferedSource payload,
                                     WebSocket.PayloadType type) throws IOException {
-        Log.e("ws", "ws message");
         String message = payload.readUtf8();
         payload.close();
-        Log.e("ws", "recv: " + message);
+        Logger.event(this.getClass(), "websocket message: " + site + ": " + message);
         try {
             JsonNode root = mapper.readTree(message);
-            listener.onNewEvents(root);
+            listener.onNewEvents(site, root);
         } catch (IOException e) {
             Log.e(e.getClass().getSimpleName(), e.getMessage(), e);
         }
     }
 
     @Override public void onPong(Buffer payload) {
-        Log.e("ws", "ws pong");
+        Logger.event(this.getClass(), "websocket pong: " + site);
     }
 
     @Override public void onClose(int code, String reason) {
-        Log.e("ws", "ws close");
+        Logger.event(this.getClass(), "websocket close: " + site + ": " + code + ", " + reason);
     }
 
     interface ServiceWebsocketListener {
 
-        void onNewEvents(JsonNode root);
-        void onConnect(boolean success);
+        void onNewEvents(String site, JsonNode root);
+        void onConnect(String site, boolean success);
     }
 }

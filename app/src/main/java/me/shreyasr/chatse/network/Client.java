@@ -21,6 +21,7 @@ public class Client {
             + "Chrome/44.0.2403.155 Safari/537.36";
 
     public static final String SITE_STACK_EXCHANGE = "http://chat.stackexchange.com";
+    public static final String SITE_STACK_OVERFLOW = "http://chat.stackoverflow.com";
 
 //    private static final Client instance = new Client(new OkHttpClient(),
 //            new PersistentCookieStore(App.get()));

@@ -40,18 +40,19 @@ import me.shreyasr.chatse.event.message.MessageEvent;
 import me.shreyasr.chatse.event.message.MessageEventGenerator;
 import me.shreyasr.chatse.network.Client;
 import me.shreyasr.chatse.network.ClientManager;
+import me.shreyasr.chatse.util.Logger;
 
-public class ChatActivityFragment extends Fragment implements IncomingEventListener {
+public class ChatFragment extends Fragment implements IncomingEventListener {
 
     private static final String EXTRA_ROOM = "room";
     private static final String EXTRA_FKEY = "fkey";
 
-    public static ChatActivityFragment createInstance(ChatRoom room, String fkey) {
+    public static ChatFragment createInstance(ChatRoom room, String fkey) {
         Bundle b = new Bundle(2);
         b.putParcelable(EXTRA_ROOM, room);
         b.putString(EXTRA_FKEY, fkey);
 
-        ChatActivityFragment fragment = new ChatActivityFragment();
+        ChatFragment fragment = new ChatFragment();
         fragment.setArguments(b);
         return fragment;
     }
@@ -65,7 +66,7 @@ public class ChatActivityFragment extends Fragment implements IncomingEventListe
     private Client client = ClientManager.getClient();
 
     private Handler networkHandler;
-    private Handler updateThread = new Handler(Looper.getMainLooper());
+    private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
     private MessageAdapter messageAdapter;
     private ObjectMapper mapper = new ObjectMapper();
     private MessageEventGenerator messageEventGenerator = new MessageEventGenerator();
@@ -131,7 +132,7 @@ public class ChatActivityFragment extends Fragment implements IncomingEventListe
                 events.add(newMessageEvent);
             }
         }
-        updateThread.post(new Runnable() {
+        uiThreadHandler.post(new Runnable() {
             @Override public void run() {
                 messageAdapter.addMessages(events);
             }
@@ -153,18 +154,18 @@ public class ChatActivityFragment extends Fragment implements IncomingEventListe
     }
 
     private JsonNode getMessagesObject(Client client, ChatRoom room, int count) throws IOException {
-        RequestBody newMessageRequestBody = new FormEncodingBuilder()
+        RequestBody getMessagesRequestBody = new FormEncodingBuilder()
                 .add("since", String.valueOf(0))
                 .add("mode", "Messages")
                 .add("msgCount", String.valueOf(count))
                 .add("fkey", chatFkey)
                 .build();
-        Request newMessageRequest = new Request.Builder()
+        Request getMessagesRequest = new Request.Builder()
                 .url(room.site + "/chats/" + room.num + "/events")
-                .post(newMessageRequestBody)
+                .post(getMessagesRequestBody)
                 .build();
-        Response newMessageResponse = client.newCall(newMessageRequest).execute();
-        return mapper.readTree(newMessageResponse.body().byteStream());
+        Response getMessagesResponse = client.newCall(getMessagesRequest).execute();
+        return mapper.readTree(getMessagesResponse.body().byteStream());
     }
 
     private void newMessage(Client client, ChatRoom room,
@@ -178,7 +179,10 @@ public class ChatActivityFragment extends Fragment implements IncomingEventListe
                 .post(newMessageRequestBody)
                 .build();
         Response newMessageResponse = client.newCall(newMessageRequest).execute();
-        Log.e("newmssageresposne", newMessageResponse.body().string());
-        Log.v("new message", message);
+        Logger.event(this.getClass(), "New message");
+    }
+
+    public String getPageTitle() {
+        return room != null ? room.toString() : "null";
     }
 }

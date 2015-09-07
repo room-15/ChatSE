@@ -18,10 +18,13 @@ import org.jsoup.Jsoup;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import me.shreyasr.chatse.chat.ChatRoom;
 import me.shreyasr.chatse.network.Client;
+import me.shreyasr.chatse.util.Logger;
 
 public class IncomingEventService extends Service
         implements ChatWebSocketListener.ServiceWebsocketListener {
@@ -57,8 +60,9 @@ public class IncomingEventService extends Service
         }
     }
 
-    @Override public void onNewEvents(JsonNode message) {
+    @Override public void onNewEvents(String site, JsonNode message) {
         for (MessageListenerHolder holder : listeners) {
+            if (!holder.room.site.equals(site)) continue;
             if (!message.has("r" + holder.room.num)) {
                 Log.e("No room element", message.toString());
                 return;
@@ -70,19 +74,21 @@ public class IncomingEventService extends Service
         }
     }
 
-    @Override public void onConnect(boolean success) {
-        hasWsConn = true;
-        creatingWsConn = false;
+    @Override public void onConnect(String site, boolean success) {
+        siteStatuses.put(site, WebsocketConnectionStatus.ESTABLISHED);
     }
 
-    private volatile boolean hasWsConn = false;
-    private volatile boolean creatingWsConn = false;
+    private enum WebsocketConnectionStatus { ESTABLISHED, CREATING, DISCONNECTED }
+    private Map<String, WebsocketConnectionStatus> siteStatuses = new HashMap<>();
 
     String joinRoom(Client client, ChatRoom room) throws IOException, JSONException {
+        if (!siteStatuses.containsKey(room.site)) {
+            siteStatuses.put(room.site, WebsocketConnectionStatus.DISCONNECTED);
+        }
         String chatFkey = getChatFkey(client, room.site);
         String wsUrl = registerRoom(client, room, chatFkey);
-        if (!hasWsConn && !creatingWsConn) {
-            creatingWsConn = true;
+        if (siteStatuses.get(room.site) != WebsocketConnectionStatus.ESTABLISHED) {
+            siteStatuses.put(room.site, WebsocketConnectionStatus.CREATING);
             initWs(client, wsUrl, room.site);
         }
         return chatFkey;
@@ -112,8 +118,7 @@ public class IncomingEventService extends Service
                 .url(wsUrl + "?l=0")// + "?l=" + firstMessageTime;
                 .build();
         WebSocketCall wsCall = WebSocketCall.create(client.getHttpClient(), wsRequest);
-        wsCall.enqueue(new ChatWebSocketListener(this));
-        Log.e("ws", "init");
+        wsCall.enqueue(new ChatWebSocketListener(site, this));
     }
 
     private String getChatFkey(Client client, String site) throws IOException {

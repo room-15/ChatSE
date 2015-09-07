@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,42 +24,74 @@ import me.shreyasr.chatse.chat.service.IncomingEventServiceBinder;
 import me.shreyasr.chatse.network.Client;
 import me.shreyasr.chatse.util.Logger;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity implements ServiceConnection {
 
     private IncomingEventServiceBinder serviceBinder;
-    private Handler networkHandler;
 
+    private Handler networkHandler;
+    private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
+    ChatFragmentPagerAdapter pagerAdapter;
+    ViewPager viewPager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_chat);
 
         Intent serviceIntent = new Intent(this, IncomingEventService.class);
-        this.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+        this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
 
         HandlerThread handlerThread = new HandlerThread("ChatActivityNetworkHandlerThread");
         handlerThread.start();
         networkHandler = new Handler(handlerThread.getLooper());
 
-        if(savedInstanceState == null) {
-//            try {
-//                createChatFragment(new ChatRoom(Client.SITE_STACK_EXCHANGE, 16));
-//            } catch (IOException | JSONException e) {
-//                Logger.exception(this.getClass(), "Failed to create chat fragment", e);
-//            }
-        }
+        viewPager = (ViewPager) this.findViewById(R.id.pager);
+        pagerAdapter = new ChatFragmentPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(pagerAdapter);
+//        viewPager.setOffscreenPageLimit(7);
+//        viewPager.setCurrentItem();
     }
 
-    private void createChatFragment(ChatRoom room) throws IOException, JSONException {
+    @Override public void onServiceConnected(ComponentName name, IBinder binder) {
+        Logger.message(this.getClass(), "Service connect");
+        serviceBinder = (IncomingEventServiceBinder) binder;
+
+        loadChatFragment(new ChatRoom(Client.SITE_STACK_EXCHANGE, 1));
+        loadChatFragment(new ChatRoom(Client.SITE_STACK_OVERFLOW, 15));
+    }
+
+    @Override public void onServiceDisconnected(ComponentName name) {
+        Logger.message(this.getClass(), "Service disconnect");
+    }
+
+    private void loadChatFragment(final ChatRoom room) {
+        networkHandler.post(new Runnable() {
+            @Override public void run() {
+                try {
+                    addChatFragment(createChatFragment(room));
+                } catch (IOException | JSONException e) {
+                    Logger.exception(this.getClass(), "Failed to create chat fragment", e);
+                }
+            }
+        });
+    }
+
+    private void addChatFragment(final ChatFragment fragment) {
+        uiThreadHandler.post(new Runnable() {
+            @Override public void run() {
+                pagerAdapter.addFragment(fragment);
+            }
+        });
+    }
+
+    private ChatFragment createChatFragment(ChatRoom room) throws IOException, JSONException {
         if (serviceBinder != null) {
             String fkey = serviceBinder.joinRoom(room);
-            ChatActivityFragment chatFragment = ChatActivityFragment.createInstance(room, fkey);
+            ChatFragment chatFragment = ChatFragment.createInstance(room, fkey);
             serviceBinder.registerListener(room, chatFragment);
 
-            getSupportFragmentManager().beginTransaction()
-                    .add(android.R.id.content, chatFragment)
-                    .commit();
+            return chatFragment;
         } else {
-            Logger.exception(this.getClass(), "Null serviceBinder", null);
+            throw new IOException("null serviceBinder");
         }
     }
 
@@ -78,24 +112,4 @@ public class ChatActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-    private ServiceConnection serviceConnection = new ServiceConnection() {
-        @Override public void onServiceConnected(ComponentName name, IBinder binder) {
-            serviceBinder = (IncomingEventServiceBinder) binder;
-            Logger.message(this.getClass(), "Service connect");
-            networkHandler.post(new Runnable() {
-                @Override public void run() {
-                    try {
-                        createChatFragment(new ChatRoom(Client.SITE_STACK_EXCHANGE, 1));
-                    } catch (IOException | JSONException e) {
-                        Logger.exception(this.getClass(), "Failed to create chat fragment", e);
-                    }
-                }
-            });
-        }
-
-        @Override public void onServiceDisconnected(ComponentName name) {
-            Logger.message(this.getClass(), "Service disconnect");
-        }
-    };
 }
