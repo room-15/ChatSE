@@ -1,4 +1,4 @@
-package me.shreyasr.chatse.event.message;
+package me.shreyasr.chatse.event;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -7,13 +7,13 @@ import java.io.IOException;
 
 import me.shreyasr.chatse.util.Logger;
 
-public class MessageEventGenerator {
+public class ChatEventGenerator {
 
-    ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper = new ObjectMapper();
 
-    public MessageEvent createMessageEvent(JsonNode json) {
+    public ChatEvent createEvent(JsonNode json) {
         try {
-            return mapper.readValue(json, MessageEvent.class);
+            return mapper.readValue(json, ChatEvent.class);
         } catch (IOException e) {
             Logger.exception(this.getClass(), "Failed to map json", e);
         }

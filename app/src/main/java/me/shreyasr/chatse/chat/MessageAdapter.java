@@ -9,16 +9,22 @@ import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import me.shreyasr.chatse.R;
-import me.shreyasr.chatse.event.message.MessageEvent;
+import me.shreyasr.chatse.event.EventList;
+import me.shreyasr.chatse.event.presenter.message.MessageEvent;
 
 public class MessageAdapter extends RecyclerView.Adapter {
+
+    private EventList events;
+
+    public MessageAdapter(EventList events) {
+        this.events = events;
+    }
 
     class MessageViewHolder extends RecyclerView.ViewHolder {
 
@@ -34,9 +40,8 @@ public class MessageAdapter extends RecyclerView.Adapter {
 
     List<MessageEvent> messages = new ArrayList<>();
 
-    public void addMessages(List<MessageEvent> messageEvents) {
-        messages.addAll(messageEvents);
-        Collections.sort(messages);
+    public void update() {
+        messages = events.messagePresenter.getEvents();
         notifyDataSetChanged();
     }
 
@@ -56,8 +61,8 @@ public class MessageAdapter extends RecyclerView.Adapter {
         MessageViewHolder root = (MessageViewHolder) viewHolder;
 
         root.messageView.setText(message.content);
-        root.userNameView.setText(message.user_name);
-        root.messageTimestamp.setText(timestampFormat.format(new Date(message.time_stamp*1000)));
+        root.userNameView.setText(message.userName);
+        root.messageTimestamp.setText(timestampFormat.format(new Date(message.timestamp*1000)));
     }
 
     @Override

@@ -1,10 +1,8 @@
-package me.shreyasr.chatse.event.message;
-
-import android.support.annotation.NonNull;
+package me.shreyasr.chatse.event;
 
 import org.unbescape.html.HtmlEscape;
 
-public class MessageEvent implements Comparable<MessageEvent> {
+public class ChatEvent {
 
     public static final int EVENT_TYPE_MESSAGE = 1;
     public static final int EVENT_TYPE_EDIT = 2;
@@ -36,9 +34,5 @@ public class MessageEvent implements Comparable<MessageEvent> {
 
     public void setContent(String content) {
         this.content = HtmlEscape.unescapeHtml(content);
-    }
-
-    @Override public int compareTo(@NonNull MessageEvent other) {
-        return -Long.valueOf(this.time_stamp).compareTo(other.time_stamp);
     }
 }
