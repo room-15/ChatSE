@@ -1,11 +1,11 @@
 package me.shreyasr.chatse.event.message;
 
-import android.util.Log;
-
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
+
+import me.shreyasr.chatse.util.Logger;
 
 public class MessageEventGenerator {
 
@@ -15,7 +15,7 @@ public class MessageEventGenerator {
         try {
             return mapper.readValue(json, MessageEvent.class);
         } catch (IOException e) {
-            Log.e(MessageEventGenerator.class.getSimpleName(), e.getMessage(), e);
+            Logger.exception(this.getClass(), "Failed to map json", e);
         }
         return null;
     }

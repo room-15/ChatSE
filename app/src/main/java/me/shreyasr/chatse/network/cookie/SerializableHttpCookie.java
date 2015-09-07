@@ -30,7 +30,7 @@
 
 // STOPSHIP: Credit properly
 
-package me.shreyasr.chatse.network;
+package me.shreyasr.chatse.network.cookie;
 
 
 import android.util.Log;

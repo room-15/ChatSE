@@ -24,10 +24,9 @@ import java.util.Map;
 
 import me.shreyasr.chatse.chat.ChatRoom;
 import me.shreyasr.chatse.network.Client;
-import me.shreyasr.chatse.util.Logger;
 
 public class IncomingEventService extends Service
-        implements ChatWebSocketListener.ServiceWebsocketListener {
+        implements ChatWebsocketListener.ServiceWebsocketListener {
 
     private static final String TAG = IncomingEventService.class.getSimpleName();
     private List<MessageListenerHolder> listeners = new ArrayList<>();
@@ -118,7 +117,7 @@ public class IncomingEventService extends Service
                 .url(wsUrl + "?l=0")// + "?l=" + firstMessageTime;
                 .build();
         WebSocketCall wsCall = WebSocketCall.create(client.getHttpClient(), wsRequest);
-        wsCall.enqueue(new ChatWebSocketListener(site, this));
+        wsCall.enqueue(new ChatWebsocketListener(site, this));
     }
 
     private String getChatFkey(Client client, String site) throws IOException {

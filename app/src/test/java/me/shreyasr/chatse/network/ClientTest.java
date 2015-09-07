@@ -13,6 +13,7 @@ import junit.framework.TestCase;
 import java.net.CookieStore;
 
 import me.shreyasr.chatse.TestUtils;
+import me.shreyasr.chatse.network.cookie.PersistentCookieStore;
 
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyString;

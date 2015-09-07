@@ -24,7 +24,7 @@
 
 // STOPSHIP: Credit properly
 
-package me.shreyasr.chatse.network;
+package me.shreyasr.chatse.network.cookie;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -174,8 +174,7 @@ public class PersistentCookieStore implements CookieStore {
         // Check it there are expired cookies and remove them
         if (targetCookies != null) {
             List<HttpCookie> cookiesToRemoveFromPersistence = new ArrayList<HttpCookie>();
-            for (Iterator<HttpCookie> it = targetCookies.iterator(); it
-                    .hasNext(); ) {
+            for (Iterator<HttpCookie> it = targetCookies.iterator(); it.hasNext(); ) {
                 HttpCookie currentCookie = it.next();
                 if (currentCookie.hasExpired()) {
                     cookiesToRemoveFromPersistence.add(currentCookie);

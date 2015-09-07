@@ -6,6 +6,13 @@ import org.unbescape.html.HtmlEscape;
 
 public class MessageEvent implements Comparable<MessageEvent> {
 
+    public static final int EVENT_TYPE_MESSAGE = 1;
+    public static final int EVENT_TYPE_EDIT = 2;
+    public static final int EVENT_TYPE_JOIN = 3;
+    public static final int EVENT_TYPE_STAR = 6;
+    public static final int EVENT_TYPE_MENTION = 8;
+    public static final int EVENT_TYPE_DELETE = 10;
+
     public int event_type;
     public long time_stamp;
     public int room_id;

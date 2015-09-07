@@ -72,8 +72,6 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-        attemptLogin();
     }
 
     @OnClick(R.id.login_submit) void attemptLogin() {
