@@ -4,7 +4,7 @@
 
     <stroke
         android:width="1px"
-        android:color="@color/message_divider"/>
+        android:color="@color/divider"/>
     <size
         android:height="3px" />
 </shape>

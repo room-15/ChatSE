@@ -97,7 +97,7 @@ public class ChatFragment extends Fragment implements IncomingEventListener {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
         ButterKnife.bind(this, view);
 
-        messageAdapter = new MessageAdapter(events);
+        messageAdapter = new MessageAdapter(events, getActivity().getResources());
         messageList.setLayoutManager(
                 new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, true));
         messageList.setAdapter(messageAdapter);
@@ -117,13 +117,15 @@ public class ChatFragment extends Fragment implements IncomingEventListener {
         networkHandler.post(new Runnable() {
             @Override public void run() {
                 try {
-                    JsonNode messages = getMessagesObject(client, room, 3);
+                    JsonNode messages = getMessagesObject(client, room, 50);
                     handleNewEvents(messages.get("events"));
                 } catch (IOException e) {
                     Log.e(e.getClass().getSimpleName(), e.getMessage(), e);
                 }
             }
         });
+
+        input.requestFocus();
         return view;
     }
 

@@ -24,7 +24,16 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:textSize="12sp"
-        tools:text="12/05/1999 6:23 AM"/>
+        tools:text="6:23 AM"/>
+
+    <ImageView
+        android:id="@+id/message_edit_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/message_user_name"
+        android:alpha="0.2"
+        android:visibility="invisible"
+        android:src="@drawable/ic_edit_black_18dp"/>
 
     <TextView
         android:id="@+id/message_content"

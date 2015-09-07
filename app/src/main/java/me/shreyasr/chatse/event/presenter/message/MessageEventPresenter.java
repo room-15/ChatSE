@@ -26,7 +26,7 @@ public class MessageEventPresenter implements EventPresenter<MessageEvent> {
                     Logger.exception(this.getClass(), "Attempting to edit nonexistent message", null);
                     return;
                 }
-                newMessage.last = originalMessage;
+                newMessage.previous = originalMessage;
                 messages.remove(originalMessage);
                 messages.add(newMessage);
                 break;

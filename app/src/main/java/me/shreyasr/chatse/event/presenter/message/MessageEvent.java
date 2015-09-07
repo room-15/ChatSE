@@ -1,13 +1,15 @@
 package me.shreyasr.chatse.event.presenter.message;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import me.shreyasr.chatse.event.ChatEvent;
 
 public class MessageEvent implements Comparable<MessageEvent> {
 
-    MessageEvent last;
+    MessageEvent previous;
+
+    public boolean isDeleted() { return content == null; }
+    public boolean isEdited() { return (previous != null || editCount != 0) && !isDeleted(); }
 
     public final String content;
     public final long timestamp;
@@ -18,6 +20,7 @@ public class MessageEvent implements Comparable<MessageEvent> {
     public final String roomName;
     public final int messageId;
     public final long parentId;
+    public final int editCount;
 
     public MessageEvent(ChatEvent baseEvent) {
         this.content = baseEvent.content;
@@ -29,6 +32,7 @@ public class MessageEvent implements Comparable<MessageEvent> {
         this.roomName = baseEvent.room_name;
         this.messageId = baseEvent.message_id;
         this.parentId = baseEvent.parent_id;
+        this.editCount = baseEvent.message_edits;
     }
 
     @Override public boolean equals(Object o) {
