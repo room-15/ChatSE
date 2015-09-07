@@ -25,6 +25,7 @@ public class MessageEvent implements Comparable<MessageEvent> {
     public int message_owner_stars = 0;
     public int target_user_id = -1;
 
+    public boolean message_starred = false;
 
     public void setContent(String content) {
         this.content = HtmlEscape.unescapeHtml(content);

@@ -10,6 +10,10 @@ public class App extends Application {
     public static final String PREF_EMAIL = "email";
     public static final String PREF_HAS_CREDS = "creds";
 
+    public static final String EXTRA_ROOM_NUM = "room";
+    public static final String EXTRA_SITE = "site";
+    public static final String EXTRA_FKEY = "fkey";
+
     private static App inst;
     public static App get() { return inst; }
 

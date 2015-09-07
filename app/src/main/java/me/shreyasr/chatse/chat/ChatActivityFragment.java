@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,13 +22,9 @@ import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ws.WebSocketCall;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,23 +35,37 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.shreyasr.chatse.App;
 import me.shreyasr.chatse.R;
+import me.shreyasr.chatse.chat.service.IncomingEventListener;
 import me.shreyasr.chatse.event.message.MessageEvent;
 import me.shreyasr.chatse.event.message.MessageEventGenerator;
 import me.shreyasr.chatse.network.Client;
 import me.shreyasr.chatse.network.ClientManager;
 
-public class ChatActivityFragment extends Fragment {
+public class ChatActivityFragment extends Fragment implements IncomingEventListener {
+
+    private static final String EXTRA_ROOM = "room";
+    private static final String EXTRA_FKEY = "fkey";
+
+    public static ChatActivityFragment createInstance(ChatRoom room, String fkey) {
+        Bundle b = new Bundle(2);
+        b.putParcelable(EXTRA_ROOM, room);
+        b.putString(EXTRA_FKEY, fkey);
+
+        ChatActivityFragment fragment = new ChatActivityFragment();
+        fragment.setArguments(b);
+        return fragment;
+    }
 
     @Bind(R.id.chat_input_text) EditText input;
     @Bind(R.id.chat_message_list) RecyclerView messageList;
 
-    private String chatFkey = null;
-    private String site = "http://chat.stackexchange.com";
-    private int roomNum = 1;
+    private String chatFkey;
+    private ChatRoom room;
+
     private Client client = ClientManager.getClient();
 
     private Handler networkHandler;
-    private Handler updateThread = new Handler();
+    private Handler updateThread = new Handler(Looper.getMainLooper());
     private MessageAdapter messageAdapter;
     private ObjectMapper mapper = new ObjectMapper();
     private MessageEventGenerator messageEventGenerator = new MessageEventGenerator();
@@ -64,7 +75,12 @@ public class ChatActivityFragment extends Fragment {
 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        chatFkey = args.getString(EXTRA_FKEY);
+        room = args.getParcelable(EXTRA_ROOM);
+
         prefs = App.getPrefs(getActivity());
+
         HandlerThread handlerThread = new HandlerThread("NetworkHandlerThread");
         handlerThread.start();
         networkHandler = new Handler(handlerThread.getLooper());
@@ -96,17 +112,7 @@ public class ChatActivityFragment extends Fragment {
         networkHandler.post(new Runnable() {
             @Override public void run() {
                 try {
-                    chatFkey = getChatFkey(client, site);
-                    prefs.edit().putBoolean(App.PREF_HAS_CREDS, true).apply();
-                } catch (IOException e) {
-                    Log.e(e.getClass().getSimpleName(), e.getMessage(), e);
-                }
-            }
-        });
-        networkHandler.post(new Runnable() {
-            @Override public void run() {
-                try {
-                    JsonNode messages = getMessagesObject(client, site, roomNum, 100);
+                    JsonNode messages = getMessagesObject(client, room, 100);
                     firstMessageTime = messages.get("time").getIntValue();
                     handleNewEvents(messages.get("events"));
                 } catch (IOException e) {
@@ -114,46 +120,16 @@ public class ChatActivityFragment extends Fragment {
                 }
             }
         });
-        networkHandler.post(new Runnable() {
-            @Override public void run() {
-                try {
-                    initWebsocket();
-                } catch (IOException | JSONException e) {
-                    Log.e(e.getClass().getSimpleName(), e.getMessage(), e);
-                }
-            }
-        });
         return view;
-    }
-
-    private void initWebsocket() throws IOException, JSONException {
-        RequestBody wsUrlRequestBody = new FormEncodingBuilder()
-                .add("roomid", String.valueOf(roomNum))
-                .add("fkey", chatFkey).build();
-        Request wsUrlRequest = new Request.Builder()
-                .url("http://chat.stackexchange.com/ws-auth")
-                .post(wsUrlRequestBody)
-                .build();
-        Response wsUrlResponse = client.newCall(wsUrlRequest).execute();
-        JSONObject wsUrlJson = new JSONObject(wsUrlResponse.body().string());
-        Log.e("websocket", "url: " + wsUrlJson.getString("url"));
-        String wsUrl = wsUrlJson.getString("url");// + "?l=" + firstMessageTime;
-        Request wsRequest = new Request.Builder()
-                .addHeader("User-Agent", Client.USER_AGENT)
-                .addHeader("Sec-WebSocket-Extensions", "permessage-deflate")
-                .addHeader("Sec-WebSocket-Extensions", "client_max_window_bits")
-                .addHeader("Origin", "http://stackexchange.com")
-                .url(wsUrl + "?l=" + firstMessageTime)
-                .build();
-        WebSocketCall wsCall = WebSocketCall.create(client.getHttpClient(), wsRequest);
-        wsCall.enqueue(new ChatWebSocketListener(ChatActivityFragment.this, mapper, roomNum));
-        Log.e("ws", "init");
     }
 
     public void handleNewEvents(JsonNode messages) {
         final List<MessageEvent> events = new ArrayList<>();
         for (JsonNode message : messages) {
-            events.add(messageEventGenerator.createMessageEvent(message));
+            MessageEvent newMessageEvent = messageEventGenerator.createMessageEvent(message);
+            if (newMessageEvent.room_id == room.num) {
+                events.add(newMessageEvent);
+            }
         }
         updateThread.post(new Runnable() {
             @Override public void run() {
@@ -168,8 +144,7 @@ public class ChatActivityFragment extends Fragment {
         networkHandler.post(new Runnable() {
             @Override public void run() {
                 try {
-                    newMessage(client, "http://chat.stackexchange.com", roomNum,
-                            chatFkey, content);
+                    newMessage(client, room, chatFkey, content);
                 } catch (IOException e) {
                     Log.e(e.getClass().getSimpleName(), e.getMessage(), e);
                 }
@@ -177,8 +152,7 @@ public class ChatActivityFragment extends Fragment {
         });
     }
 
-    private JsonNode getMessagesObject(Client client,
-                                       String site, int room, int count) throws IOException {
+    private JsonNode getMessagesObject(Client client, ChatRoom room, int count) throws IOException {
         RequestBody newMessageRequestBody = new FormEncodingBuilder()
                 .add("since", String.valueOf(0))
                 .add("mode", "Messages")
@@ -186,34 +160,25 @@ public class ChatActivityFragment extends Fragment {
                 .add("fkey", chatFkey)
                 .build();
         Request newMessageRequest = new Request.Builder()
-                .url(site + "/chats/" + room + "/events")
+                .url(room.site + "/chats/" + room.num + "/events")
                 .post(newMessageRequestBody)
                 .build();
         Response newMessageResponse = client.newCall(newMessageRequest).execute();
         return mapper.readTree(newMessageResponse.body().byteStream());
     }
 
-    private void newMessage(Client client, String site, int room,
+    private void newMessage(Client client, ChatRoom room,
                             String fkey, String message) throws IOException {
         RequestBody newMessageRequestBody = new FormEncodingBuilder()
                 .add("text", message)
                 .add("fkey", fkey)
                 .build();
         Request newMessageRequest = new Request.Builder()
-                .url(site + "/chats/" + room + "/messages/new/")
+                .url(room.site + "/chats/" + room.num + "/messages/new/")
                 .post(newMessageRequestBody)
                 .build();
         Response newMessageResponse = client.newCall(newMessageRequest).execute();
         Log.e("newmssageresposne", newMessageResponse.body().string());
         Log.v("new message", message);
-    }
-
-    private String getChatFkey(Client client, String site) throws IOException {
-        Request chatPageRequest = new Request.Builder()
-                .url(site)
-                .build();
-        Response chatPageResponse = client.newCall(chatPageRequest).execute();
-        return Jsoup.parse(chatPageResponse.body().string())
-                .select("input[name=fkey]").attr("value");
     }
 }

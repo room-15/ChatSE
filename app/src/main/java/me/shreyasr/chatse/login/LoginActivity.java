@@ -39,10 +39,10 @@ import me.shreyasr.chatse.network.ClientManager;
 
 public class LoginActivity extends AppCompatActivity {
 
-    @Bind(R.id.login_email) EditText emailView;
+    @Bind(R.id.login_email)    EditText emailView;
     @Bind(R.id.login_password) EditText passwordView;
     @Bind(R.id.login_progress) ProgressBar progressBar;
-    @Bind(R.id.login_submit) Button loginButton;
+    @Bind(R.id.login_submit)   Button loginButton;
 
     SharedPreferences prefs;
 
@@ -160,6 +160,18 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
 
+        protected void onPostExecute(Boolean success) {
+            if (success) {
+                prefs.edit().putBoolean(App.PREF_HAS_CREDS, true).apply();
+                LoginActivity.this.startActivity(new Intent(LoginActivity.this, ChatActivity.class));
+                LoginActivity.this.finish();
+            } else {
+                progressBar.setVisibility(View.GONE);
+                loginButton.setEnabled(false);
+                Toast.makeText(LoginActivity.this, "Failed to connect", Toast.LENGTH_LONG).show();
+            }
+        }
+
         private void loginToSite(Client client, String site,
                                  String email, String password) throws IOException {
             String soFkey = Jsoup.connect(site + "/users/login/")
@@ -226,17 +238,6 @@ public class LoginActivity extends AppCompatActivity {
                     .build();
             Response seLoginResponse = client.newCall(seLoginRequest).execute();
             Log.i("se openid login", seLoginResponse.toString());
-        }
-
-        protected void onPostExecute(Boolean success) {
-            if (success) {
-                LoginActivity.this.startActivity(new Intent(LoginActivity.this, ChatActivity.class));
-                LoginActivity.this.finish();
-            } else {
-                progressBar.setVisibility(View.GONE);
-                loginButton.setEnabled(false);
-                Toast.makeText(LoginActivity.this, "Failed to connect", Toast.LENGTH_LONG).show();
-            }
         }
     }
 }

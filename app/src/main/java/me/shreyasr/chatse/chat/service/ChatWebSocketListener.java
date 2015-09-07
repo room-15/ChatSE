@@ -1,4 +1,4 @@
-package me.shreyasr.chatse.chat;
+package me.shreyasr.chatse.chat.service;
 
 import android.util.Log;
 
@@ -16,22 +16,21 @@ import okio.BufferedSource;
 
 public class ChatWebSocketListener implements WebSocketListener {
 
-    private ChatActivityFragment fragment;
-    private final ObjectMapper mapper;
-    private final int roomNum;
+    private ServiceWebsocketListener listener;
+    private final ObjectMapper mapper = new ObjectMapper();
 
-    public ChatWebSocketListener(ChatActivityFragment fragment, ObjectMapper mapper, int roomNum) {
-        this.fragment = fragment;
-        this.mapper = mapper;
-        this.roomNum = roomNum;
+    public ChatWebSocketListener(ServiceWebsocketListener listener) {
+        this.listener = listener;
     }
 
     @Override public void onOpen(WebSocket webSocket, Response response) {
         Log.e("ws", "ws open");
+        listener.onConnect(true);
     }
 
     @Override public void onFailure(IOException e, Response response) {
         Log.e("ws", "ws fail");
+        listener.onConnect(false);
         Log.e(e.getClass().getSimpleName(), e.getMessage(), e);
     }
 
@@ -43,14 +42,7 @@ public class ChatWebSocketListener implements WebSocketListener {
         Log.e("ws", "recv: " + message);
         try {
             JsonNode root = mapper.readTree(message);
-            if (!root.has("r" + roomNum)) {
-                Log.e("No room element", root.toString());
-                return;
-            }
-            JsonNode roomNode = root.get("r" + roomNum);
-            if (!roomNode.has("e")) return;
-
-            fragment.handleNewEvents(roomNode.get("e"));
+            listener.onNewEvents(root);
         } catch (IOException e) {
             Log.e(e.getClass().getSimpleName(), e.getMessage(), e);
         }
@@ -62,5 +54,11 @@ public class ChatWebSocketListener implements WebSocketListener {
 
     @Override public void onClose(int code, String reason) {
         Log.e("ws", "ws close");
+    }
+
+    interface ServiceWebsocketListener {
+
+        void onNewEvents(JsonNode root);
+        void onConnect(boolean success);
     }
 }
