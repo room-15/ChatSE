@@ -129,7 +129,7 @@ public class IncomingEventService extends Service
                 .addHeader("Sec-WebSocket-Extensions", "permessage-deflate")
                 .addHeader("Sec-WebSocket-Extensions", "client_max_window_bits")
                 .addHeader("Origin", site)
-                .url(wsUrl + "?l=0")// + "?l=" + firstMessageTime;
+                .url(wsUrl + "?l=0")
                 .build();
         WebSocketCall wsCall = WebSocketCall.create(client.getHttpClient(), wsRequest);
         wsCall.enqueue(new ChatWebsocketListener(site, this));

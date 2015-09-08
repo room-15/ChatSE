@@ -47,8 +47,6 @@ public class ChatActivity extends AppCompatActivity implements ServiceConnection
         viewPager = (ViewPager) this.findViewById(R.id.pager);
         pagerAdapter = new ChatFragmentPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
-//        viewPager.setOffscreenPageLimit(7);
-//        viewPager.setCurrentItem();
     }
 
     @Override public void onServiceConnected(ComponentName name, IBinder binder) {

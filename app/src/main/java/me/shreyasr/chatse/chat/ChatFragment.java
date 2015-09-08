@@ -132,7 +132,8 @@ public class ChatFragment extends Fragment implements IncomingEventListener {
         return view;
     }
 
-    public void handleNewEvents(JsonNode jsonEvents) {
+    @Override public void handleNewEvents(JsonNode jsonEvents) {
+        if (room == null || events == null) return;
         for (JsonNode jsonEvent : jsonEvents) {
             ChatEvent newEvent = chatEventGenerator.createEvent(jsonEvent);
             if (newEvent.room_id == room.num) {
