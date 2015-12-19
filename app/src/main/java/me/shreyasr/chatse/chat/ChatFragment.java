@@ -100,6 +100,8 @@ public class ChatFragment extends Fragment implements IncomingEventListener {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
         ButterKnife.bind(this, view);
 
+        //TODO add cat pictures instant add
+
         messageAdapter = new MessageAdapter(events, getActivity().getResources());
         messageList.setLayoutManager(
                 new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, true));

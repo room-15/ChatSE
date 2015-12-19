@@ -44,4 +44,13 @@
         android:layout_marginStart="16dp"
         android:textSize="16sp"
         tools:text="Message"/>
+
+    <ImageView
+        android:id="@+id/message_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/message_user_name"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:textSize="16sp"/>
 </RelativeLayout>

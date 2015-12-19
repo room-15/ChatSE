@@ -1,6 +1,7 @@
 package me.shreyasr.chatse.chat;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,6 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,6 +28,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
 
     private EventList events;
     private Resources res;
+    Context context;
 
     public MessageAdapter(EventList events, Resources res) {
         this.events = events;
@@ -36,6 +41,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
         @Bind(R.id.message_user_name) TextView userNameView;
         @Bind(R.id.message_timestamp) TextView messageTimestamp;
         @Bind(R.id.message_edit_indicator) ImageView editIndicator;
+        @Bind(R.id.message_image) ImageView oneboxImage;
 
         public MessageViewHolder(View itemView) {
             super(itemView);
@@ -52,6 +58,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
 
     @Override
     public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        context = parent.getContext();
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.message, parent, false);
         return new MessageViewHolder(view);
@@ -69,8 +76,15 @@ public class MessageAdapter extends RecyclerView.Adapter {
             holder.messageView.setTextColor(res.getColor(R.color.deleted));
             holder.messageView.setText("(removed)");
         } else {
-            holder.messageView.setTextColor(res.getColor(R.color.primary_text));
-            holder.messageView.setText(message.content);
+            if(!message.onebox) {
+                holder.messageView.setTextColor(res.getColor(R.color.primary_text));
+                holder.messageView.setText(message.content);
+            }else{
+//                Toast.makeText(context, message.onebox_content, Toast.LENGTH_SHORT).show();
+                Glide.with(context)
+                        .load(message.onebox_content)
+                        .into(holder.oneboxImage);
+            }
         }
         holder.userNameView.setText(message.userName);
         holder.messageTimestamp.setText(timestampFormat.format(new Date(message.timestamp*1000)));

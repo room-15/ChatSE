@@ -1,5 +1,10 @@
 package me.shreyasr.chatse.event;
 
+import android.widget.Toast;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.unbescape.html.HtmlEscape;
 
 public class ChatEvent {
@@ -30,9 +35,40 @@ public class ChatEvent {
     public int message_owner_stars = 0;
     public int target_user_id = -1;
 
+    public boolean message_onebox = false;
+    public String onebox_type = "";
+    public String onebox_content = "";
+
     public boolean message_starred = false;
 
     public void setContent(String content) {
+
+        Document doc = Jsoup.parse(content);
+        Elements elements = doc.select("div");
+
+        if(elements.size() != 0) {
+            String obType = elements.get(0).className();
+
+            if(obType.contains("ob-message")){
+                System.out.println("This is a quote");
+            }else if(obType.contains("ob-message")){
+                System.out.println("This is a Youtube Video");
+            }else if(obType.contains("ob-wikipedia")){
+                System.out.println("This is Wikipedia");
+            } else if (obType.contains("ob-image")) {
+                String url = elements.get(0).select("img").first().absUrl("src");
+                System.out.println(url);
+                message_onebox = true;
+                onebox_type = "image";
+                onebox_content = url;
+            } else{
+                message_onebox = false;
+                onebox_type = "";
+                onebox_content = "";
+            }
+        }
+
+
         this.content = HtmlEscape.unescapeHtml(content);
     }
 }
