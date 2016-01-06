@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
@@ -28,11 +27,12 @@ public class MessageAdapter extends RecyclerView.Adapter {
 
     private EventList events;
     private Resources res;
-    Context context;
+    private Context context;
 
-    public MessageAdapter(EventList events, Resources res) {
+    public MessageAdapter(EventList events, Resources res, Context context) {
         this.events = events;
         this.res = res;
+        this.context = context;
     }
 
     class MessageViewHolder extends RecyclerView.ViewHolder {
@@ -58,7 +58,6 @@ public class MessageAdapter extends RecyclerView.Adapter {
 
     @Override
     public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        context = parent.getContext();
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.message, parent, false);
         return new MessageViewHolder(view);
@@ -75,12 +74,15 @@ public class MessageAdapter extends RecyclerView.Adapter {
         if (message.isDeleted()) {
             holder.messageView.setTextColor(res.getColor(R.color.deleted));
             holder.messageView.setText("(removed)");
+            Glide.clear(holder.oneboxImage);
+            holder.oneboxImage.setImageDrawable(null);
         } else {
             if(!message.onebox) {
                 holder.messageView.setTextColor(res.getColor(R.color.primary_text));
                 holder.messageView.setText(message.content);
-            }else{
-//                Toast.makeText(context, message.onebox_content, Toast.LENGTH_SHORT).show();
+                Glide.clear(holder.oneboxImage);
+//                holder.oneboxImage.setImageDrawable(null); // only needed with placeholder
+            } else {
                 Glide.with(context)
                         .load(message.onebox_content)
                         .into(holder.oneboxImage);

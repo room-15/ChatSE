@@ -102,7 +102,7 @@ public class ChatFragment extends Fragment implements IncomingEventListener {
 
         //TODO add cat pictures instant add
 
-        messageAdapter = new MessageAdapter(events, getActivity().getResources());
+        messageAdapter = new MessageAdapter(events, getActivity().getResources(), getActivity());
         messageList.setLayoutManager(
                 new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, true));
         messageList.setAdapter(messageAdapter);

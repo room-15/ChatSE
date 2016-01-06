@@ -1,11 +1,11 @@
 package me.shreyasr.chatse.event;
 
-import android.widget.Toast;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.unbescape.html.HtmlEscape;
+
+import me.shreyasr.chatse.util.Logger;
 
 public class ChatEvent {
 
@@ -43,7 +43,7 @@ public class ChatEvent {
 
     public void setContent(String content) {
 
-        Document doc = Jsoup.parse(content);
+        Document doc = Jsoup.parse(content, "http://chat.stackexchange.com/");
         Elements elements = doc.select("div");
 
         if(elements.size() != 0) {
@@ -51,17 +51,17 @@ public class ChatEvent {
 
             if(obType.contains("ob-message")){
                 System.out.println("This is a quote");
-            }else if(obType.contains("ob-message")){
+            } else if(obType.contains("ob-message")){
                 System.out.println("This is a Youtube Video");
-            }else if(obType.contains("ob-wikipedia")){
+            } else if(obType.contains("ob-wikipedia")){
                 System.out.println("This is Wikipedia");
             } else if (obType.contains("ob-image")) {
-                String url = elements.get(0).select("img").first().absUrl("src");
-                System.out.println(url);
+                String url = elements.select("img").first().absUrl("src");
+                Logger.debug(getClass(), "ob-image: " + url);
                 message_onebox = true;
                 onebox_type = "image";
                 onebox_content = url;
-            } else{
+            } else {
                 message_onebox = false;
                 onebox_type = "";
                 onebox_content = "";
