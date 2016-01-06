@@ -32,6 +32,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceConnection
     private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
     ChatFragmentPagerAdapter pagerAdapter;
     ViewPager viewPager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
