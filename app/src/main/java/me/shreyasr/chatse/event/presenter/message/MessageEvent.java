@@ -21,6 +21,9 @@ public class MessageEvent implements Comparable<MessageEvent> {
     public final int messageId;
     public final long parentId;
     public final int editCount;
+    public final boolean onebox;
+    public final String onebox_type;
+    public final String onebox_content;
 
     public MessageEvent(ChatEvent baseEvent) {
         this.content = baseEvent.content;
@@ -33,6 +36,9 @@ public class MessageEvent implements Comparable<MessageEvent> {
         this.messageId = baseEvent.message_id;
         this.parentId = baseEvent.parent_id;
         this.editCount = baseEvent.message_edits;
+        this.onebox = baseEvent.message_onebox;
+        this.onebox_type = baseEvent.onebox_type;
+        this.onebox_content = baseEvent.onebox_content;
     }
 
     @Override public boolean equals(Object o) {

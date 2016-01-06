@@ -1,6 +1,7 @@
 package me.shreyasr.chatse.chat;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,10 +27,12 @@ public class MessageAdapter extends RecyclerView.Adapter {
 
     private EventList events;
     private Resources res;
+    private Context context;
 
-    public MessageAdapter(EventList events, Resources res) {
+    public MessageAdapter(EventList events, Resources res, Context context) {
         this.events = events;
         this.res = res;
+        this.context = context;
     }
 
     class MessageViewHolder extends RecyclerView.ViewHolder {
@@ -36,6 +41,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
         @Bind(R.id.message_user_name) TextView userNameView;
         @Bind(R.id.message_timestamp) TextView messageTimestamp;
         @Bind(R.id.message_edit_indicator) ImageView editIndicator;
+        @Bind(R.id.message_image) ImageView oneboxImage;
 
         public MessageViewHolder(View itemView) {
             super(itemView);
@@ -68,9 +74,19 @@ public class MessageAdapter extends RecyclerView.Adapter {
         if (message.isDeleted()) {
             holder.messageView.setTextColor(res.getColor(R.color.deleted));
             holder.messageView.setText("(removed)");
+            Glide.clear(holder.oneboxImage);
+            holder.oneboxImage.setImageDrawable(null);
         } else {
-            holder.messageView.setTextColor(res.getColor(R.color.primary_text));
-            holder.messageView.setText(message.content);
+            if(!message.onebox) {
+                holder.messageView.setTextColor(res.getColor(R.color.primary_text));
+                holder.messageView.setText(message.content);
+                Glide.clear(holder.oneboxImage);
+//                holder.oneboxImage.setImageDrawable(null); // only needed with placeholder
+            } else {
+                Glide.with(context)
+                        .load(message.onebox_content)
+                        .into(holder.oneboxImage);
+            }
         }
         holder.userNameView.setText(message.userName);
         holder.messageTimestamp.setText(timestampFormat.format(new Date(message.timestamp*1000)));

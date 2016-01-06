@@ -31,4 +31,8 @@ public class Logger {
     public static void event(Class<?> source, String message) {
         Log.i(source.getSimpleName(), message);
     }
+
+    public static void debug(Class source, String message) {
+        Log.d(source.getSimpleName(), message);
+    }
 }
