@@ -55,6 +55,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceConnection
         Logger.message(this.getClass(), "Service connect");
         serviceBinder = (IncomingEventServiceBinder) binder;
 
+        //TODO: Don't hardcode this.
         loadChatFragment(new ChatRoom(Client.SITE_STACK_EXCHANGE, 1));
         loadChatFragment(new ChatRoom(Client.SITE_STACK_OVERFLOW, 15));
     }
