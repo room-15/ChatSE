@@ -1,17 +1,24 @@
-<android.support.v4.view.ViewPager
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/pager"
+    xmlns:tab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="me.shreyasr.chatse.chat.ChatActivity" >
+    android:orientation="vertical">
 
-    <android.support.v4.view.PagerTitleStrip
-        android:id="@+id/pager_title_strip"
+    <android.support.design.widget.TabLayout
+        android:id="@+id/room_tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp" />
+        android:background="@color/primary"
+        tab:tabTextColor="@android:color/white"
+        tab:tabSelectedTextColor="@android:color/white"/>
 
-</android.support.v4.view.ViewPager>
+    <android.support.v4.view.ViewPager
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        tools:context="me.shreyasr.chatse.chat.ChatActivity"/>
+
+</LinearLayout>

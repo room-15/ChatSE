@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -78,6 +79,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceConnection
         uiThreadHandler.post(new Runnable() {
             @Override public void run() {
                 pagerAdapter.addFragment(fragment);
+                setupTabLayout();
             }
         });
     }
@@ -111,5 +113,18 @@ public class ChatActivity extends AppCompatActivity implements ServiceConnection
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setupTabLayout(){
+        // Get and set up tablayout
+        final TabLayout tabLayout = (TabLayout) findViewById(R.id.room_tabs);
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
+        tabLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                tabLayout.setupWithViewPager(viewPager);
+            }
+        });
     }
 }
