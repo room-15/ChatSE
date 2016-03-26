@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,7 +60,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
     @Override
     public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.message, parent, false);
+                .inflate(R.layout.list_item_message, parent, false);
         return new MessageViewHolder(view);
     }
 
@@ -79,13 +80,17 @@ public class MessageAdapter extends RecyclerView.Adapter {
         } else {
             if(!message.onebox) {
                 holder.messageView.setTextColor(res.getColor(R.color.primary_text));
-                holder.messageView.setText(message.content);
+                //TODO: Testing
+                // holder.messageView.setText(message.content);
+                holder.messageView.setText(Html.fromHtml(message.content));
                 Glide.clear(holder.oneboxImage);
 //                holder.oneboxImage.setImageDrawable(null); // only needed with placeholder
             } else {
                 Glide.with(context)
                         .load(message.onebox_content)
                         .into(holder.oneboxImage);
+                // When we load an image remove any text from being recycled from the previous item.
+                holder.messageView.setText("");
             }
         }
         holder.userNameView.setText(message.userName);
