@@ -15,13 +15,13 @@ import me.shreyasr.chatse.util.Logger;
 import okio.Buffer;
 import okio.BufferedSource;
 
-public class ChatWebsocketListener implements WebSocketListener {
+public class ChatWebSocketListener implements WebSocketListener {
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final ServiceWebsocketListener listener;
     private final String site;
 
-    public ChatWebsocketListener(String site, ServiceWebsocketListener listener) {
+    public ChatWebSocketListener(String site, ServiceWebsocketListener listener) {
         this.listener = listener;
         this.site = site;
     }

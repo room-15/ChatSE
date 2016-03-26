@@ -28,7 +28,7 @@ import me.shreyasr.chatse.network.Client;
 import me.shreyasr.chatse.util.Logger;
 
 public class IncomingEventService extends Service
-        implements ChatWebsocketListener.ServiceWebsocketListener {
+        implements ChatWebSocketListener.ServiceWebsocketListener {
 
     private static final String TAG = IncomingEventService.class.getSimpleName();
     private List<MessageListenerHolder> listeners = new ArrayList<>();
@@ -132,7 +132,7 @@ public class IncomingEventService extends Service
                 .url(wsUrl + "?l=0")
                 .build();
         WebSocketCall wsCall = WebSocketCall.create(client.getHttpClient(), wsRequest);
-        wsCall.enqueue(new ChatWebsocketListener(site, this));
+        wsCall.enqueue(new ChatWebSocketListener(site, this));
     }
 
     public class RoomInfo {
