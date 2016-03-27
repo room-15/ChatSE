@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -59,6 +60,9 @@ public class LoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         emailView.setText(prefs.getString(App.PREF_EMAIL, ""));
         passwordView.setText(prefs.getString("password", "")); // STOPSHIP
