@@ -15,8 +15,8 @@ import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.service.IncomingEventService
 import me.shreyasr.chatse.chat.service.IncomingEventServiceBinder
 import me.shreyasr.chatse.network.Client
-import me.shreyasr.chatse.util.Logger
 import org.json.JSONException
+import timber.log.Timber
 import java.io.IOException
 
 class ChatActivity : AppCompatActivity(), ServiceConnection {
@@ -48,7 +48,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     }
 
     override fun onServiceConnected(name: ComponentName, binder: IBinder) {
-        Logger.message(this.javaClass, "Service connect")
+        Timber.d("Service connect")
         serviceBinder = binder as IncomingEventServiceBinder
 
         //TODO: Don't hardcode this.
@@ -57,7 +57,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
-        Logger.message(this.javaClass, "Service disconnect")
+        Timber.d("Service disconnect")
     }
 
     private fun loadChatFragment(room: ChatRoom) {
@@ -66,9 +66,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                 try {
                     addChatFragment(createChatFragment(room))
                 } catch (e: IOException) {
-                    Logger.exception(this.javaClass, "Failed to create chat fragment", e)
+                    Timber.e("Failed to create chat fragment", e)
                 } catch (e: JSONException) {
-                    Logger.exception(this.javaClass, "Failed to create chat fragment", e)
+                    Timber.e("Failed to create chat fragment", e)
                 }
 
             }

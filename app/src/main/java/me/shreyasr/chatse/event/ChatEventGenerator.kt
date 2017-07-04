@@ -1,8 +1,8 @@
 package me.shreyasr.chatse.event
 
-import me.shreyasr.chatse.util.Logger
 import org.codehaus.jackson.JsonNode
 import org.codehaus.jackson.map.ObjectMapper
+import timber.log.Timber
 import java.io.IOException
 
 class ChatEventGenerator {
@@ -14,7 +14,7 @@ class ChatEventGenerator {
         try {
             c = mapper.readValue<ChatEvent>(json, ChatEvent::class.java)
         } catch (e: IOException) {
-            Logger.exception(this.javaClass, "Failed to map json", e)
+            Timber.e("Failed to map json", e)
         }
 
         return c

@@ -1,8 +1,8 @@
 package me.shreyasr.chatse.event
 
-import me.shreyasr.chatse.util.Logger
 import org.jsoup.Jsoup
 import org.unbescape.html.HtmlEscape
+import timber.log.Timber
 
 class ChatEvent {
 
@@ -46,7 +46,7 @@ class ChatEvent {
                 println("This is Wikipedia")
             } else if (obType.contains("ob-image")) {
                 val url = elements.select("img").first().absUrl("src")
-                Logger.debug(javaClass, "ob-image: " + url)
+                Timber.d("ob-image: $url")
                 message_onebox = true
                 onebox_type = "image"
                 onebox_content = url

@@ -25,9 +25,9 @@ import me.shreyasr.chatse.event.ChatEventGenerator
 import me.shreyasr.chatse.event.EventList
 import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
-import me.shreyasr.chatse.util.Logger
 import org.codehaus.jackson.JsonNode
 import org.codehaus.jackson.map.ObjectMapper
+import timber.log.Timber
 import java.io.IOException
 
 class ChatFragment : Fragment(), IncomingEventListener {
@@ -155,7 +155,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 .post(newMessageRequestBody)
                 .build()
         val newMessageResponse = client.newCall(newMessageRequest).execute()
-        Logger.event(this.javaClass, "New message")
+        Timber.i("New message")
     }
 
     val pageTitle: String

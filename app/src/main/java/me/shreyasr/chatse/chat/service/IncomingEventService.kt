@@ -9,11 +9,11 @@ import com.squareup.okhttp.Request
 import com.squareup.okhttp.ws.WebSocketCall
 import me.shreyasr.chatse.chat.ChatRoom
 import me.shreyasr.chatse.network.Client
-import me.shreyasr.chatse.util.Logger
 import org.codehaus.jackson.JsonNode
 import org.json.JSONException
 import org.json.JSONObject
 import org.jsoup.Jsoup
+import timber.log.Timber
 import java.io.IOException
 import java.util.*
 
@@ -63,7 +63,7 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
         val fkey = chatPage.select("input[name=fkey]").attr("value")
         val name = chatPage.select("span[id=roomname]").text()
 
-        Logger.message(this.javaClass, "Loaded room: " + name)
+        Timber.i("Loaded room: $name")
 
         return RoomInfo(name, fkey)
     }
