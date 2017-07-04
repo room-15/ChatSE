@@ -147,7 +147,7 @@ public class PersistentCookieStore implements CookieStore {
 
     @Override
     public synchronized List<HttpCookie> getCookies() {
-        List<HttpCookie> allValidCookies = new ArrayList<HttpCookie>();
+        List<HttpCookie> allValidCookies = new ArrayList<>();
         for (URI storedUri : allCookies.keySet()) {
             allValidCookies.addAll(getValidCookies(storedUri));
         }
@@ -156,7 +156,7 @@ public class PersistentCookieStore implements CookieStore {
     }
 
     private List<HttpCookie> getValidCookies(URI uri) {
-        List<HttpCookie> targetCookies = new ArrayList<HttpCookie>();
+        List<HttpCookie> targetCookies = new ArrayList<>();
         // If the stored URI does not have a path then it must match any URI in
         // the same domain
         for (URI storedUri : allCookies.keySet()) {
