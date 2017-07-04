@@ -3,8 +3,7 @@ package me.shreyasr.chatse.chat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-
-import java.util.ArrayList
+import java.util.*
 
 class ChatFragmentPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 

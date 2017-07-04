@@ -1,19 +1,15 @@
 package me.shreyasr.chatse.chat.service
 
 import android.util.Log
-
 import com.squareup.okhttp.Response
 import com.squareup.okhttp.ws.WebSocket
 import com.squareup.okhttp.ws.WebSocketListener
-
-import org.codehaus.jackson.JsonNode
-import org.codehaus.jackson.map.ObjectMapper
-
-import java.io.IOException
-
 import me.shreyasr.chatse.util.Logger
 import okio.Buffer
 import okio.BufferedSource
+import org.codehaus.jackson.JsonNode
+import org.codehaus.jackson.map.ObjectMapper
+import java.io.IOException
 
 class ChatWebSocketListener(private val site: String, private val listener: ServiceWebsocketListener) : WebSocketListener {
 
@@ -27,7 +23,7 @@ class ChatWebSocketListener(private val site: String, private val listener: Serv
     override fun onFailure(e: IOException, response: Response) {
         Logger.event(this.javaClass, "websocket fail: " + site)
         listener.onConnect(site, false)
-        Log.e(e.javaClass.getSimpleName(), e.message, e)
+        Log.e(e.javaClass.simpleName, e.message, e)
     }
 
     @Throws(IOException::class)
@@ -40,7 +36,7 @@ class ChatWebSocketListener(private val site: String, private val listener: Serv
             val root = mapper.readTree(message)
             listener.onNewEvents(site, root)
         } catch (e: IOException) {
-            Log.e(e.javaClass.getSimpleName(), e.message, e)
+            Log.e(e.javaClass.simpleName, e.message, e)
         }
 
     }

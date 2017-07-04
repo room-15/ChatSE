@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,26 +16,19 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
-
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
-import com.squareup.okhttp.RequestBody
-import com.squareup.okhttp.Response
-
-import org.codehaus.jackson.JsonNode
-import org.codehaus.jackson.map.ObjectMapper
-
-import java.io.IOException
-
 import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.service.IncomingEventListener
-import me.shreyasr.chatse.event.ChatEvent
 import me.shreyasr.chatse.event.ChatEventGenerator
 import me.shreyasr.chatse.event.EventList
 import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
 import me.shreyasr.chatse.util.Logger
+import org.codehaus.jackson.JsonNode
+import org.codehaus.jackson.map.ObjectMapper
+import java.io.IOException
 
 class ChatFragment : Fragment(), IncomingEventListener {
     internal lateinit var input: EditText

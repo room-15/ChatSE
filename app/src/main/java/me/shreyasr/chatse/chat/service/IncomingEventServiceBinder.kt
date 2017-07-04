@@ -1,13 +1,10 @@
 package me.shreyasr.chatse.chat.service
 
 import android.os.Binder
-
-import org.json.JSONException
-
-import java.io.IOException
-
 import me.shreyasr.chatse.chat.ChatRoom
 import me.shreyasr.chatse.network.ClientManager
+import org.json.JSONException
+import java.io.IOException
 
 /**
  * Exposes methods from the IncomingEventService.
