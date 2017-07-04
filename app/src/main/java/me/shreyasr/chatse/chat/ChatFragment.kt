@@ -114,8 +114,10 @@ class ChatFragment : Fragment(), IncomingEventListener {
         if (room == null || events == null) return
         for (jsonEvent in jsonEvents) {
             val newEvent = chatEventGenerator.createEvent(jsonEvent)
-            if (newEvent!!.room_id == room!!.num) {
-                events!!.addEvent(newEvent)
+            if (newEvent != null) {
+                if (newEvent.room_id == room!!.num) {
+                    (events as EventList).addEvent(newEvent)
+                }
             }
         }
         uiThreadHandler.post { messageAdapter!!.update() }

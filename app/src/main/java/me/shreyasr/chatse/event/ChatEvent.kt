@@ -18,8 +18,8 @@ class ChatEvent {
 
     var id = -1
 
-    lateinit var room_name: String
-    lateinit var content: String
+    var room_name: String = ""
+    var contents: String = ""
     var message_edits = 0
     var message_stars = 0
     var message_owner_stars = 0
@@ -31,8 +31,7 @@ class ChatEvent {
 
     var message_starred = false
 
-    fun setChatContent(content: String) {
-
+    fun setContent(content: String) {
         val doc = Jsoup.parse(content, "http://chat.stackexchange.com/")
         val elements = doc.select("div")
 
@@ -59,7 +58,7 @@ class ChatEvent {
         }
 
 
-        this.content = HtmlEscape.unescapeHtml(content)
+        this.contents = HtmlEscape.unescapeHtml(content)
     }
 
     companion object {

@@ -54,7 +54,7 @@ class MessageAdapter(val events: EventList, private val res: Resources, private 
     private val timestampFormat = SimpleDateFormat("hh:mm aa", Locale.getDefault())
 
     fun update() {
-        messages = events.messagePresenter.events
+        messages = events.messagePresenter.getEventsList()
         notifyDataSetChanged()
     }
 

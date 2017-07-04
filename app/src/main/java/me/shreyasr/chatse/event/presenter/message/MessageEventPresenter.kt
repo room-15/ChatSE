@@ -1,13 +1,9 @@
 package me.shreyasr.chatse.event.presenter.message
 
 import android.util.Log
-import java.util.ArrayList
-import java.util.Collections
-import java.util.TreeSet
-
 import me.shreyasr.chatse.event.ChatEvent
 import me.shreyasr.chatse.event.presenter.EventPresenter
-import me.shreyasr.chatse.util.Logger
+import java.util.*
 
 class MessageEventPresenter : EventPresenter<MessageEvent> {
 
@@ -30,6 +26,7 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
         }
     }
 
-    override val events: List<MessageEvent>
-        get() = Collections.unmodifiableList(ArrayList(messages))
+    override fun getEventsList(): List<MessageEvent> {
+        return Collections.unmodifiableList(ArrayList(messages))
+    }
 }

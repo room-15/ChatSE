@@ -1,23 +1,43 @@
 package me.shreyasr.chatse.event.presenter.message
 
+import android.util.Log
 import me.shreyasr.chatse.event.ChatEvent
 
 class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
 
-    var content: String? = baseEvent.content
-    val timestamp: Long = baseEvent.time_stamp
-    val id: Long = baseEvent.id.toLong()
-    val userId: Long = baseEvent.user_id.toLong()
-    val userName: String = baseEvent.user_name
-    val roomId: Long = baseEvent.room_id.toLong()
-    val roomName: String = baseEvent.room_name
-    val messageId: Int = baseEvent.message_id
-    val parentId: Long = baseEvent.parent_id.toLong()
-    val editCount: Int = baseEvent.message_edits
-    val onebox: Boolean = baseEvent.message_onebox
-    val onebox_type: String = baseEvent.onebox_type
-    val onebox_content: String = baseEvent.onebox_content
+
+    val content: String?
+    val timestamp: Long
+    val id: Long
+    val userId: Long
+    val userName: String
+    val roomId: Long
+    val roomName: String
+    val messageId: Int
+    val parentId: Long
+    val editCount: Int
+    val onebox: Boolean
+    val onebox_type: String
+    val onebox_content: String
     internal var previous: MessageEvent? = null
+
+    init {
+        Log.wtf("THISSHIT", baseEvent.toString())
+        this.content = baseEvent.contents
+        this.timestamp = baseEvent.time_stamp
+        this.id = baseEvent.id.toLong()
+        this.userId = baseEvent.user_id.toLong()
+        this.userName = baseEvent.user_name
+        this.roomId = baseEvent.room_id.toLong()
+        this.roomName = baseEvent.room_name
+        this.messageId = baseEvent.message_id
+        this.parentId = baseEvent.parent_id.toLong()
+        this.editCount = baseEvent.message_edits
+        this.onebox = baseEvent.message_onebox
+        this.onebox_type = baseEvent.onebox_type
+        this.onebox_content = baseEvent.onebox_content
+
+    }
 
     val isDeleted: Boolean
         get() = content == null

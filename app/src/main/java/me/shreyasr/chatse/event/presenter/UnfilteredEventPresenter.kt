@@ -5,7 +5,7 @@ import java.util.*
 
 class UnfilteredEventPresenter : EventPresenter<ChatEvent> {
 
-    override val events = ArrayList<ChatEvent>()
+    val events = ArrayList<ChatEvent>()
 
     override fun addEvent(event: ChatEvent, roomNum: Int) {
         if (event.room_id == roomNum) {
@@ -13,7 +13,7 @@ class UnfilteredEventPresenter : EventPresenter<ChatEvent> {
         }
     }
 
-    fun getEventsList(): List<ChatEvent> {
+    override fun getEventsList(): List<ChatEvent> {
         return Collections.unmodifiableList(ArrayList(events))
     }
 }

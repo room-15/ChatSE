@@ -6,5 +6,7 @@ interface EventPresenter<T> {
 
     fun addEvent(event: ChatEvent, roomNum: Int)
 
-    val events: List<T>
+    fun getEventsList(): List<T>
+
+
 }

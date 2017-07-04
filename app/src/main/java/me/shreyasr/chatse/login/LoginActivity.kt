@@ -50,7 +50,7 @@ class LoginActivity : AppCompatActivity() {
         prefs = App.getPrefs(this)
 
         if (prefs.getBoolean(App.PREF_HAS_CREDS, false)) {
-            this.startActivity(Intent(this@LoginActivity, ChatActivity::class.java))
+            this.startActivity(Intent(this@LoginActivity, ChatActivity()::class.java))
             this.finish()
             return
         }

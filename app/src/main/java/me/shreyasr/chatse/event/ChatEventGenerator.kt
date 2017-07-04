@@ -17,6 +17,7 @@ class ChatEventGenerator {
         try {
             Log.wtf("JSON", json.toString())
             c = mapper.readValue<ChatEvent>(json, ChatEvent::class.java)
+//            Log.wtf("Thefuckis", c.contents)
         } catch (e: IOException) {
             Logger.exception(this.javaClass, "Failed to map json", e)
         }
