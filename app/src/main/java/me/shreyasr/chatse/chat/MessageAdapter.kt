@@ -36,7 +36,6 @@ class MessageAdapter(val events: EventList, private val res: Resources, private 
                 //                Ion.clear(holder.oneboxImage);
                 //                holder.oneboxImage.setImageDrawable(null); // only needed with placeholder
             } else {
-                Log.wtf("The Image Url", message.onebox_content)
                 Ion.with(context)
                         .load(message.onebox_content)
                         .intoImageView(holder.oneboxImage)

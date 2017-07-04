@@ -4,26 +4,18 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
-
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
-import com.squareup.okhttp.RequestBody
-import com.squareup.okhttp.Response
 import com.squareup.okhttp.ws.WebSocketCall
-
+import me.shreyasr.chatse.chat.ChatRoom
+import me.shreyasr.chatse.network.Client
+import me.shreyasr.chatse.util.Logger
 import org.codehaus.jackson.JsonNode
 import org.json.JSONException
 import org.json.JSONObject
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-
 import java.io.IOException
-import java.util.ArrayList
-import java.util.HashMap
-
-import me.shreyasr.chatse.chat.ChatRoom
-import me.shreyasr.chatse.network.Client
-import me.shreyasr.chatse.util.Logger
+import java.util.*
 
 class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketListener {
     private val listeners = ArrayList<MessageListenerHolder>()
@@ -42,14 +34,14 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
         listeners.add(MessageListenerHolder(room, listener))
     }
 
-    override fun onNewEvents(site: String, message: JsonNode) {
+    override fun onNewEvents(site: String, root: JsonNode) {
         for (holder in listeners) {
             if (holder.room.site != site) continue
-            if (!message.has("r" + holder.room.num)) {
-                Log.e("No room element", message.toString())
+            if (!root.has("r" + holder.room.num)) {
+                Log.e("No room element", root.toString())
                 return
             }
-            val roomNode = message.get("r" + holder.room.num)
+            val roomNode = root.get("r" + holder.room.num)
             if (roomNode.has("e")) {
                 holder.listener.handleNewEvents(roomNode.get("e"))
             }

@@ -69,7 +69,7 @@ class LoginActivity : AppCompatActivity() {
 
         emailView.setText(prefs.getString(App.PREF_EMAIL, ""))
         passwordView.setText(prefs.getString("password", "")) // STOPSHIP
-        passwordView.setOnEditorActionListener(TextView.OnEditorActionListener { textView, id, keyEvent ->
+        passwordView.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
             if (id == R.id.login_submit || id == EditorInfo.IME_NULL) {
                 attemptLogin()
                 return@OnEditorActionListener true
@@ -118,6 +118,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         // STOPSHIP
+        //TODO store using AccountManager
         prefs.edit().putString(App.PREF_EMAIL, email).putString("password", password).apply()
 
         return null
