@@ -15,12 +15,9 @@ public class App extends Application {
     public static final String EXTRA_FKEY = "fkey";
 
     private static App inst;
-    public static App get() { return inst; }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        inst = this;
+    public static App get() {
+        return inst;
     }
 
     private static SharedPreferences getPrefs() {
@@ -29,5 +26,11 @@ public class App extends Application {
 
     public static SharedPreferences getPrefs(Context context) {
         return getPrefs();
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        inst = this;
     }
 }

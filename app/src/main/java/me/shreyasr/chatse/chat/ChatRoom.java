@@ -8,6 +8,18 @@ import android.os.Parcelable;
  */
 public class ChatRoom implements Parcelable {
 
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<ChatRoom> CREATOR = new Parcelable.Creator<ChatRoom>() {
+        @Override
+        public ChatRoom createFromParcel(Parcel in) {
+            return new ChatRoom(in);
+        }
+
+        @Override
+        public ChatRoom[] newArray(int size) {
+            return new ChatRoom[size];
+        }
+    };
     public final String site;
     public final int num;
 
@@ -21,7 +33,8 @@ public class ChatRoom implements Parcelable {
         num = in.readInt();
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return "Room " + num;
     }
 
@@ -35,17 +48,4 @@ public class ChatRoom implements Parcelable {
         dest.writeString(site);
         dest.writeInt(num);
     }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<ChatRoom> CREATOR = new Parcelable.Creator<ChatRoom>() {
-        @Override
-        public ChatRoom createFromParcel(Parcel in) {
-            return new ChatRoom(in);
-        }
-
-        @Override
-        public ChatRoom[] newArray(int size) {
-            return new ChatRoom[size];
-        }
-    };
 }

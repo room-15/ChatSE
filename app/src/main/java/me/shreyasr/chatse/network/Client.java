@@ -32,8 +32,6 @@ public class Client {
     private final OkHttpClient httpClient;
     private final CookieStore cookieStore;
 
-    public OkHttpClient getHttpClient() { return httpClient; }
-
     Client(OkHttpClient client, CookieStore cookieStore) {
         this.httpClient = client;
         this.cookieStore = cookieStore;
@@ -42,7 +40,8 @@ public class Client {
         httpClient.setCookieHandler(cookieManager);
 
         httpClient.networkInterceptors().add(new Interceptor() {
-            @Override public Response intercept(Chain chain) throws IOException {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
                 Request originalRequest = chain.request();
                 Request requestWithUserAgent = originalRequest.newBuilder()
                         .removeHeader("User-Agent")
@@ -51,6 +50,10 @@ public class Client {
                 return chain.proceed(requestWithUserAgent);
             }
         });
+    }
+
+    public OkHttpClient getHttpClient() {
+        return httpClient;
     }
 
     public String getCookie(String host, String name) {
@@ -69,6 +72,7 @@ public class Client {
     public void putCookie(String uri, String cookieName, String cookieContent) {
         putCookie(URI.create(uri), cookieName, cookieContent);
     }
+
     public void putCookie(URI uri, String cookieName, String cookieContent) {
         cookieStore.add(uri, new HttpCookie(cookieName, cookieContent));
     }

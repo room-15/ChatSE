@@ -46,14 +46,14 @@ public class ChatEvent {
         Document doc = Jsoup.parse(content, "http://chat.stackexchange.com/");
         Elements elements = doc.select("div");
 
-        if(elements.size() != 0) {
+        if (elements.size() != 0) {
             String obType = elements.get(0).className();
 
-            if(obType.contains("ob-message")){
+            if (obType.contains("ob-message")) {
                 System.out.println("This is a quote");
-            } else if(obType.contains("ob-message")){
+            } else if (obType.contains("ob-message")) {
                 System.out.println("This is a Youtube Video");
-            } else if(obType.contains("ob-wikipedia")){
+            } else if (obType.contains("ob-wikipedia")) {
                 System.out.println("This is Wikipedia");
             } else if (obType.contains("ob-image")) {
                 String url = elements.select("img").first().absUrl("src");

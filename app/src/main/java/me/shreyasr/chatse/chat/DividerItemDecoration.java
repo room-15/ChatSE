@@ -13,16 +13,15 @@ import android.view.View;
 
 /**
  * Adapted from a Gist by the GitHub user zokipirlo:
- *
+ * <p>
  * https://gist.github.com/zokipirlo/82336d89249e05bba5aa
  */
 public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
+    int mOrientation = -1;
     private Drawable mDivider;
     private boolean mShowFirstDivider = false;
     private boolean mShowLastDivider = false;
-
-    int mOrientation = -1;
 
     public DividerItemDecoration(Context context, AttributeSet attrs) {
         final TypedArray a = context

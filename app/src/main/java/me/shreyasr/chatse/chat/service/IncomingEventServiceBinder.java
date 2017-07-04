@@ -39,7 +39,7 @@ public class IncomingEventServiceBinder extends Binder {
      * Joins a specified chat room.
      *
      * @param room The chat room to join
-     * @throws IOException If the registration request or the websocket creation fails
+     * @throws IOException   If the registration request or the websocket creation fails
      * @throws JSONException If the registration requests fails to parse the websocket url
      */
     public void joinRoom(ChatRoom room, String chatFkey) throws IOException, JSONException {

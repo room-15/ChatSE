@@ -25,15 +25,18 @@ public class ChatFragmentPagerAdapter extends FragmentPagerAdapter {
         notifyDataSetChanged();
     }
 
-    @Override public int getCount() {
+    @Override
+    public int getCount() {
         return chatFragments.size();
     }
 
-    @Override public Fragment getItem(int pos) {
+    @Override
+    public Fragment getItem(int pos) {
         return chatFragments.get(pos);
     }
 
-    @Override public String getPageTitle(int pos) {
+    @Override
+    public String getPageTitle(int pos) {
         return chatFragments.get(pos).getPageTitle();
     }
 }

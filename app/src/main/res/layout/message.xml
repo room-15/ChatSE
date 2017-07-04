@@ -1,30 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="wrap_content"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <!--<ImageView-->
-        <!--android:id="@+id/message_user_avatar"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="match_parent"/>-->
+    <!--android:id="@+id/message_user_avatar"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="match_parent"/>-->
 
     <TextView
         android:id="@+id/message_user_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="12sp"
-        tools:text="Anubian Noob"/>
+        tools:text="Anubian Noob" />
 
     <TextView
         android:id="@+id/message_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:textSize="12sp"
-        tools:text="6:23 AM"/>
+        tools:text="6:23 AM" />
 
     <ImageView
         android:id="@+id/message_edit_indicator"
@@ -32,8 +31,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/message_user_name"
         android:alpha="0.2"
-        android:visibility="invisible"
-        android:src="@drawable/ic_edit_black_18dp"/>
+        android:src="@drawable/ic_edit_black_18dp"
+        android:visibility="invisible" />
 
     <TextView
         android:id="@+id/message_content"
@@ -43,7 +42,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:textSize="16sp"
-        tools:text="Message"/>
+        tools:text="Message" />
 
     <ImageView
         android:id="@+id/message_image"
@@ -52,5 +51,5 @@
         android:layout_below="@id/message_user_name"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        android:textSize="16sp"/>
+        android:textSize="16sp" />
 </RelativeLayout>

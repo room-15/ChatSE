@@ -10,13 +10,15 @@ public class UnfilteredEventPresenter implements EventPresenter<ChatEvent> {
 
     private List<ChatEvent> events = new ArrayList<>();
 
-    @Override public void addEvent(ChatEvent event, int roomNum) {
+    @Override
+    public void addEvent(ChatEvent event, int roomNum) {
         if (event.room_id == roomNum) {
             events.add(event);
         }
     }
 
-    @Override public List<ChatEvent> getEvents() {
+    @Override
+    public List<ChatEvent> getEvents() {
         return Collections.unmodifiableList(new ArrayList<>(events));
     }
 }

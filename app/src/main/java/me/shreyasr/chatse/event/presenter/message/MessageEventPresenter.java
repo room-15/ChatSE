@@ -13,7 +13,8 @@ public class MessageEventPresenter implements EventPresenter<MessageEvent> {
 
     TreeSet<MessageEvent> messages = new TreeSet<>();
 
-    @Override public void addEvent(ChatEvent event, int roomNum) {
+    @Override
+    public void addEvent(ChatEvent event, int roomNum) {
         switch (event.event_type) {
             case ChatEvent.EVENT_TYPE_MESSAGE:
                 messages.add(new MessageEvent(event));
@@ -33,7 +34,8 @@ public class MessageEventPresenter implements EventPresenter<MessageEvent> {
         }
     }
 
-    @Override public List<MessageEvent> getEvents() {
+    @Override
+    public List<MessageEvent> getEvents() {
         return Collections.unmodifiableList(new ArrayList<>(messages));
     }
 }

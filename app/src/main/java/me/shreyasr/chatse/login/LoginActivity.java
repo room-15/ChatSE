@@ -29,9 +29,6 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import me.shreyasr.chatse.App;
 import me.shreyasr.chatse.R;
 import me.shreyasr.chatse.chat.ChatActivity;
@@ -40,14 +37,15 @@ import me.shreyasr.chatse.network.ClientManager;
 
 public class LoginActivity extends AppCompatActivity {
 
-    @Bind(R.id.login_email)    EditText emailView;
-    @Bind(R.id.login_password) EditText passwordView;
-    @Bind(R.id.login_progress) ProgressBar progressBar;
-    @Bind(R.id.login_submit)   Button loginButton;
+    EditText emailView;
+    EditText passwordView;
+    ProgressBar progressBar;
+    Button loginButton;
 
     SharedPreferences prefs;
 
-    @Override protected void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         prefs = App.getPrefs(this);
@@ -59,10 +57,21 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         setContentView(R.layout.activity_login);
-        ButterKnife.bind(this);
+
+        emailView = (EditText) findViewById(R.id.login_email);
+        passwordView = (EditText) findViewById(R.id.login_password);
+        progressBar = (ProgressBar) findViewById(R.id.login_progress);
+        loginButton = (Button) findViewById(R.id.login_submit);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attemptLogin();
+            }
+        });
 
         emailView.setText(prefs.getString(App.PREF_EMAIL, ""));
         passwordView.setText(prefs.getString("password", "")); // STOPSHIP
@@ -78,7 +87,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    @OnClick(R.id.login_submit) void attemptLogin() {
+    void attemptLogin() {
         loginButton.setEnabled(false);
 
         // Reset errors.
@@ -127,12 +136,14 @@ public class LoginActivity extends AppCompatActivity {
         return email.contains("@"); //TODO Improve email prevalidation
     }
 
-    @Override public boolean onCreateOptionsMenu(Menu menu) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_login, menu);
         return true;
     }
 
-    @Override public boolean onOptionsItemSelected(MenuItem item) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -145,7 +156,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private class LoginAsyncTask extends AsyncTask<String, Void, Boolean> {
 
-        @Override protected Boolean doInBackground(String... params) {
+        @Override
+        protected Boolean doInBackground(String... params) {
             String email = params[0];
             String password = params[1];
 

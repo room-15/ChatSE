@@ -1,8 +1,8 @@
 package me.shreyasr.chatse.event;
 
 import me.shreyasr.chatse.event.presenter.EventPresenter;
-import me.shreyasr.chatse.event.presenter.message.MessageEventPresenter;
 import me.shreyasr.chatse.event.presenter.UnfilteredEventPresenter;
+import me.shreyasr.chatse.event.presenter.message.MessageEventPresenter;
 
 public class EventList {
 
@@ -12,7 +12,7 @@ public class EventList {
     public MessageEventPresenter messagePresenter = new MessageEventPresenter();
 
     private EventPresenter[] presenters
-            = new EventPresenter[] { unfilteredPresenter, messagePresenter };
+            = new EventPresenter[]{unfilteredPresenter, messagePresenter};
 
     public EventList(int roomNum) {
         this.roomNum = roomNum;

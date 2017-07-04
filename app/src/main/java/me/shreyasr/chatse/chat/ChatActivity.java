@@ -28,12 +28,11 @@ import me.shreyasr.chatse.util.Logger;
 
 public class ChatActivity extends AppCompatActivity implements ServiceConnection {
 
-    private IncomingEventServiceBinder serviceBinder;
-
-    private Handler networkHandler;
-    private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
     ChatFragmentPagerAdapter pagerAdapter;
     ViewPager viewPager;
+    private IncomingEventServiceBinder serviceBinder;
+    private Handler networkHandler;
+    private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +55,8 @@ public class ChatActivity extends AppCompatActivity implements ServiceConnection
         viewPager.setAdapter(pagerAdapter);
     }
 
-    @Override public void onServiceConnected(ComponentName name, IBinder binder) {
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder binder) {
         Logger.message(this.getClass(), "Service connect");
         serviceBinder = (IncomingEventServiceBinder) binder;
 
@@ -65,13 +65,15 @@ public class ChatActivity extends AppCompatActivity implements ServiceConnection
         loadChatFragment(new ChatRoom(Client.SITE_STACK_OVERFLOW, 15));
     }
 
-    @Override public void onServiceDisconnected(ComponentName name) {
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
         Logger.message(this.getClass(), "Service disconnect");
     }
 
     private void loadChatFragment(final ChatRoom room) {
         networkHandler.post(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 try {
                     addChatFragment(createChatFragment(room));
                 } catch (IOException | JSONException e) {
@@ -83,7 +85,8 @@ public class ChatActivity extends AppCompatActivity implements ServiceConnection
 
     private void addChatFragment(final ChatFragment fragment) {
         uiThreadHandler.post(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 pagerAdapter.addFragment(fragment);
                 setupTabLayout();
             }
@@ -121,7 +124,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceConnection
         return super.onOptionsItemSelected(item);
     }
 
-    private void setupTabLayout(){
+    private void setupTabLayout() {
         // Get and set up tablayout
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.room_tabs);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);

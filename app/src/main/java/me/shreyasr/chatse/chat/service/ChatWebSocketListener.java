@@ -26,19 +26,22 @@ public class ChatWebSocketListener implements WebSocketListener {
         this.site = site;
     }
 
-    @Override public void onOpen(WebSocket webSocket, Response response) {
+    @Override
+    public void onOpen(WebSocket webSocket, Response response) {
         Logger.event(this.getClass(), "websocket open: " + site);
         listener.onConnect(site, true);
     }
 
-    @Override public void onFailure(IOException e, Response response) {
+    @Override
+    public void onFailure(IOException e, Response response) {
         Logger.event(this.getClass(), "websocket fail: " + site);
         listener.onConnect(site, false);
         Log.e(e.getClass().getSimpleName(), e.getMessage(), e);
     }
 
-    @Override public void onMessage(BufferedSource payload,
-                                    WebSocket.PayloadType type) throws IOException {
+    @Override
+    public void onMessage(BufferedSource payload,
+                          WebSocket.PayloadType type) throws IOException {
         String message = payload.readUtf8();
         payload.close();
         Logger.event(this.getClass(), "websocket message: " + site + ": " + message);
@@ -50,17 +53,20 @@ public class ChatWebSocketListener implements WebSocketListener {
         }
     }
 
-    @Override public void onPong(Buffer payload) {
+    @Override
+    public void onPong(Buffer payload) {
         Logger.event(this.getClass(), "websocket pong: " + site);
     }
 
-    @Override public void onClose(int code, String reason) {
+    @Override
+    public void onClose(int code, String reason) {
         Logger.event(this.getClass(), "websocket close: " + site + ": " + code + ", " + reason);
     }
 
     interface ServiceWebsocketListener {
 
         void onNewEvents(String site, JsonNode root);
+
         void onConnect(String site, boolean success);
     }
 }

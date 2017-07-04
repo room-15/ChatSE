@@ -9,5 +9,8 @@ public class ClientManager {
 
     private static Client client
             = new Client(new OkHttpClient(), new PersistentCookieStore(App.get()));
-    public static Client getClient() { return client; }
+
+    public static Client getClient() {
+        return client;
+    }
 }

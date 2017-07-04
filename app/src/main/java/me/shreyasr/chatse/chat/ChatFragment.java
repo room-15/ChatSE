@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.squareup.okhttp.FormEncodingBuilder;
@@ -28,9 +29,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import me.shreyasr.chatse.App;
 import me.shreyasr.chatse.R;
 import me.shreyasr.chatse.chat.service.IncomingEventListener;
@@ -46,6 +44,19 @@ public class ChatFragment extends Fragment implements IncomingEventListener {
     private static final String EXTRA_ROOM = "room";
     private static final String EXTRA_NAME = "name";
     private static final String EXTRA_FKEY = "fkey";
+    EditText input;
+    RecyclerView messageList;
+    private String roomName;
+    private String chatFkey;
+    private ChatRoom room;
+    private Client client = ClientManager.getClient();
+    private Handler networkHandler;
+    private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
+    private MessageAdapter messageAdapter;
+    private ObjectMapper mapper = new ObjectMapper();
+    private ChatEventGenerator chatEventGenerator = new ChatEventGenerator();
+    private SharedPreferences prefs;
+    private EventList events;
 
     public static ChatFragment createInstance(ChatRoom room, String name, String fkey) {
         Bundle b = new Bundle(3);
@@ -57,24 +68,6 @@ public class ChatFragment extends Fragment implements IncomingEventListener {
         fragment.setArguments(b);
         return fragment;
     }
-
-    @Bind(R.id.chat_input_text) EditText input;
-    @Bind(R.id.chat_message_list) RecyclerView messageList;
-
-    private String roomName;
-    private String chatFkey;
-    private ChatRoom room;
-
-    private Client client = ClientManager.getClient();
-
-    private Handler networkHandler;
-    private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
-    private MessageAdapter messageAdapter;
-    private ObjectMapper mapper = new ObjectMapper();
-    private ChatEventGenerator chatEventGenerator = new ChatEventGenerator();
-    private SharedPreferences prefs;
-
-    private EventList events;
 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,15 +91,26 @@ public class ChatFragment extends Fragment implements IncomingEventListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
-        ButterKnife.bind(this, view);
 
         //TODO add cat pictures instant add
+
+        ImageButton chat_submit = (ImageButton) view.findViewById(R.id.chat_input_submit);
+        chat_submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onSubmit();
+            }
+        });
+
+        input = (EditText) view.findViewById(R.id.chat_input_text);
+        messageList = (RecyclerView) view.findViewById(R.id.chat_message_list);
 
         messageAdapter = new MessageAdapter(events, getActivity().getResources(), getActivity());
         messageList.setLayoutManager(
                 new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, true));
         messageList.setAdapter(messageAdapter);
         messageList.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.message_divider));
+
 
         input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -120,7 +124,8 @@ public class ChatFragment extends Fragment implements IncomingEventListener {
         });
 
         networkHandler.post(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 try {
                     JsonNode messages = getMessagesObject(client, room, 50);
                     handleNewEvents(messages.get("events"));
@@ -134,7 +139,8 @@ public class ChatFragment extends Fragment implements IncomingEventListener {
         return view;
     }
 
-    @Override public void handleNewEvents(JsonNode jsonEvents) {
+    @Override
+    public void handleNewEvents(JsonNode jsonEvents) {
         if (room == null || events == null) return;
         for (JsonNode jsonEvent : jsonEvents) {
             ChatEvent newEvent = chatEventGenerator.createEvent(jsonEvent);
@@ -143,17 +149,19 @@ public class ChatFragment extends Fragment implements IncomingEventListener {
             }
         }
         uiThreadHandler.post(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 messageAdapter.update();
             }
         });
     }
 
-    @OnClick(R.id.chat_input_submit) void onSubmit() {
+    void onSubmit() {
         final String content = input.getText().toString();
         input.setText("");
         networkHandler.post(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 try {
                     newMessage(client, room, chatFkey, content);
                 } catch (IOException e) {

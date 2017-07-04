@@ -32,8 +32,10 @@ public class IncomingEventService extends Service
 
     private static final String TAG = IncomingEventService.class.getSimpleName();
     private List<MessageListenerHolder> listeners = new ArrayList<>();
+    private Map<String, WebsocketConnectionStatus> siteStatuses = new HashMap<>();
 
-    public IncomingEventService() { }
+    public IncomingEventService() {
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -50,18 +52,8 @@ public class IncomingEventService extends Service
         listeners.add(new MessageListenerHolder(room, listener));
     }
 
-    class MessageListenerHolder {
-
-        public final IncomingEventListener listener;
-        public final ChatRoom room;
-
-        public MessageListenerHolder(ChatRoom room, IncomingEventListener listener) {
-            this.room = room;
-            this.listener = listener;
-        }
-    }
-
-    @Override public void onNewEvents(String site, JsonNode message) {
+    @Override
+    public void onNewEvents(String site, JsonNode message) {
         for (MessageListenerHolder holder : listeners) {
             if (!holder.room.site.equals(site)) continue;
             if (!message.has("r" + holder.room.num)) {
@@ -75,12 +67,10 @@ public class IncomingEventService extends Service
         }
     }
 
-    @Override public void onConnect(String site, boolean success) {
+    @Override
+    public void onConnect(String site, boolean success) {
         siteStatuses.put(site, WebsocketConnectionStatus.ESTABLISHED);
     }
-
-    private enum WebsocketConnectionStatus { ESTABLISHED, CREATING, DISCONNECTED }
-    private Map<String, WebsocketConnectionStatus> siteStatuses = new HashMap<>();
 
     RoomInfo loadRoom(Client client, ChatRoom room) throws IOException {
         Request chatPageRequest = new Request.Builder()
@@ -133,6 +123,19 @@ public class IncomingEventService extends Service
                 .build();
         WebSocketCall wsCall = WebSocketCall.create(client.getHttpClient(), wsRequest);
         wsCall.enqueue(new ChatWebSocketListener(site, this));
+    }
+
+    private enum WebsocketConnectionStatus {ESTABLISHED, CREATING, DISCONNECTED}
+
+    class MessageListenerHolder {
+
+        public final IncomingEventListener listener;
+        public final ChatRoom room;
+
+        public MessageListenerHolder(ChatRoom room, IncomingEventListener listener) {
+            this.room = room;
+            this.listener = listener;
+        }
     }
 
     public class RoomInfo {

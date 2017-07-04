@@ -7,5 +7,6 @@ import me.shreyasr.chatse.event.ChatEvent;
 public interface EventPresenter<T> {
 
     void addEvent(ChatEvent event, int roomNum);
+
     List<T> getEvents();
 }

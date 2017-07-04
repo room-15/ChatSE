@@ -62,6 +62,33 @@ public class PersistentCookieStore implements CookieStore {
         loadAllFromPersistence();
     }
 
+    /**
+     * Get the real URI from the cookie "domain" and "path" attributes, if they
+     * are not set then uses the URI provided (coming from the response)
+     *
+     * @param uri
+     * @param cookie
+     * @return
+     */
+    private static URI cookieUri(URI uri, HttpCookie cookie) {
+        URI cookieUri = uri;
+        if (cookie.getDomain() != null) {
+            // Remove the starting dot character of the domain, if exists (e.g: .domain.com -> domain.com)
+            String domain = cookie.getDomain();
+            if (domain.charAt(0) == '.') {
+                domain = domain.substring(1);
+            }
+            try {
+                cookieUri = new URI(uri.getScheme() == null ? "http"
+                        : uri.getScheme(), domain,
+                        cookie.getPath() == null ? "/" : cookie.getPath(), null);
+            } catch (URISyntaxException e) {
+                Log.w(TAG, e);
+            }
+        }
+        return cookieUri;
+    }
+
     private void loadAllFromPersistence() {
         allCookies = new HashMap<URI, Set<HttpCookie>>();
 
@@ -103,33 +130,6 @@ public class PersistentCookieStore implements CookieStore {
         targetCookies.add(cookie);
 
         saveToPersistence(uri, cookie);
-    }
-
-    /**
-     * Get the real URI from the cookie "domain" and "path" attributes, if they
-     * are not set then uses the URI provided (coming from the response)
-     *
-     * @param uri
-     * @param cookie
-     * @return
-     */
-    private static URI cookieUri(URI uri, HttpCookie cookie) {
-        URI cookieUri = uri;
-        if (cookie.getDomain() != null) {
-            // Remove the starting dot character of the domain, if exists (e.g: .domain.com -> domain.com)
-            String domain = cookie.getDomain();
-            if (domain.charAt(0) == '.') {
-                domain = domain.substring(1);
-            }
-            try {
-                cookieUri = new URI(uri.getScheme() == null ? "http"
-                        : uri.getScheme(), domain,
-                        cookie.getPath() == null ? "/" : cookie.getPath(), null);
-            } catch (URISyntaxException e) {
-                Log.w(TAG, e);
-            }
-        }
-        return cookieUri;
     }
 
     private void saveToPersistence(URI uri, HttpCookie cookie) {

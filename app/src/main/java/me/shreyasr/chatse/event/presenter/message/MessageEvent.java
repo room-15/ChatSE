@@ -6,11 +6,6 @@ import me.shreyasr.chatse.event.ChatEvent;
 
 public class MessageEvent implements Comparable<MessageEvent> {
 
-    MessageEvent previous;
-
-    public boolean isDeleted() { return content == null; }
-    public boolean isEdited() { return (previous != null || editCount != 0) && !isDeleted(); }
-
     public final String content;
     public final long timestamp;
     public final long id;
@@ -24,7 +19,7 @@ public class MessageEvent implements Comparable<MessageEvent> {
     public final boolean onebox;
     public final String onebox_type;
     public final String onebox_content;
-
+    MessageEvent previous;
     public MessageEvent(ChatEvent baseEvent) {
         this.content = baseEvent.content;
         this.timestamp = baseEvent.time_stamp;
@@ -41,13 +36,23 @@ public class MessageEvent implements Comparable<MessageEvent> {
         this.onebox_content = baseEvent.onebox_content;
     }
 
-    @Override public boolean equals(Object o) {
+    public boolean isDeleted() {
+        return content == null;
+    }
+
+    public boolean isEdited() {
+        return (previous != null || editCount != 0) && !isDeleted();
+    }
+
+    @Override
+    public boolean equals(Object o) {
         if (!(o instanceof MessageEvent)) return false;
         MessageEvent event = (MessageEvent) o;
         return this.messageId == event.messageId;
     }
 
-    @Override public int compareTo(@NonNull MessageEvent other) {
+    @Override
+    public int compareTo(@NonNull MessageEvent other) {
         if (this.equals(other)) {
             return 0;
         }
