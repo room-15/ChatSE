@@ -29,7 +29,7 @@ public class ChatEvent {
     public int id = -1;
 
     public String room_name;
-    public String content = null;
+    public String contents = null;
     public int message_edits = 0;
     public int message_stars = 0;
     public int message_owner_stars = 0;
@@ -69,6 +69,6 @@ public class ChatEvent {
         }
 
 
-        this.content = HtmlEscape.unescapeHtml(content);
+        this.contents = HtmlEscape.unescapeHtml(content);
     }
 }

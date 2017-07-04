@@ -21,7 +21,7 @@ public class MessageEvent implements Comparable<MessageEvent> {
     public final String onebox_content;
     MessageEvent previous;
     public MessageEvent(ChatEvent baseEvent) {
-        this.content = baseEvent.content;
+        this.content = baseEvent.contents;
         this.timestamp = baseEvent.time_stamp;
         this.id = baseEvent.id;
         this.userId = baseEvent.user_id;
