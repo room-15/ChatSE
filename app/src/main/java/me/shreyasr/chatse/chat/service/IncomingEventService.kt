@@ -1,0 +1,132 @@
+package me.shreyasr.chatse.chat.service
+
+import android.app.Service
+import android.content.Intent
+import android.os.IBinder
+import android.util.Log
+
+import com.squareup.okhttp.FormEncodingBuilder
+import com.squareup.okhttp.Request
+import com.squareup.okhttp.RequestBody
+import com.squareup.okhttp.Response
+import com.squareup.okhttp.ws.WebSocketCall
+
+import org.codehaus.jackson.JsonNode
+import org.json.JSONException
+import org.json.JSONObject
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+
+import java.io.IOException
+import java.util.ArrayList
+import java.util.HashMap
+
+import me.shreyasr.chatse.chat.ChatRoom
+import me.shreyasr.chatse.network.Client
+import me.shreyasr.chatse.util.Logger
+
+class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketListener {
+    private val listeners = ArrayList<MessageListenerHolder>()
+    private val siteStatuses = HashMap<String, WebsocketConnectionStatus>()
+
+    override fun onBind(intent: Intent): IBinder? {
+        return IncomingEventServiceBinder(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy")
+    }
+
+    internal fun registerListener(room: ChatRoom, listener: IncomingEventListener) {
+        listeners.add(MessageListenerHolder(room, listener))
+    }
+
+    override fun onNewEvents(site: String, message: JsonNode) {
+        for (holder in listeners) {
+            if (holder.room.site != site) continue
+            if (!message.has("r" + holder.room.num)) {
+                Log.e("No room element", message.toString())
+                return
+            }
+            val roomNode = message.get("r" + holder.room.num)
+            if (roomNode.has("e")) {
+                holder.listener.handleNewEvents(roomNode.get("e"))
+            }
+        }
+    }
+
+    override fun onConnect(site: String, success: Boolean) {
+        siteStatuses.put(site, WebsocketConnectionStatus.ESTABLISHED)
+    }
+
+    @Throws(IOException::class)
+    internal fun loadRoom(client: Client, room: ChatRoom): RoomInfo {
+        val chatPageRequest = Request.Builder()
+                .url(room.site + "/rooms/" + room.num)
+                .build()
+        val chatPageResponse = client.newCall(chatPageRequest).execute()
+        val chatPage = Jsoup.parse(chatPageResponse.body().string())
+
+        val fkey = chatPage.select("input[name=fkey]").attr("value")
+        val name = chatPage.select("span[id=roomname]").text()
+
+        Logger.message(this.javaClass, "Loaded room: " + name)
+
+        return RoomInfo(name, fkey)
+    }
+
+    @Throws(IOException::class, JSONException::class)
+    internal fun joinRoom(client: Client, room: ChatRoom, chatFkey: String) {
+        if (!siteStatuses.containsKey(room.site)) {
+            siteStatuses.put(room.site, WebsocketConnectionStatus.DISCONNECTED)
+        }
+        val wsUrl = registerRoom(client, room, chatFkey)
+        if (siteStatuses[room.site] != WebsocketConnectionStatus.ESTABLISHED) {
+            siteStatuses.put(room.site, WebsocketConnectionStatus.CREATING)
+            initWs(client, wsUrl, room.site)
+        }
+    }
+
+    @Throws(IOException::class, JSONException::class)
+    private fun registerRoom(client: Client, room: ChatRoom, chatFkey: String): String {
+        val wsUrlRequestBody = FormEncodingBuilder()
+                .add("roomid", room.num.toString())
+                .add("fkey", chatFkey).build()
+        val wsUrlRequest = Request.Builder()
+                .url(room.site + "/ws-auth")
+                .post(wsUrlRequestBody)
+                .build()
+
+        val wsRegisterResponse = client.newCall(wsUrlRequest).execute()
+        val wsUrlJson = JSONObject(wsRegisterResponse.body().string())
+        return wsUrlJson.getString("url")
+    }
+
+    @Throws(IOException::class)
+    private fun initWs(client: Client, wsUrl: String, site: String) {
+        val wsRequest = Request.Builder()
+                .addHeader("User-Agent", Client.USER_AGENT)
+                .addHeader("Sec-WebSocket-Extensions", "permessage-deflate")
+                .addHeader("Sec-WebSocket-Extensions", "client_max_window_bits")
+                .addHeader("Origin", site)
+                .url(wsUrl + "?l=0")
+                .build()
+        val wsCall = WebSocketCall.create(client.httpClient, wsRequest)
+        wsCall.enqueue(ChatWebSocketListener(site, this))
+    }
+
+    private enum class WebsocketConnectionStatus {
+        ESTABLISHED, CREATING, DISCONNECTED
+    }
+
+    internal inner class MessageListenerHolder(val room: ChatRoom, val listener: IncomingEventListener)
+
+    inner class RoomInfo internal constructor(val name: String, val fkey: String)
+
+    companion object {
+
+        private val TAG = IncomingEventService::class.java!!.getSimpleName()
+    }
+}
+
