@@ -34,7 +34,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        prefs = App.getPrefs(this)
+        prefs = App.sharedPreferences
 
         if (prefs.getBoolean(App.PREF_HAS_CREDS, false)) {
             this.startActivity(Intent(this@LoginActivity, ChatActivity()::class.java))

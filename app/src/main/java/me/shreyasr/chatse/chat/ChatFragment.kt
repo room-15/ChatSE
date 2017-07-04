@@ -56,7 +56,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
 
         events = EventList(room!!.num)
 
-        prefs = App.getPrefs(activity)
+        prefs = App.sharedPreferences
 
         val handlerThread = HandlerThread("NetworkHandlerThread")
         handlerThread.start()

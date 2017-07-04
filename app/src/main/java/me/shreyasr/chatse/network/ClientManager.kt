@@ -7,5 +7,5 @@ import me.shreyasr.chatse.network.cookie.PersistentCookieStore
 
 object ClientManager {
 
-    val client = Client(OkHttpClient(), PersistentCookieStore(App.get()!!))
+    val client = Client(OkHttpClient(), PersistentCookieStore(App.instance))
 }
