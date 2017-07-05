@@ -5,7 +5,12 @@ import com.squareup.okhttp.OkHttpClient
 import me.shreyasr.chatse.App
 import me.shreyasr.chatse.network.cookie.PersistentCookieStore
 
+/**
+ * Static manager of our HTTP Client.
+ */
 object ClientManager {
-
-    val client = Client(OkHttpClient(), PersistentCookieStore(App.get()!!))
+    /**
+     * The client to use for network requests.
+     */
+    val client = Client(OkHttpClient(), PersistentCookieStore(App.instance))
 }

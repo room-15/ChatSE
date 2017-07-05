@@ -8,7 +8,6 @@ import android.os.Looper
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,15 +24,16 @@ import me.shreyasr.chatse.event.ChatEventGenerator
 import me.shreyasr.chatse.event.EventList
 import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
-import me.shreyasr.chatse.util.Logger
 import org.codehaus.jackson.JsonNode
 import org.codehaus.jackson.map.ObjectMapper
+import timber.log.Timber
 import java.io.IOException
 
 class ChatFragment : Fragment(), IncomingEventListener {
-    internal lateinit var input: EditText
-    internal lateinit var messageList: RecyclerView
-    private lateinit var roomName: String
+    private lateinit var input: EditText
+    private lateinit var messageList: RecyclerView
+    private lateinit var prefs: SharedPreferences
+    private lateinit var events: EventList
     private var chatFkey: String? = null
     private var room: ChatRoom? = null
     private val client = ClientManager.client
@@ -42,8 +42,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
     private var messageAdapter: MessageAdapter? = null
     private val mapper = ObjectMapper()
     private val chatEventGenerator = ChatEventGenerator()
-    private var prefs: SharedPreferences? = null
-    private var events: EventList? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,9 +52,8 @@ class ChatFragment : Fragment(), IncomingEventListener {
         assert(chatFkey != null)
         assert(room != null)
 
-        events = EventList(room!!.num)
-
-        prefs = App.getPrefs(activity)
+        events = EventList(room?.num ?: 0)
+        prefs = App.sharedPreferences
 
         val handlerThread = HandlerThread("NetworkHandlerThread")
         handlerThread.start()
@@ -65,23 +62,23 @@ class ChatFragment : Fragment(), IncomingEventListener {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater!!.inflate(R.layout.fragment_chat, container, false)
+        val view = inflater?.inflate(R.layout.fragment_chat, container, false)
 
-        //TODO add cat pictures instant add
+        //TODO: add cat pictures instant add
 
-        val chat_submit = view.findViewById(R.id.chat_input_submit) as ImageButton
+        val chat_submit = view?.findViewById(R.id.chat_input_submit) as ImageButton
         chat_submit.setOnClickListener { onSubmit() }
 
         input = view.findViewById(R.id.chat_input_text) as EditText
         messageList = view.findViewById(R.id.chat_message_list) as RecyclerView
 
-        messageAdapter = MessageAdapter(events!!, activity.resources, activity)
+        messageAdapter = MessageAdapter(events)
         messageList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, true)
         messageList.adapter = messageAdapter
-        messageList.addItemDecoration(DividerItemDecoration(activity, R.drawable.message_divider))
+        messageList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))
 
 
-        input.setOnEditorActionListener(TextView.OnEditorActionListener { v, actionId, event ->
+        input.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 onSubmit()
                 return@OnEditorActionListener true
@@ -89,12 +86,12 @@ class ChatFragment : Fragment(), IncomingEventListener {
             false
         })
 
-        networkHandler!!.post {
+        networkHandler?.post {
             try {
-                val messages = getMessagesObject(client, room!!, 50)
+                val messages = getMessagesObject(client, room, 50)
                 handleNewEvents(messages.get("events"))
             } catch (e: IOException) {
-                Log.e(e::class.simpleName, e.message, e)
+                Timber.e(e)
             }
         }
 
@@ -102,67 +99,64 @@ class ChatFragment : Fragment(), IncomingEventListener {
         return view
     }
 
-    override fun handleNewEvents(jsonEvents: JsonNode) {
-        if (room == null || events == null) return
-        for (jsonEvent in jsonEvents) {
-            val newEvent = chatEventGenerator.createEvent(jsonEvent)
-            if (newEvent != null) {
-                if (newEvent.room_id == room!!.num) {
-                    (events as EventList).addEvent(newEvent)
-                }
-            }
-        }
-        uiThreadHandler.post { messageAdapter!!.update() }
+    override fun handleNewEvents(messagesJson: JsonNode) {
+        if (room == null) return
+
+        messagesJson
+                .mapNotNull { chatEventGenerator.createEvent(it) }
+                .filter { it.room_id == room?.num }
+                .forEach { events.addEvent(it) }
+
+        uiThreadHandler.post { messageAdapter?.update() }
     }
 
-    internal fun onSubmit() {
+    private fun onSubmit() {
         val content = input.text.toString()
         input.setText("")
-        networkHandler!!.post {
+        networkHandler?.post {
             try {
-                newMessage(client, room!!, chatFkey!!, content)
+                newMessage(client, room, chatFkey, content)
             } catch (e: IOException) {
-                Log.e(e::class.simpleName, e.message, e)
+                Timber.e(e)
             }
         }
     }
 
     @Throws(IOException::class)
-    private fun getMessagesObject(client: Client, room: ChatRoom, count: Int): JsonNode {
+    private fun getMessagesObject(client: Client, room: ChatRoom?, count: Int): JsonNode {
         val getMessagesRequestBody = FormEncodingBuilder()
                 .add("since", 0.toString())
                 .add("mode", "Messages")
                 .add("msgCount", count.toString())
-                .add("fkey", chatFkey!!)
+                .add("fkey", chatFkey)
                 .build()
         val getMessagesRequest = Request.Builder()
-                .url(room.site + "/chats/" + room.num + "/events")
+                .url(room?.site + "/chats/" + room?.num + "/events")
                 .post(getMessagesRequestBody)
                 .build()
+
         val getMessagesResponse = client.newCall(getMessagesRequest).execute()
         return mapper.readTree(getMessagesResponse.body().byteStream())
     }
 
     @Throws(IOException::class)
-    private fun newMessage(client: Client, room: ChatRoom,
-                           fkey: String, message: String) {
+    private fun newMessage(client: Client, room: ChatRoom?,
+                           fkey: String?, message: String) {
         val newMessageRequestBody = FormEncodingBuilder()
                 .add("text", message)
                 .add("fkey", fkey)
                 .build()
         val newMessageRequest = Request.Builder()
-                .url(room.site + "/chats/" + room.num + "/messages/new/")
+                .url(room?.site + "/chats/" + room?.num + "/messages/new/")
                 .post(newMessageRequestBody)
                 .build()
-        val newMessageResponse = client.newCall(newMessageRequest).execute()
-        Logger.event(this.javaClass, "New message")
+
+        client.newCall(newMessageRequest).execute()
+        Timber.i("New message")
     }
 
     val pageTitle: String
-        get() {
-            roomName = arguments.getString(EXTRA_NAME)
-            return roomName
-        }
+        get() = arguments.getString(EXTRA_NAME)
 
     companion object {
 

@@ -1,8 +1,8 @@
 package me.shreyasr.chatse.event.presenter.message
 
-import android.util.Log
 import me.shreyasr.chatse.event.ChatEvent
 import me.shreyasr.chatse.event.presenter.EventPresenter
+import timber.log.Timber
 import java.util.*
 
 class MessageEventPresenter : EventPresenter<MessageEvent> {
@@ -16,7 +16,7 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                 val newMessage = MessageEvent(event)
                 val originalMessage = messages.floor(newMessage)
                 if (originalMessage != newMessage) {
-                    Log.w("MessageEventPresenter", "Attempting to edit nonexistent message")
+                    Timber.w("Attempting to edit nonexistent message")
                     return
                 }
                 newMessage.previous = originalMessage

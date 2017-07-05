@@ -6,22 +6,12 @@ import android.os.Parcelable
 /**
  * Represents a room: a site and a room number. Immutable.
  */
-class ChatRoom : Parcelable {
-    val site: String
-    val num: Int
+class ChatRoom(val site: String, val num: Int) : Parcelable {
 
-    constructor(site: String, num: Int) {
-        this.site = site
-        this.num = num
-    }
-
-    protected constructor(`in`: Parcel) {
-        site = `in`.readString()
-        num = `in`.readInt()
-    }
+    private constructor(source: Parcel): this(source.readString(), source.readInt())
 
     override fun toString(): String {
-        return "Room " + num
+        return "Room $num"
     }
 
     override fun describeContents(): Int {
@@ -34,8 +24,7 @@ class ChatRoom : Parcelable {
     }
 
     companion object {
-
-        val CREATOR: Parcelable.Creator<ChatRoom> = object : Parcelable.Creator<ChatRoom> {
+        @JvmField val CREATOR: Parcelable.Creator<ChatRoom> = object : Parcelable.Creator<ChatRoom> {
             override fun createFromParcel(`in`: Parcel): ChatRoom {
                 return ChatRoom(`in`)
             }

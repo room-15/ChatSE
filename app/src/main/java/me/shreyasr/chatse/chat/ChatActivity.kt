@@ -9,20 +9,18 @@ import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.view.Menu
-import android.view.MenuItem
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.service.IncomingEventService
 import me.shreyasr.chatse.chat.service.IncomingEventServiceBinder
 import me.shreyasr.chatse.network.Client
-import me.shreyasr.chatse.util.Logger
 import org.json.JSONException
+import timber.log.Timber
 import java.io.IOException
 
 class ChatActivity : AppCompatActivity(), ServiceConnection {
 
-    internal lateinit var pagerAdapter: ChatFragmentPagerAdapter
-    internal lateinit var viewPager: ViewPager
+    private lateinit var pagerAdapter: ChatFragmentPagerAdapter
+    private lateinit var viewPager: ViewPager
     private lateinit var serviceBinder: IncomingEventServiceBinder
     private var networkHandler: Handler? = null
     private val uiThreadHandler = Handler(Looper.getMainLooper())
@@ -48,7 +46,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     }
 
     override fun onServiceConnected(name: ComponentName, binder: IBinder) {
-        Logger.message(this.javaClass, "Service connect")
+        Timber.d("Service connect")
         serviceBinder = binder as IncomingEventServiceBinder
 
         //TODO: Don't hardcode this.
@@ -57,22 +55,19 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
-        Logger.message(this.javaClass, "Service disconnect")
+        Timber.d("Service disconnect")
     }
 
     private fun loadChatFragment(room: ChatRoom) {
-        networkHandler?.post(object : Runnable {
-            override fun run() {
-                try {
-                    addChatFragment(createChatFragment(room))
-                } catch (e: IOException) {
-                    Logger.exception(this.javaClass, "Failed to create chat fragment", e)
-                } catch (e: JSONException) {
-                    Logger.exception(this.javaClass, "Failed to create chat fragment", e)
-                }
-
+        networkHandler?.post {
+            try {
+                addChatFragment(createChatFragment(room))
+            } catch (e: IOException) {
+                Timber.e("Failed to create chat fragment", e)
+            } catch (e: JSONException) {
+                Timber.e("Failed to create chat fragment", e)
             }
-        })
+        }
     }
 
     private fun addChatFragment(fragment: ChatFragment) {
@@ -90,22 +85,6 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         serviceBinder.registerListener(room, chatFragment)
 
         return chatFragment
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_chat, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-
-
-        if (id == R.id.action_settings) {
-            return true
-        }
-
-        return super.onOptionsItemSelected(item)
     }
 
     private fun setupTabLayout() {

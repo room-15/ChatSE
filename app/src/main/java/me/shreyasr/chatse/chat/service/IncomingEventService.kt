@@ -9,11 +9,11 @@ import com.squareup.okhttp.Request
 import com.squareup.okhttp.ws.WebSocketCall
 import me.shreyasr.chatse.chat.ChatRoom
 import me.shreyasr.chatse.network.Client
-import me.shreyasr.chatse.util.Logger
 import org.codehaus.jackson.JsonNode
 import org.json.JSONException
 import org.json.JSONObject
 import org.jsoup.Jsoup
+import timber.log.Timber
 import java.io.IOException
 import java.util.*
 
@@ -27,10 +27,10 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(TAG, "onDestroy")
+        Timber.d("onDestroy")
     }
 
-    internal fun registerListener(room: ChatRoom, listener: IncomingEventListener) {
+    fun registerListener(room: ChatRoom, listener: IncomingEventListener) {
         listeners.add(MessageListenerHolder(room, listener))
     }
 
@@ -63,7 +63,7 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
         val fkey = chatPage.select("input[name=fkey]").attr("value")
         val name = chatPage.select("span[id=roomname]").text()
 
-        Logger.message(this.javaClass, "Loaded room: " + name)
+        Timber.i("Loaded room: $name")
 
         return RoomInfo(name, fkey)
     }
@@ -112,13 +112,8 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
         ESTABLISHED, CREATING, DISCONNECTED
     }
 
-    internal inner class MessageListenerHolder(val room: ChatRoom, val listener: IncomingEventListener)
+    class MessageListenerHolder(val room: ChatRoom, val listener: IncomingEventListener)
 
-    inner class RoomInfo internal constructor(val name: String, val fkey: String)
-
-    companion object {
-
-        private val TAG = IncomingEventService::class.java!!.getSimpleName()
-    }
+    class RoomInfo internal constructor(val name: String, val fkey: String)
 }
 
