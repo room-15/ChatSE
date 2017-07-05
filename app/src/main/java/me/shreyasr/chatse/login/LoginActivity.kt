@@ -6,9 +6,6 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
@@ -20,30 +17,34 @@ import me.shreyasr.chatse.chat.ChatActivity
 import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
 import org.jsoup.Jsoup
+import timber.log.Timber
 import java.io.IOException
 
+/**
+ * Activity to login the user.
+ */
 class LoginActivity : AppCompatActivity() {
 
-    internal lateinit var emailView: EditText
-    internal lateinit var passwordView: EditText
-    internal lateinit var progressBar: ProgressBar
-    internal lateinit var loginButton: Button
-
-    internal lateinit var prefs: SharedPreferences
+    // Views
+    lateinit var emailView: EditText
+    lateinit var passwordView: EditText
+    lateinit var progressBar: ProgressBar
+    lateinit var loginButton: Button
+    lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         prefs = App.sharedPreferences
-
         if (prefs.getBoolean(App.PREF_HAS_CREDS, false)) {
-            this.startActivity(Intent(this@LoginActivity, ChatActivity()::class.java))
+            this.startActivity(Intent(this, ChatActivity::class.java))
             this.finish()
             return
         }
 
         setContentView(R.layout.activity_login)
 
+        // Get views
         emailView = findViewById(R.id.login_email) as EditText
         passwordView = findViewById(R.id.login_password) as EditText
         progressBar = findViewById(R.id.login_progress) as ProgressBar
@@ -65,17 +66,14 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 
-    internal fun attemptLogin() {
+    fun attemptLogin() {
         loginButton.isEnabled = false
 
         // Reset errors.
         emailView.error = null
         passwordView.error = null
 
-        val errorView = validateInputs()
-
-        if (errorView != null) {
-            errorView.requestFocus()
+        if (!validateInputs()) {
             loginButton.isEnabled = true
             return
         }
@@ -85,52 +83,41 @@ class LoginActivity : AppCompatActivity() {
         LoginAsyncTask().execute(emailView.text.toString(), passwordView.text.toString())
     }
 
-    private fun validateInputs(): View? {
+    private fun validateInputs(): Boolean {
+        var isValid = true
         val email = emailView.text.toString()
         val password = passwordView.text.toString()
 
-        if (password.isEmpty()) {
-            passwordView.error = getString(R.string.err_blank_password)
-            return passwordView
+        if (!isEmailValid(email)) {
+            emailView.error = getString(R.string.err_invalid_email)
+            isValid = false
         }
 
         if (email.isEmpty()) {
             emailView.error = getString(R.string.err_blank_email)
-            return emailView
+            isValid = false
         }
 
-        if (!isEmailValid(email)) {
-            emailView.error = getString(R.string.err_invalid_email)
-            return emailView
+        if (password.isNullOrBlank()) {
+            passwordView.error = getString(R.string.err_blank_password)
+            isValid = false
         }
 
         // STOPSHIP
         //TODO store using AccountManager
-        prefs.edit().putString(App.PREF_EMAIL, email).putString("password", password).apply()
+        if (isValid) {
+            prefs.edit().putString(App.PREF_EMAIL, email).putString("password", password).apply()
+        }
 
-        return null
+        return isValid
     }
 
     private fun isEmailValid(email: String): Boolean {
         return email.contains("@") //TODO Improve email prevalidation
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_login, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-
-
-        if (id == R.id.action_settings) {
-            return true
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
+    //TODO: We don't want this to be an inner class. We can fix it, or just replace it
+    // with RxJava like #6 suggests.
     private inner class LoginAsyncTask : AsyncTask<String, Void, Boolean>() {
 
         override fun doInBackground(vararg params: String): Boolean? {
@@ -145,7 +132,7 @@ class LoginActivity : AppCompatActivity() {
                 loginToSite(client, "https://stackoverflow.com", email, password)
                 return true
             } catch (e: IOException) {
-                Log.e(e.javaClass.getSimpleName(), e.message, e)
+                Timber.e(e)
                 return false
             }
 
@@ -180,7 +167,7 @@ class LoginActivity : AppCompatActivity() {
                     .post(soLoginRequestBody)
                     .build()
             val soLoginResponse = client.newCall(soLoginRequest).execute()
-            Log.i("site login", soLoginResponse.toString())
+            Timber.i("Site login: " + soLoginResponse.toString())
         }
 
         @Throws(IOException::class)
@@ -207,7 +194,7 @@ class LoginActivity : AppCompatActivity() {
                     .post(data.build())
                     .build()
             val loginResponse = client.newCall(loginRequest).execute()
-            Log.i("se login", loginResponse.toString())
+            Timber.i("So login: " + loginResponse.toString())
         }
 
         @Throws(IOException::class)
@@ -231,7 +218,7 @@ class LoginActivity : AppCompatActivity() {
                     .post(seLoginRequestBody)
                     .build()
             val seLoginResponse = client.newCall(seLoginRequest).execute()
-            Log.i("se openid login", seLoginResponse.toString())
+            Timber.i("Se openid login: " + seLoginResponse.toString())
         }
     }
 }
