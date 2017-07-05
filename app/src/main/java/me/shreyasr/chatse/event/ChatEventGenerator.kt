@@ -5,6 +5,9 @@ import org.codehaus.jackson.map.ObjectMapper
 import timber.log.Timber
 import java.io.IOException
 
+/**
+ * Generates an event for a JSON payload.
+ */
 class ChatEventGenerator {
 
     private val mapper = ObjectMapper()

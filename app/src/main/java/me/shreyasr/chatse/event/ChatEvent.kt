@@ -31,6 +31,7 @@ class ChatEvent {
 
     var message_starred = false
 
+    //TODO:
     fun setContent(content: String) {
         val doc = Jsoup.parse(content, "http://chat.stackexchange.com/")
         val elements = doc.select("div")

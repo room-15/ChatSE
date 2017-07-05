@@ -1,11 +1,9 @@
 package me.shreyasr.chatse.event.presenter.message
 
-import android.util.Log
 import me.shreyasr.chatse.event.ChatEvent
+import timber.log.Timber
 
 class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
-
-
     val content: String?
     val timestamp: Long
     val id: Long
@@ -22,7 +20,7 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
     internal var previous: MessageEvent? = null
 
     init {
-        Log.wtf("THISSHIT", baseEvent.toString())
+        Timber.wtf(baseEvent.toString())
         this.content = baseEvent.contents
         this.timestamp = baseEvent.time_stamp
         this.id = baseEvent.id.toLong()
@@ -36,7 +34,6 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
         this.onebox = baseEvent.message_onebox
         this.onebox_type = baseEvent.onebox_type
         this.onebox_content = baseEvent.onebox_content
-
     }
 
     val isDeleted: Boolean
@@ -56,5 +53,23 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
             return 0
         }
         return -java.lang.Long.valueOf(timestamp)!!.compareTo(other.timestamp)
+    }
+
+    override fun hashCode(): Int {
+        var result = content?.hashCode() ?: 0
+        result = 31 * result + timestamp.hashCode()
+        result = 31 * result + id.hashCode()
+        result = 31 * result + userId.hashCode()
+        result = 31 * result + userName.hashCode()
+        result = 31 * result + roomId.hashCode()
+        result = 31 * result + roomName.hashCode()
+        result = 31 * result + messageId
+        result = 31 * result + parentId.hashCode()
+        result = 31 * result + editCount
+        result = 31 * result + onebox.hashCode()
+        result = 31 * result + onebox_type.hashCode()
+        result = 31 * result + onebox_content.hashCode()
+        result = 31 * result + (previous?.hashCode() ?: 0)
+        return result
     }
 }
