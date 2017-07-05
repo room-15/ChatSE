@@ -9,8 +9,6 @@ import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.view.Menu
-import android.view.MenuItem
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.service.IncomingEventService
 import me.shreyasr.chatse.chat.service.IncomingEventServiceBinder
@@ -21,8 +19,8 @@ import java.io.IOException
 
 class ChatActivity : AppCompatActivity(), ServiceConnection {
 
-    internal lateinit var pagerAdapter: ChatFragmentPagerAdapter
-    internal lateinit var viewPager: ViewPager
+    private lateinit var pagerAdapter: ChatFragmentPagerAdapter
+    private lateinit var viewPager: ViewPager
     private lateinit var serviceBinder: IncomingEventServiceBinder
     private var networkHandler: Handler? = null
     private val uiThreadHandler = Handler(Looper.getMainLooper())
@@ -61,18 +59,15 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun loadChatFragment(room: ChatRoom) {
-        networkHandler?.post(object : Runnable {
-            override fun run() {
-                try {
-                    addChatFragment(createChatFragment(room))
-                } catch (e: IOException) {
-                    Timber.e("Failed to create chat fragment", e)
-                } catch (e: JSONException) {
-                    Timber.e("Failed to create chat fragment", e)
-                }
-
+        networkHandler?.post {
+            try {
+                addChatFragment(createChatFragment(room))
+            } catch (e: IOException) {
+                Timber.e("Failed to create chat fragment", e)
+            } catch (e: JSONException) {
+                Timber.e("Failed to create chat fragment", e)
             }
-        })
+        }
     }
 
     private fun addChatFragment(fragment: ChatFragment) {
@@ -90,22 +85,6 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         serviceBinder.registerListener(room, chatFragment)
 
         return chatFragment
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_chat, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-
-
-        if (id == R.id.action_settings) {
-            return true
-        }
-
-        return super.onOptionsItemSelected(item)
     }
 
     private fun setupTabLayout() {

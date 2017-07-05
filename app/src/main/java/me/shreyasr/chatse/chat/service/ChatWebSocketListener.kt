@@ -20,10 +20,10 @@ class ChatWebSocketListener(private val site: String, private val listener: Serv
         listener.onConnect(site, true)
     }
 
-    override fun onFailure(e: IOException, response: Response) {
+    override fun onFailure(e: IOException, response: Response?) {
         Timber.i("websocket fail: $site")
         listener.onConnect(site, false)
-        Log.e(e.javaClass.simpleName, e.message, e)
+        Timber.e(e)
     }
 
     @Throws(IOException::class)
