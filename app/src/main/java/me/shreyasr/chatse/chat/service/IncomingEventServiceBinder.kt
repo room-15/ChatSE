@@ -17,11 +17,9 @@ class IncomingEventServiceBinder internal constructor(private val service: Incom
 
     /**
      * Load a specified room, getting the name of the room and the fkey.
-
+     *
      * @param room The room to load
-     * *
      * @return A RoomInfo object, containing the room name and the fkey
-     * *
      * @throws IOException If the page fails to load.
      */
     @Throws(IOException::class)
@@ -31,11 +29,9 @@ class IncomingEventServiceBinder internal constructor(private val service: Incom
 
     /**
      * Joins a specified chat room.
-
+     *
      * @param room The chat room to join
-     * *
      * @throws IOException   If the registration request or the websocket creation fails
-     * *
      * @throws JSONException If the registration requests fails to parse the websocket url
      */
     @Throws(IOException::class, JSONException::class)

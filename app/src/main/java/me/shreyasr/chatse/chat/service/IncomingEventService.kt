@@ -27,10 +27,10 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(TAG, "onDestroy")
+        Timber.d("onDestroy")
     }
 
-    internal fun registerListener(room: ChatRoom, listener: IncomingEventListener) {
+    fun registerListener(room: ChatRoom, listener: IncomingEventListener) {
         listeners.add(MessageListenerHolder(room, listener))
     }
 
@@ -112,13 +112,8 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
         ESTABLISHED, CREATING, DISCONNECTED
     }
 
-    internal inner class MessageListenerHolder(val room: ChatRoom, val listener: IncomingEventListener)
+    class MessageListenerHolder(val room: ChatRoom, val listener: IncomingEventListener)
 
-    inner class RoomInfo internal constructor(val name: String, val fkey: String)
-
-    companion object {
-
-        private val TAG = IncomingEventService::class.java!!.getSimpleName()
-    }
+    class RoomInfo internal constructor(val name: String, val fkey: String)
 }
 

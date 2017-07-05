@@ -32,6 +32,8 @@ import java.io.IOException
 class ChatFragment : Fragment(), IncomingEventListener {
     private lateinit var input: EditText
     private lateinit var messageList: RecyclerView
+    private lateinit var prefs: SharedPreferences
+    private lateinit var events: EventList
     private var chatFkey: String? = null
     private var room: ChatRoom? = null
     private val client = ClientManager.client
@@ -40,8 +42,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
     private var messageAdapter: MessageAdapter? = null
     private val mapper = ObjectMapper()
     private val chatEventGenerator = ChatEventGenerator()
-    private var prefs: SharedPreferences? = null
-    private var events: EventList? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,7 +72,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
         input = view.findViewById(R.id.chat_input_text) as EditText
         messageList = view.findViewById(R.id.chat_message_list) as RecyclerView
 
-        messageAdapter = MessageAdapter(events!!)
+        messageAdapter = MessageAdapter(events)
         messageList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, true)
         messageList.adapter = messageAdapter
         messageList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))
@@ -100,12 +100,12 @@ class ChatFragment : Fragment(), IncomingEventListener {
     }
 
     override fun handleNewEvents(messagesJson: JsonNode) {
-        if (room == null || events == null) return
+        if (room == null) return
 
         messagesJson
                 .mapNotNull { chatEventGenerator.createEvent(it) }
                 .filter { it.room_id == room?.num }
-                .forEach { (events as EventList).addEvent(it) }
+                .forEach { events.addEvent(it) }
 
         uiThreadHandler.post { messageAdapter?.update() }
     }
@@ -128,7 +128,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 .add("since", 0.toString())
                 .add("mode", "Messages")
                 .add("msgCount", count.toString())
-                .add("fkey", chatFkey!!)
+                .add("fkey", chatFkey)
                 .build()
         val getMessagesRequest = Request.Builder()
                 .url(room?.site + "/chats/" + room?.num + "/events")

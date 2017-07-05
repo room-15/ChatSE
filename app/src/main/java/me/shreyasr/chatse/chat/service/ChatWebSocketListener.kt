@@ -12,7 +12,6 @@ import timber.log.Timber
 import java.io.IOException
 
 class ChatWebSocketListener(private val site: String, private val listener: ServiceWebsocketListener) : WebSocketListener {
-
     private val mapper = ObjectMapper()
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -36,7 +35,7 @@ class ChatWebSocketListener(private val site: String, private val listener: Serv
             val root = mapper.readTree(message)
             listener.onNewEvents(site, root)
         } catch (e: IOException) {
-            Log.e(e.javaClass.simpleName, e.message, e)
+            Timber.e(e)
         }
 
     }
@@ -50,7 +49,6 @@ class ChatWebSocketListener(private val site: String, private val listener: Serv
     }
 
     interface ServiceWebsocketListener {
-
         fun onNewEvents(site: String, root: JsonNode)
 
         fun onConnect(site: String, success: Boolean)

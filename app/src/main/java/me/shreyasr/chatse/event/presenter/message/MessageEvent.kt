@@ -45,14 +45,14 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
     override fun equals(other: Any?): Boolean {
         if (other !is MessageEvent) return false
         val event = other as MessageEvent?
-        return this.messageId == event!!.messageId
+        return this.messageId == event?.messageId
     }
 
     override fun compareTo(other: MessageEvent): Int {
         if (this == other) {
             return 0
         }
-        return -java.lang.Long.valueOf(timestamp)!!.compareTo(other.timestamp)
+        return other.timestamp.compareTo(this.timestamp)
     }
 
     override fun hashCode(): Int {
