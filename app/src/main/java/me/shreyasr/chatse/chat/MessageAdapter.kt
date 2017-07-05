@@ -64,13 +64,13 @@ class MessageAdapter(val events: EventList, var messages: List<MessageEvent> = A
                         messageView.text = Html.fromHtml(message.content)
                     }
                 } else {
-                    oneboxImage.visibility = View.VISIBLE
-                    Log.wtf("ImageURL", message.onebox_content + " " + message.onebox_type)
-                    Ion.with(context)
-                            .load(message.onebox_content)
-                            .intoImageView(oneboxImage)
-                    // When we load an image remove any text from being recycled from the previous item.
-                    messageView.text = ""
+//\                    Log.wtf("ImageURL", message.onebox_content + " " + message.onebox_type)
+//                    Ion.with(context)
+//                            .load(message.onebox_content)
+//                            .intoImageView(oneboxImage)
+
+                    //TODO fix the images, reverting to just showing the image URL for now
+                    messageView.text = Html.fromHtml("<html><a href=\"" + message.onebox_content + "\">" + message.onebox_content + "</a></html>")
                 }
             }
 

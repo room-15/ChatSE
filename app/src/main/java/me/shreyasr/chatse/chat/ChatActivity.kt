@@ -65,8 +65,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
             val chatPageResponse = client.newCall(chatPageRequest).execute()
             val chatPage = Jsoup.parse(chatPageResponse.body().string())
 
-            val fkey = chatPage.getElementsByClass("room-name").filter { it.children()[0].hasAttr("href") }
-            fkey.forEach {
+            val rooms = chatPage.getElementsByClass("room-name").filter { it.children()[0].hasAttr("href") }
+            rooms.forEach {
                 val roomNum = it.child(0).attr("href").split("/")[2].toInt()
                 loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, roomNum))
             }
