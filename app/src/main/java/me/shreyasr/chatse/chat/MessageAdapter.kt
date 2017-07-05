@@ -1,8 +1,10 @@
 package me.shreyasr.chatse.chat
 
+import android.os.Build
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.text.Html
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,14 +52,20 @@ class MessageAdapter(val events: EventList, var messages: List<MessageEvent> = A
             if (message.isDeleted) {
                 messageView.setTextColor(ContextCompat.getColor(context, R.color.deleted))
                 messageView.text = context?.getString(R.string.removed)
-                oneboxImage.setImageDrawable(null)
+//                oneboxImage.setImageDrawable(null)
             } else {
                 if (!message.onebox) {
                     messageView.setTextColor(ContextCompat.getColor(context, R.color.primary_text))
                     messageView.text = message.content
-                    //TODO: Figure out the proper use of this
-                    messageView.text = Html.fromHtml(message.content)
+                    //If Android version is 24 and above use the updated version, otherwise use the deprecated version
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        messageView.text = Html.fromHtml(message.content, Html.FROM_HTML_MODE_LEGACY)
+                    } else {
+                        messageView.text = Html.fromHtml(message.content)
+                    }
                 } else {
+                    oneboxImage.visibility = View.VISIBLE
+                    Log.wtf("ImageURL", message.onebox_content + " " + message.onebox_type)
                     Ion.with(context)
                             .load(message.onebox_content)
                             .intoImageView(oneboxImage)

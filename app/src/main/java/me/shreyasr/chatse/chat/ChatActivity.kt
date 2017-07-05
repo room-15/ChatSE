@@ -9,11 +9,15 @@ import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import com.squareup.okhttp.Request
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.service.IncomingEventService
 import me.shreyasr.chatse.chat.service.IncomingEventServiceBinder
 import me.shreyasr.chatse.network.Client
+import me.shreyasr.chatse.network.ClientManager
+import org.jetbrains.anko.doAsync
 import org.json.JSONException
+import org.jsoup.Jsoup
 import timber.log.Timber
 import java.io.IOException
 
@@ -49,9 +53,25 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         Timber.d("Service connect")
         serviceBinder = binder as IncomingEventServiceBinder
 
-        //TODO: Don't hardcode this.
-        loadChatFragment(ChatRoom(Client.SITE_STACK_EXCHANGE, 1))
-        loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, 15))
+        joinRooms()
+    }
+
+    private fun joinRooms() {
+        val client = ClientManager.client
+        doAsync {
+            val chatPageRequest = Request.Builder()
+                    .url("https://chat.stackoverflow.com/rooms?tab=mine&sort=active")
+                    .build()
+            val chatPageResponse = client.newCall(chatPageRequest).execute()
+            val chatPage = Jsoup.parse(chatPageResponse.body().string())
+
+            val fkey = chatPage.getElementsByClass("room-name").filter { it.children()[0].hasAttr("href") }
+            fkey.forEach {
+                val roomNum = it.child(0).attr("href").split("/")[2].toInt()
+                loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, roomNum))
+            }
+
+        }
     }
 
     override fun onServiceDisconnected(name: ComponentName) {

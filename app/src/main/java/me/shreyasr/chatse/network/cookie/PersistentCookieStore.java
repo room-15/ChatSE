@@ -30,6 +30,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import java.io.IOException;
 import java.net.CookieStore;
 import java.net.HttpCookie;
 import java.net.URI;
@@ -46,6 +47,7 @@ public class PersistentCookieStore implements CookieStore {
     private static final String TAG = PersistentCookieStore.class
             .getSimpleName();
 
+    Context c;
     // Persistence
     private static final String SP_COOKIE_STORE = "cookieStore";
     private static final String SP_KEY_DELIMITER = "|"; // Unusual char in URL
@@ -57,6 +59,7 @@ public class PersistentCookieStore implements CookieStore {
     private Map<URI, Set<HttpCookie>> allCookies;
 
     public PersistentCookieStore(Context context) {
+        c = context;
         sharedPreferences = context.getSharedPreferences(SP_COOKIE_STORE,
                 Context.MODE_PRIVATE);
         loadAllFromPersistence();
@@ -119,6 +122,11 @@ public class PersistentCookieStore implements CookieStore {
     @Override
     public synchronized void add(URI uri, HttpCookie cookie) {
         uri = cookieUri(uri, cookie);
+        try {
+            new IonCookieManager(c).storeCookie(uri, cookie.getName(), cookie.getValue());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         Set<HttpCookie> targetCookies = allCookies.get(uri);
         if (targetCookies == null) {
