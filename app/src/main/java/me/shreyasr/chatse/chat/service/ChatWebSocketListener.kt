@@ -1,6 +1,5 @@
 package me.shreyasr.chatse.chat.service
 
-import android.util.Log
 import com.squareup.okhttp.Response
 import com.squareup.okhttp.ws.WebSocket
 import com.squareup.okhttp.ws.WebSocketListener

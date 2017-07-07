@@ -6,4 +6,5 @@
     <string name="chat_send_description">Send Message</string>
     <string name="chat_input_hint">Enter message&#230;</string>
     <string name="removed">(removed)</string>
+    <string name="join_room">Join Room</string>
 </resources>

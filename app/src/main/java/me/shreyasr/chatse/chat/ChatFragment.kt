@@ -8,6 +8,7 @@ import android.os.Looper
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,8 +65,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
                               savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.fragment_chat, container, false)
 
-        //TODO: add cat pictures instant add
-
         val chat_submit = view?.findViewById(R.id.chat_input_submit) as ImageButton
         chat_submit.setOnClickListener { onSubmit() }
 
@@ -101,7 +100,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
 
     override fun handleNewEvents(messagesJson: JsonNode) {
         if (room == null) return
-
+        Log.wtf("DAMNSON", messagesJson.valueAsText)
         messagesJson
                 .mapNotNull { chatEventGenerator.createEvent(it) }
                 .filter { it.room_id == room?.num }

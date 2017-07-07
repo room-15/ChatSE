@@ -9,6 +9,8 @@ import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.view.Menu
+import android.view.MenuItem
 import com.squareup.okhttp.Request
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.service.IncomingEventService
@@ -16,12 +18,27 @@ import me.shreyasr.chatse.chat.service.IncomingEventServiceBinder
 import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.intentFor
 import org.json.JSONException
 import org.jsoup.Jsoup
 import timber.log.Timber
 import java.io.IOException
 
 class ChatActivity : AppCompatActivity(), ServiceConnection {
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_chat, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item != null) {
+            when (item.itemId) {
+                R.id.search_rooms -> startActivity(intentFor<RoomSearchActivity>())
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
 
     private lateinit var pagerAdapter: ChatFragmentPagerAdapter
     private lateinit var viewPager: ViewPager
