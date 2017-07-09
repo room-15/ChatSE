@@ -122,11 +122,6 @@ public class PersistentCookieStore implements CookieStore {
     @Override
     public synchronized void add(URI uri, HttpCookie cookie) {
         uri = cookieUri(uri, cookie);
-        try {
-            new IonCookieManager(c).storeCookie(uri, cookie.getName(), cookie.getValue());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         Set<HttpCookie> targetCookies = allCookies.get(uri);
         if (targetCookies == null) {

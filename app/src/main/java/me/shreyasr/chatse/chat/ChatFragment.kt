@@ -100,7 +100,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
 
     override fun handleNewEvents(messagesJson: JsonNode) {
         if (room == null) return
-        Log.wtf("DAMNSON", messagesJson.valueAsText)
         messagesJson
                 .mapNotNull { chatEventGenerator.createEvent(it) }
                 .filter { it.room_id == room?.num }
@@ -175,3 +174,5 @@ class ChatFragment : Fragment(), IncomingEventListener {
         }
     }
 }
+
+

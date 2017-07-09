@@ -4,7 +4,7 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="chat_send_description">Send Message</string>
-    <string name="chat_input_hint">Enter message&#230;</string>
+    <string name="chat_input_hint">Enter message</string>
     <string name="removed">(removed)</string>
     <string name="join_room">Join Room</string>
 </resources>

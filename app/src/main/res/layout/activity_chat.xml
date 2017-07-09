@@ -1,29 +1,37 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tab="http://schemas.android.com/apk/res-auto"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <include layout="@layout/toolbar" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="left|start"
+        android:fitsSystemWindows="true">
 
-    <android.support.design.widget.TabLayout
-        android:id="@+id/room_tabs"
+        <ListView
+            android:id="@+id/navList"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="#ffeeeeee" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/primary"
-        tab:tabSelectedTextColor="@android:color/white"
-        tab:tabTextColor="@android:color/white" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="8dp"
-        android:background="@drawable/shadow" />
+        <include layout="@layout/toolbar" />
 
-    <android.support.v4.view.ViewPager xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/pager"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        tools:context="me.shreyasr.chatse.chat.ChatActivity" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:background="@drawable/shadow" />
 
-</LinearLayout>
+        <FrameLayout
+            android:id="@+id/fragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+</android.support.v4.widget.DrawerLayout>
