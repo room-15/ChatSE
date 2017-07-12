@@ -57,6 +57,7 @@ class ChatEvent {
                 onebox_content = ""
             }
         }
+//                oneboxImage.setImageDrawable(null)
 
 
         this.contents = HtmlEscape.unescapeHtml(content)

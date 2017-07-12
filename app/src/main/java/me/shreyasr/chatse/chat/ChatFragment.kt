@@ -76,7 +76,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
         messageList.adapter = messageAdapter
         messageList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))
 
-
         input.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 onSubmit()
@@ -97,6 +96,8 @@ class ChatFragment : Fragment(), IncomingEventListener {
         input.requestFocus()
         return view
     }
+
+
 
     override fun handleNewEvents(messagesJson: JsonNode) {
         if (room == null) return

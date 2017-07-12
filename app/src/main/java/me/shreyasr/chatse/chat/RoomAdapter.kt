@@ -11,6 +11,7 @@ import me.shreyasr.chatse.R
 
 class RoomAdapter(val list: MutableList<Room>, context: Context) : BaseAdapter() {
     val mInflater: LayoutInflater = LayoutInflater.from(context)
+    val mContext = context
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
 
@@ -32,7 +33,7 @@ class RoomAdapter(val list: MutableList<Room>, context: Context) : BaseAdapter()
     }
 
     private class ListRowHolder(row: View?) {
-        val name: TextView = row?.findViewById(R.id.room_name) as TextView
+        val name = row?.findViewById(R.id.room_name) as TextView
     }
 
     override fun getItem(position: Int): Room {

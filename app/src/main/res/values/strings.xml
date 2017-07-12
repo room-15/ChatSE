@@ -7,4 +7,8 @@
     <string name="chat_input_hint">Enter message</string>
     <string name="removed">(removed)</string>
     <string name="join_room">Join Room</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

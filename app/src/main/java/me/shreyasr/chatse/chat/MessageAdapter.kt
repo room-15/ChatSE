@@ -10,7 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.koushikdutta.ion.Ion
+import com.squareup.picasso.Picasso
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.event.EventList
 import me.shreyasr.chatse.event.presenter.message.MessageEvent
@@ -50,9 +50,9 @@ class MessageAdapter(val events: EventList, var messages: List<MessageEvent> = A
             val context = itemView?.context
 
             if (message.isDeleted) {
+                Log.wtf("DELETED", "TRUE")
                 messageView.setTextColor(ContextCompat.getColor(context, R.color.deleted))
                 messageView.text = context?.getString(R.string.removed)
-//                oneboxImage.setImageDrawable(null)
             } else {
                 if (!message.onebox) {
                     messageView.setTextColor(ContextCompat.getColor(context, R.color.primary_text))
@@ -64,13 +64,14 @@ class MessageAdapter(val events: EventList, var messages: List<MessageEvent> = A
                         messageView.text = Html.fromHtml(message.content)
                     }
                 } else {
-//\                    Log.wtf("ImageURL", message.onebox_content + " " + message.onebox_type)
-//                    Ion.with(context)
-//                            .load(message.onebox_content)
-//                            .intoImageView(oneboxImage)
+                    Picasso.with(context)
+                            .load(message.onebox_content)
+                            .placeholder(R.drawable.ic_add)
+                            .noFade()
+                            .into(oneboxImage)
 
                     //TODO fix the images, reverting to just showing the image URL for now
-                    messageView.text = Html.fromHtml("<html><a href=\"" + message.onebox_content + "\">" + message.onebox_content + "</a></html>")
+//                    messageView.text = Html.fromHtml("<html><a href=\"" + message.onebox_content + "\">" + message.onebox_content + "</a></html>")
                 }
             }
 

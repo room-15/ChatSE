@@ -5,15 +5,19 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.*
-import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemClickListener
 import android.widget.ListView
+import android.widget.Toast
 import com.squareup.okhttp.Request
+import kotlinx.android.synthetic.main.activity_chat.*
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.service.IncomingEventService
 import me.shreyasr.chatse.chat.service.IncomingEventServiceBinder
@@ -42,30 +46,20 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
         mAdapter = RoomAdapter(roomList, applicationContext)
 
-        // Setup toolbar
-        val navDrawer = findViewById(R.id.drawer_layout) as DrawerLayout
-        navDrawer.addDrawerListener(object : DrawerLayout.DrawerListener {
-            override fun onDrawerSlide(drawerView: View?, slideOffset: Float) {
-//                addRoomsToDrawer()
-            }
-
-            override fun onDrawerClosed(drawerView: View?) {
-                //Nothing
-            }
-
-            override fun onDrawerOpened(drawerView: View?) {
-                //Nothing
-            }
-
-            override fun onDrawerStateChanged(newState: Int) {
-                //Nothing
-            }
-        })
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
-        mDrawerList = findViewById(R.id.navList) as ListView
+        val toggle = ActionBarDrawerToggle(
+                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawer_layout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        mDrawerList = findViewById(R.id.lst_menu_items) as ListView
         mDrawerList.adapter = mAdapter
+        mDrawerList.onItemClickListener = OnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
+            loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, mAdapter.getItem(position).roomID.toInt()))
+            drawer_layout.closeDrawers()
+        }
 
         val serviceIntent = Intent(this, IncomingEventService::class.java)
         this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
@@ -74,12 +68,12 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         val handlerThread = HandlerThread("ChatActivityNetworkHandlerThread")
         handlerThread.start()
         networkHandler = Handler(handlerThread.looper)
-        addRoomsToDrawer()
     }
 
     override fun onServiceConnected(name: ComponentName, binder: IBinder) {
         Timber.d("Service connect")
         serviceBinder = binder as IncomingEventServiceBinder
+        addRoomsToDrawer()
         loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, 15))
     }
 
@@ -88,14 +82,12 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         roomList.clear()
         doAsync {
             val chatPageRequest = Request.Builder()
-                    .url("https://chat.stackoverflow.com/rooms?tab=mine&sort=active")
+                    .url("https://chat.stackoverflow.com/rooms?tab=favorite&sort=active")
                     .build()
             val chatPageResponse = client.newCall(chatPageRequest).execute()
             val chatPage = Jsoup.parse(chatPageResponse.body().string())
 
             val rooms = chatPage.getElementsByClass("room-name").filter { it.children()[0].hasAttr("href") }
-            Log.wtf("SIZE", rooms.size.toString())
-//            Log.wtf("HTML", chatPage.html())
             rooms.forEach {
                 val roomName = it.attr("title")
                 val roomNum = it.child(0).attr("href").split("/")[2].toInt()
@@ -124,7 +116,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         Timber.d("Service disconnect")
     }
 
-    private fun loadChatFragment(room: ChatRoom) {
+    fun loadChatFragment(room: ChatRoom) {
         networkHandler?.post {
             try {
                 addChatFragment(createChatFragment(room))
