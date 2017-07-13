@@ -1,6 +1,5 @@
 package me.shreyasr.chatse.chat
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
@@ -8,7 +7,6 @@ import android.os.Looper
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +16,6 @@ import android.widget.ImageButton
 import android.widget.TextView
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
-import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.service.IncomingEventListener
 import me.shreyasr.chatse.event.ChatEventGenerator
@@ -33,7 +30,6 @@ import java.io.IOException
 class ChatFragment : Fragment(), IncomingEventListener {
     private lateinit var input: EditText
     private lateinit var messageList: RecyclerView
-    private lateinit var prefs: SharedPreferences
     private lateinit var events: EventList
     private var chatFkey: String? = null
     private var room: ChatRoom? = null
@@ -54,7 +50,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
         assert(room != null)
 
         events = EventList(room?.num ?: 0)
-        prefs = App.sharedPreferences
 
         val handlerThread = HandlerThread("NetworkHandlerThread")
         handlerThread.start()
@@ -96,7 +91,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
         input.requestFocus()
         return view
     }
-
 
 
     override fun handleNewEvents(messagesJson: JsonNode) {

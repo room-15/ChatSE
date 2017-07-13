@@ -6,6 +6,7 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
@@ -20,11 +21,11 @@ import org.jsoup.Jsoup
 import timber.log.Timber
 import java.io.IOException
 
+
 /**
  * Activity to login the user.
  */
 class LoginActivity : AppCompatActivity() {
-
     // Views
     lateinit var emailView: EditText
     lateinit var passwordView: EditText
@@ -66,6 +67,17 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                Toast.makeText(this, "Credentials saved", Toast.LENGTH_SHORT).show()
+            } else {
+                Log.e("LoginActivity", "SAVE: Canceled by user")
+            }
+        }
+    }
+
     fun attemptLogin() {
         loginButton.isEnabled = false
 
@@ -101,12 +113,6 @@ class LoginActivity : AppCompatActivity() {
         if (password.isNullOrBlank()) {
             passwordView.error = getString(R.string.err_blank_password)
             isValid = false
-        }
-
-        // STOPSHIP
-        //TODO store using AccountManager
-        if (isValid) {
-            prefs.edit().putString(App.PREF_EMAIL, email).putString("password", password).apply()
         }
 
         return isValid
