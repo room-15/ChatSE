@@ -17,6 +17,8 @@ import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.ChatActivity
 import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
+import org.jetbrains.anko.defaultSharedPreferences
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import timber.log.Timber
 import java.io.IOException
@@ -133,13 +135,10 @@ class LoginActivity : AppCompatActivity() {
             try {
                 val client = ClientManager.client
 
-                if (seOpenIdLogin(client, email, password)) {
-                    loginToSE(client)
-                    loginToSite(client, "https://stackoverflow.com", email, password)
-                    return true
-                } else {
-                    return false
-                }
+                seOpenIdLogin(client, email, password)
+                loginToSE(client)
+                loginToSite(client, "https://stackoverflow.com", email, password)
+                return true
             } catch (e: IOException) {
                 Timber.e(e)
                 return false
@@ -147,8 +146,8 @@ class LoginActivity : AppCompatActivity() {
 
         }
 
-        override fun onPostExecute(success: Boolean?) {
-            if (success!!) {
+        override fun onPostExecute(success: Boolean) {
+            if (success) {
                 prefs.edit().putBoolean(App.PREF_HAS_CREDS, true).apply()
                 this@LoginActivity.startActivity(Intent(this@LoginActivity, ChatActivity::class.java))
                 this@LoginActivity.finish()
@@ -158,77 +157,88 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this@LoginActivity, "Failed to log in, try again!", Toast.LENGTH_LONG).show()
             }
         }
+    }
 
-        @Throws(IOException::class)
-        private fun loginToSite(client: Client, site: String,
-                                email: String, password: String) {
-            val soFkey = Jsoup.connect(site + "/users/login/")
-                    .userAgent(Client.USER_AGENT).get()
-                    .select("input[name=fkey]").attr("value")
 
-            val soLoginRequestBody = FormEncodingBuilder()
-                    .add("email", email)
-                    .add("password", password)
-                    .add("fkey", soFkey)
-                    .build()
-            val soLoginRequest = Request.Builder()
-                    .url(site + "/users/login/")
-                    .post(soLoginRequestBody)
-                    .build()
-            val soLoginResponse = client.newCall(soLoginRequest).execute()
-            Timber.i("Site login: " + soLoginResponse.toString())
+    @Throws(IOException::class)
+    private fun loginToSite(client: Client, site: String,
+                            email: String, password: String) {
+        val soFkey = Jsoup.connect(site + "/users/login/")
+                .userAgent(Client.USER_AGENT).get()
+                .select("input[name=fkey]").attr("value")
+
+        val soLoginRequestBody = FormEncodingBuilder()
+                .add("email", email)
+                .add("password", password)
+                .add("fkey", soFkey)
+                .build()
+        val soLoginRequest = Request.Builder()
+                .url(site + "/users/login/")
+                .post(soLoginRequestBody)
+                .build()
+        val soLoginResponse = client.newCall(soLoginRequest).execute()
+        val responseDoc = Jsoup.parse(soLoginResponse.body().string())
+        val scriptElements = responseDoc.getElementsByTag("script")
+        val initElement = scriptElements[3].html()
+        if (initElement.contains("StackExchange.init(")) {
+            var json = initElement.replace("StackExchange.init(", "")
+            json = json.substring(0, json.length - 2)
+            val SOID = JSONObject(json).getJSONObject("user").getInt("userId")
+            val SEID = JSONObject(json).getJSONObject("user").getInt("accountId")
+            defaultSharedPreferences.edit().putInt("SOID", SOID).putInt("SEID", SEID).apply()
         }
+        Timber.i("Site login: " + soLoginResponse.toString())
+    }
 
-        @Throws(IOException::class)
-        private fun loginToSE(client: Client) {
-            val loginPageRequest = Request.Builder()
-                    .url("http://stackexchange.com/users/login/")
-                    .build()
-            val loginPageResponse = client.newCall(loginPageRequest).execute()
+    @Throws(IOException::class)
+    private fun loginToSE(client: Client) {
+        val loginPageRequest = Request.Builder()
+                .url("http://stackexchange.com/users/login/")
+                .build()
+        val loginPageResponse = client.newCall(loginPageRequest).execute()
 
-            val doc = Jsoup.parse(loginPageResponse.body().string())
-            val fkeyElements = doc.select("input[name=fkey]")
-            val fkey = fkeyElements.attr("value")
+        val doc = Jsoup.parse(loginPageResponse.body().string())
+        val fkeyElements = doc.select("input[name=fkey]")
+        val fkey = fkeyElements.attr("value")
 
-            if (fkey == "") throw IOException("Fatal: No fkey found.")
+        if (fkey == "") throw IOException("Fatal: No fkey found.")
 
-            val data = FormEncodingBuilder()
-                    .add("oauth_version", "")
-                    .add("oauth_server", "")
-                    .add("openid_identifier", "https://openid.stackexchange.com/")
-                    .add("fkey", fkey)
+        val data = FormEncodingBuilder()
+                .add("oauth_version", "")
+                .add("oauth_server", "")
+                .add("openid_identifier", "https://openid.stackexchange.com/")
+                .add("fkey", fkey)
 
-            val loginRequest = Request.Builder()
-                    .url("https://stackexchange.com/users/authenticate/")
-                    .post(data.build())
-                    .build()
-            val loginResponse = client.newCall(loginRequest).execute()
-            Timber.i("So login: " + loginResponse.toString())
-        }
+        val loginRequest = Request.Builder()
+                .url("https://stackexchange.com/users/authenticate/")
+                .post(data.build())
+                .build()
+        val loginResponse = client.newCall(loginRequest).execute()
 
-        @Throws(IOException::class)
-        private fun seOpenIdLogin(client: Client, email: String, password: String): Boolean {
-            val seLoginPageRequest = Request.Builder()
-                    .url("https://openid.stackexchange.com/account/login/")
-                    .build()
-            val seLoginPageResponse = client.newCall(seLoginPageRequest).execute()
+        Timber.i("So login: " + loginResponse.toString())
+    }
 
-            val seLoginDoc = Jsoup.parse(seLoginPageResponse.body().string())
-            val seLoginFkeyElements = seLoginDoc.select("input[name=fkey]")
-            val seFkey = seLoginFkeyElements.attr("value")
+    @Throws(IOException::class)
+    private fun seOpenIdLogin(client: Client, email: String, password: String) {
+        val seLoginPageRequest = Request.Builder()
+                .url("https://openid.stackexchange.com/account/login/")
+                .build()
+        val seLoginPageResponse = client.newCall(seLoginPageRequest).execute()
 
-            val seLoginRequestBody = FormEncodingBuilder()
-                    .add("email", email)
-                    .add("password", password)
-                    .add("fkey", seFkey)
-                    .build()
-            val seLoginRequest = Request.Builder()
-                    .url("https://openid.stackexchange.com/account/login/submit/")
-                    .post(seLoginRequestBody)
-                    .build()
-            val seLoginResponse = client.newCall(seLoginRequest).execute()
-            Timber.i("Se openid login: " + seLoginResponse.toString())
-            return Jsoup.parse(seLoginResponse.body().string()).title().contains("error")
-        }
+        val seLoginDoc = Jsoup.parse(seLoginPageResponse.body().string())
+        val seLoginFkeyElements = seLoginDoc.select("input[name=fkey]")
+        val seFkey = seLoginFkeyElements.attr("value")
+
+        val seLoginRequestBody = FormEncodingBuilder()
+                .add("email", email)
+                .add("password", password)
+                .add("fkey", seFkey)
+                .build()
+        val seLoginRequest = Request.Builder()
+                .url("https://openid.stackexchange.com/account/login/submit/")
+                .post(seLoginRequestBody)
+                .build()
+        val seLoginResponse = client.newCall(seLoginRequest).execute()
+        Timber.i("Se openid login: " + seLoginResponse.toString())
     }
 }

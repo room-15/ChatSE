@@ -8,6 +8,7 @@ import android.os.*
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -16,6 +17,7 @@ import android.widget.AdapterView.OnItemClickListener
 import android.widget.ListView
 import com.squareup.okhttp.Request
 import kotlinx.android.synthetic.main.activity_chat.*
+import kotlinx.android.synthetic.main.room_nav_header.*
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.service.IncomingEventService
 import me.shreyasr.chatse.chat.service.IncomingEventServiceBinder
@@ -50,12 +52,15 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
+        loadUserData()
         toggle.syncState()
 
         mDrawerList = findViewById(R.id.lst_menu_items) as ListView
         mDrawerList.adapter = mAdapter
         mDrawerList.onItemClickListener = OnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
-            loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, mAdapter.getItem(position).roomID.toInt()))
+            val roomNum = mAdapter.getItem(position).roomID.toInt()
+            Log.wtf("OMGSO", roomNum.toString())
+            loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, roomNum))
             drawer_layout.closeDrawers()
         }
 
@@ -66,6 +71,12 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         val handlerThread = HandlerThread("ChatActivityNetworkHandlerThread")
         handlerThread.start()
         networkHandler = Handler(handlerThread.looper)
+    }
+
+    fun loadUserData() {
+//        val userID = defaultSharedPreferences.getInt("SOID")
+        userName.text = "Tristan Wiley"
+        userEmail.text = "tristan@tristanwiley.com"
     }
 
     override fun onServiceConnected(name: ComponentName, binder: IBinder) {

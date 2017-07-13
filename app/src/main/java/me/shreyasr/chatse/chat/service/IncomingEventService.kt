@@ -31,13 +31,17 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
     }
 
     fun registerListener(room: ChatRoom, listener: IncomingEventListener) {
-        listeners.add(MessageListenerHolder(room, listener))
+        if (listeners.filter { room.num == it.room.num }.isEmpty()) {
+            listeners.add(MessageListenerHolder(room, listener))
+        }
     }
 
     override fun onNewEvents(site: String, root: JsonNode) {
+        Log.wtf("SizeOfNewEvents", listeners.size.toString())
         for (holder in listeners) {
             if (holder.room.site != site) continue
             if (!root.has("r" + holder.room.num)) {
+                Log.e("Current Room Element", holder.room.num.toString())
                 Log.e("No room element", root.toString())
                 return
             }
