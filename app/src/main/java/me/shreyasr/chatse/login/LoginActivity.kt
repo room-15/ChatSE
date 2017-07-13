@@ -133,10 +133,13 @@ class LoginActivity : AppCompatActivity() {
             try {
                 val client = ClientManager.client
 
-                seOpenIdLogin(client, email, password)
-                loginToSE(client)
-                loginToSite(client, "https://stackoverflow.com", email, password)
-                return true
+                if (seOpenIdLogin(client, email, password)) {
+                    loginToSE(client)
+                    loginToSite(client, "https://stackoverflow.com", email, password)
+                    return true
+                } else {
+                    return false
+                }
             } catch (e: IOException) {
                 Timber.e(e)
                 return false
@@ -152,7 +155,7 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 progressBar.visibility = View.GONE
                 loginButton.isEnabled = false
-                Toast.makeText(this@LoginActivity, "Failed to connect", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@LoginActivity, "Failed to log in, try again!", Toast.LENGTH_LONG).show()
             }
         }
 
@@ -204,7 +207,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         @Throws(IOException::class)
-        private fun seOpenIdLogin(client: Client, email: String, password: String) {
+        private fun seOpenIdLogin(client: Client, email: String, password: String): Boolean {
             val seLoginPageRequest = Request.Builder()
                     .url("https://openid.stackexchange.com/account/login/")
                     .build()
@@ -225,6 +228,7 @@ class LoginActivity : AppCompatActivity() {
                     .build()
             val seLoginResponse = client.newCall(seLoginRequest).execute()
             Timber.i("Se openid login: " + seLoginResponse.toString())
+            return Jsoup.parse(seLoginResponse.body().string()).title().contains("error")
         }
     }
 }
