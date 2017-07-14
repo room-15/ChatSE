@@ -10,7 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.squareup.picasso.Picasso
+import com.koushikdutta.ion.Ion
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.event.EventList
 import me.shreyasr.chatse.event.presenter.message.MessageEvent
@@ -64,11 +64,9 @@ class MessageAdapter(val events: EventList, var messages: List<MessageEvent> = A
                         messageView.text = Html.fromHtml(message.content)
                     }
                 } else {
-                    Picasso.with(context)
+                    Ion.with(context)
                             .load(message.onebox_content)
-                            .placeholder(R.drawable.ic_add)
-                            .noFade()
-                            .into(oneboxImage)
+                            .intoImageView(oneboxImage)
 
                     //TODO fix the images, reverting to just showing the image URL for now
 //                    messageView.text = Html.fromHtml("<html><a href=\"" + message.onebox_content + "\">" + message.onebox_content + "</a></html>")

@@ -185,7 +185,7 @@ class LoginActivity : AppCompatActivity() {
             json = json.substring(0, json.length - 2)
             val SOID = JSONObject(json).getJSONObject("user").getInt("userId")
             val SEID = JSONObject(json).getJSONObject("user").getInt("accountId")
-            defaultSharedPreferences.edit().putInt("SOID", SOID).putInt("SEID", SEID).apply()
+            defaultSharedPreferences.edit().putInt("SOID", SOID).putInt("SEID", SEID).putString("email", email).apply()
         }
         Timber.i("Site login: " + soLoginResponse.toString())
     }

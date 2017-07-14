@@ -15,6 +15,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ListView
+import com.koushikdutta.ion.Ion
 import com.squareup.okhttp.Request
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.room_nav_header.*
@@ -23,6 +24,7 @@ import me.shreyasr.chatse.chat.service.IncomingEventService
 import me.shreyasr.chatse.chat.service.IncomingEventServiceBinder
 import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
+import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.intentFor
 import org.json.JSONException
@@ -74,9 +76,16 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     }
 
     fun loadUserData() {
-//        val userID = defaultSharedPreferences.getInt("SOID")
-        userName.text = "Tristan Wiley"
-        userEmail.text = "tristan@tristanwiley.com"
+        val userID = defaultSharedPreferences.getInt("SOID", -1)
+        if(userID != -1) {
+            Ion.with(applicationContext)
+                    .load("https://chat.stackoverflow.com/users/thumbs/$userID")
+                    .asJsonObject()
+                    .setCallback { e, result ->
+                        userName.text = result.get("name").asString
+                        userEmail.text = defaultSharedPreferences.getString("email", "")
+                    }
+        }
     }
 
     override fun onServiceConnected(name: ComponentName, binder: IBinder) {
