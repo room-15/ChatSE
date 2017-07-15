@@ -1,4 +1,4 @@
-package me.shreyasr.chatse.chat
+package me.shreyasr.chatse.chat.adapters
 
 import android.content.Context
 import android.os.Build
@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.koushikdutta.ion.Ion
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.event.EventList
 import me.shreyasr.chatse.event.presenter.message.MessageEvent
@@ -41,12 +40,12 @@ class MessageAdapter(val events: EventList, var messages: List<MessageEvent> = A
                     holder.messageView.text = Html.fromHtml(message.content)
                 }
             } else {
-                Log.e("IMAGE", message.onebox_content)
-                Ion.with(holder.oneboxImage)
-                        .load("http://24.media.tumblr.com/tumblr_m32yg2ZGV51qbd47zo1_1280.jpg")
-                holder.messageView.text = ""
+//                Log.e("IMAGE", message.onebox_content)
+//                Ion.with(holder.oneboxImage)
+//                        .load("http://24.media.tumblr.com/tumblr_m32yg2ZGV51qbd47zo1_1280.jpg")
+//                holder.messageView.text = ""
                 //TODO fix the images, reverting to just showing the image URL for now
-//                    messageView.text = Html.fromHtml("<html><a href=\"" + message.onebox_content + "\">" + message.onebox_content + "</a></html>")
+                holder.messageView.text = Html.fromHtml("<html><a href=\"" + message.onebox_content + "\">" + message.onebox_content + "</a></html>")
             }
         }
 

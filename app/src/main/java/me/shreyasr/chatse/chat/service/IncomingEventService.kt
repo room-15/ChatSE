@@ -39,7 +39,6 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
     }
 
     override fun onNewEvents(site: String, root: JsonNode) {
-        Log.wtf("SizeOfNewEvents", listeners.size.toString())
         for (holder in listeners) {
             if (holder.room.site != site) continue
             if (!root.has("r" + holder.room.num)) {

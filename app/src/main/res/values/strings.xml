@@ -11,4 +11,8 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="take_photo">Take Photo</string>
+    <string name="choose_from_gallery">Choose from Gallery</string>
+    <string name="upload_from_url">Upload from URL</string>
+    <string name="upload">Upload</string>
 </resources>

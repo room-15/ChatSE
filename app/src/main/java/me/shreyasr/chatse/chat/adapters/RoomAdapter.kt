@@ -1,4 +1,4 @@
-package me.shreyasr.chatse.chat
+package me.shreyasr.chatse.chat.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 import me.shreyasr.chatse.R
+import me.shreyasr.chatse.chat.Room
 
 
 class RoomAdapter(val list: MutableList<Room>, context: Context) : BaseAdapter() {

@@ -1,8 +1,9 @@
-package me.shreyasr.chatse.chat
+package me.shreyasr.chatse.chat.adapters
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import me.shreyasr.chatse.chat.ChatFragment
 import java.util.*
 
 class ChatFragmentPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {

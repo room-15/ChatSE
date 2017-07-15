@@ -1,12 +1,20 @@
 package me.shreyasr.chatse.chat
 
-import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Looper
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.database.Cursor
+import android.graphics.Bitmap
+import android.os.*
+import android.provider.MediaStore
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Base64
+import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,9 +22,16 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
+import com.koushikdutta.ion.Ion
+import com.orhanobut.dialogplus.DialogPlus
+import com.orhanobut.dialogplus.GridHolder
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
+import kotlinx.android.synthetic.main.picker_footer.view.*
 import me.shreyasr.chatse.R
+import me.shreyasr.chatse.chat.adapters.MessageAdapter
+import me.shreyasr.chatse.chat.adapters.UploadImageAdapter
 import me.shreyasr.chatse.chat.service.IncomingEventListener
 import me.shreyasr.chatse.event.ChatEventGenerator
 import me.shreyasr.chatse.event.EventList
@@ -25,9 +40,13 @@ import me.shreyasr.chatse.network.ClientManager
 import org.codehaus.jackson.JsonNode
 import org.codehaus.jackson.map.ObjectMapper
 import timber.log.Timber
+import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.IOException
 
+
 class ChatFragment : Fragment(), IncomingEventListener {
+
     private lateinit var input: EditText
     private lateinit var messageList: RecyclerView
     private lateinit var events: EventList
@@ -39,6 +58,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
     private var messageAdapter: MessageAdapter? = null
     private val mapper = ObjectMapper()
     private val chatEventGenerator = ChatEventGenerator()
+    lateinit var dialog: DialogPlus
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +81,48 @@ class ChatFragment : Fragment(), IncomingEventListener {
         val view = inflater?.inflate(R.layout.fragment_chat, container, false)
 
         val chat_submit = view?.findViewById(R.id.chat_input_submit) as ImageButton
-        chat_submit.setOnClickListener { onSubmit() }
+        chat_submit.setOnClickListener {
+            val content = input.text.toString()
+            input.setText("")
+            onSubmit(content)
+        }
+        chat_submit.setOnLongClickListener {
+            dialog = DialogPlus.newDialog(activity)
+                    .setContentHolder(GridHolder(2))
+                    .setGravity(Gravity.CENTER)
+                    .setAdapter(UploadImageAdapter(activity))
+                    .setOnItemClickListener { _, _, _, position ->
+                        when (position) {
+                            0 -> {
+                                val cameraIntent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
+                                startActivityForResult(cameraIntent, 0)
+                            }
+                            1 -> {
+                                if (ContextCompat.checkSelfPermission(activity, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                        Log.wtf("PERMISSION", "REQUESTOPEN")
+                                        ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
+                                    } else {
+                                        Log.wtf("SDK Version", "SHOULD OPEN")
+                                        openFileChooser()
+                                    }
+                                } else {
+                                    Log.wtf("HAS PERMISSION", "SHOULD OPEN")
+                                    openFileChooser()
+                                }
+                            }
+                        }
+                    }
+                    .setFooter(R.layout.picker_footer)
+                    .setPadding(50, 50, 50, 50)
+                    .create()
+
+            dialog.footerView.footer_confirm_button.setOnClickListener {
+                uploadToImgur(dialog.footerView.footer_url_box.text.toString())
+            }
+            dialog.show()
+            true
+        }
 
         input = view.findViewById(R.id.chat_input_text) as EditText
         messageList = view.findViewById(R.id.chat_message_list) as RecyclerView
@@ -73,7 +134,9 @@ class ChatFragment : Fragment(), IncomingEventListener {
 
         input.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
-                onSubmit()
+                val content = input.text.toString()
+                input.setText("")
+                onSubmit(content)
                 return@OnEditorActionListener true
             }
             false
@@ -92,6 +155,53 @@ class ChatFragment : Fragment(), IncomingEventListener {
         return view
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when (requestCode) {
+            0 -> {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.wtf("GOT PERMISSION", "SHOULD OPEN")
+                    openFileChooser()
+                } else {
+                    Toast.makeText(activity, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
+                }
+                return
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (data != null) {
+            when (requestCode) {
+                0 -> {
+                    if (data.extras != null) {
+                        val photo = data.extras.get("data") as Bitmap
+                        val byteArrayOutput = ByteArrayOutputStream()
+                        photo.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutput)
+                        val photoBytes = Base64.encodeToString(byteArrayOutput.toByteArray(), Base64.DEFAULT)
+                        uploadToImgur(photoBytes)
+                    }
+                }
+                1 -> {
+                    val cursor: Cursor
+                    if (data.data != null) {
+                        val selectedImage = data.data
+                        val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
+                        cursor = activity.contentResolver.query(selectedImage, filePathColumn, null, null, null)
+                        cursor.use {
+                            it.moveToFirst()
+                            val picturePath = it.getString(it.getColumnIndex(filePathColumn[0]))
+                            it.close()
+                            uploadFileToImgur(File(picturePath))
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     override fun handleNewEvents(messagesJson: JsonNode) {
         if (room == null) return
@@ -103,9 +213,22 @@ class ChatFragment : Fragment(), IncomingEventListener {
         uiThreadHandler.post { messageAdapter?.update() }
     }
 
-    private fun onSubmit() {
-        val content = input.text.toString()
-        input.setText("")
+    fun openFileChooser() {
+        Log.wtf("OPENFILECHOOSER", "OPENING")
+        val getIntent = Intent(Intent.ACTION_GET_CONTENT)
+        getIntent.type = "image/*"
+
+        val pickIntent = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        pickIntent.type = "image/*"
+
+        val chooserIntent = Intent.createChooser(getIntent, "Select Image")
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(pickIntent))
+
+        startActivityForResult(chooserIntent, 1)
+    }
+
+    private fun onSubmit(content: String) {
+
         networkHandler?.post {
             try {
                 newMessage(client, room, chatFkey, content)
@@ -113,6 +236,44 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 Timber.e(e)
             }
         }
+    }
+
+    fun uploadToImgur(photoBytes: String) {
+        Ion.with(activity)
+                .load("POST", "https://api.imgur.com/3/image")
+                .addHeader("authorization", "Client-ID c4b0ceea1a1b029")
+                .setBodyParameter("image", photoBytes)
+                .asJsonObject()
+                .setCallback { e, result ->
+                    if (e != null) {
+                        Toast.makeText(activity, "Failed to Upload Image", Toast.LENGTH_SHORT).show()
+                        Log.w("OnImgurUpload", e.message)
+                    }
+                    if (result.has("data") && result.get("data").asJsonObject.has("link")) {
+                        onSubmit(result.get("data").asJsonObject.get("link").asString)
+                        dialog.dismiss()
+                    } else {
+                        Toast.makeText(activity, "Failed to Upload Image", Toast.LENGTH_SHORT).show()
+                    }
+                }
+    }
+
+
+    fun uploadFileToImgur(photo: File) {
+        Ion.with(activity)
+                .load("POST", "https://api.imgur.com/3/image")
+                .addHeader("authorization", "Client-ID c4b0ceea1a1b029")
+                .setMultipartFile("image", photo)
+                .asJsonObject()
+                .setCallback { e, result ->
+                    if (e != null) {
+                        Toast.makeText(activity, "Failed to Upload Image", Toast.LENGTH_SHORT).show()
+                        Log.w("OnFileUploadImgur", e.message)
+                    } else {
+                        onSubmit(result.get("data").asJsonObject.get("link").asString)
+                        dialog.dismiss()
+                    }
+                }
     }
 
     @Throws(IOException::class)
@@ -169,5 +330,4 @@ class ChatFragment : Fragment(), IncomingEventListener {
         }
     }
 }
-
 

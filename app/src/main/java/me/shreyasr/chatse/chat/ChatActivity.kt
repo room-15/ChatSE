@@ -20,6 +20,7 @@ import com.squareup.okhttp.Request
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.room_nav_header.*
 import me.shreyasr.chatse.R
+import me.shreyasr.chatse.chat.adapters.RoomAdapter
 import me.shreyasr.chatse.chat.service.IncomingEventService
 import me.shreyasr.chatse.chat.service.IncomingEventServiceBinder
 import me.shreyasr.chatse.network.Client
@@ -31,7 +32,6 @@ import org.json.JSONException
 import org.jsoup.Jsoup
 import timber.log.Timber
 import java.io.IOException
-
 
 class ChatActivity : AppCompatActivity(), ServiceConnection {
 
