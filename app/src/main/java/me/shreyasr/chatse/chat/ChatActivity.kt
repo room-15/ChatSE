@@ -47,7 +47,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         this.setContentView(R.layout.activity_chat)
 
         mAdapter = RoomAdapter(roomList, applicationContext)
-        mAdapter.notifyDataSetChanged()
+        runOnUiThread {
+            mAdapter.notifyDataSetChanged()
+        }
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
@@ -129,8 +131,10 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
                 roomList.add(Room(roomName, roomNum.toLong(), 0))
             }
-            mAdapter.notifyDataSetChanged()
-            Log.w("ROOMLIST", roomList.size.toString())
+            runOnUiThread {
+                mAdapter.notifyDataSetChanged()
+                Log.w("ROOMLIST", roomList.size.toString())
+            }
         }
     }
 
