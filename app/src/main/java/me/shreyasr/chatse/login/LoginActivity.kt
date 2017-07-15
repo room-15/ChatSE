@@ -135,10 +135,13 @@ class LoginActivity : AppCompatActivity() {
             try {
                 val client = ClientManager.client
 
-                seOpenIdLogin(client, email, password)
-                loginToSE(client)
-                loginToSite(client, "https://stackoverflow.com", email, password)
-                return true
+                if (loginToSite(client, "https://stackoverflow.com", email, password)) {
+                    seOpenIdLogin(client, email, password)
+                    loginToSE(client)
+                    return true
+                } else {
+                    return false
+                }
             } catch (e: IOException) {
                 Timber.e(e)
                 return false
@@ -162,7 +165,7 @@ class LoginActivity : AppCompatActivity() {
 
     @Throws(IOException::class)
     private fun loginToSite(client: Client, site: String,
-                            email: String, password: String) {
+                            email: String, password: String): Boolean {
         val soFkey = Jsoup.connect(site + "/users/login/")
                 .userAgent(Client.USER_AGENT).get()
                 .select("input[name=fkey]").attr("value")
@@ -179,15 +182,23 @@ class LoginActivity : AppCompatActivity() {
         val soLoginResponse = client.newCall(soLoginRequest).execute()
         val responseDoc = Jsoup.parse(soLoginResponse.body().string())
         val scriptElements = responseDoc.getElementsByTag("script")
-        val initElement = scriptElements[3].html()
+        val initElement = scriptElements.toMutableList().filter { it.html().contains("userId") && it.html().contains("accountId") }[0].html()
+        Log.e("USERID", initElement)
         if (initElement.contains("StackExchange.init(")) {
             var json = initElement.replace("StackExchange.init(", "")
             json = json.substring(0, json.length - 2)
-            val SOID = JSONObject(json).getJSONObject("user").getInt("userId")
-            val SEID = JSONObject(json).getJSONObject("user").getInt("accountId")
-            defaultSharedPreferences.edit().putInt("SOID", SOID).putInt("SEID", SEID).putString("email", email).apply()
+            val userObj = JSONObject(json).getJSONObject("user")
+            Log.e("JSON", json)
+            if (userObj.has("userId") && userObj.has("accountId")) {
+                val SOID = JSONObject(json).getJSONObject("user").getInt("userId")
+                val SEID = JSONObject(json).getJSONObject("user").getInt("accountId")
+                defaultSharedPreferences.edit().putInt("SOID", SOID).putInt("SEID", SEID).putString("email", email).apply()
+            } else {
+                return false
+            }
         }
         Timber.i("Site login: " + soLoginResponse.toString())
+        return true
     }
 
     @Throws(IOException::class)

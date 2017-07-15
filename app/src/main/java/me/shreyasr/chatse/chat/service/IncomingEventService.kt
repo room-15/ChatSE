@@ -31,9 +31,11 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
     }
 
     fun registerListener(room: ChatRoom, listener: IncomingEventListener) {
-        if (listeners.filter { room.num == it.room.num }.isEmpty()) {
+        //Just clearing for now, need to make sure the filter actually works 100% of the time.
+        listeners.clear()
+//        if (listeners.filter { room.num == it.room.num }.isEmpty()) {
             listeners.add(MessageListenerHolder(room, listener))
-        }
+//        }
     }
 
     override fun onNewEvents(site: String, root: JsonNode) {

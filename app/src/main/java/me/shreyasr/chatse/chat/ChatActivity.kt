@@ -47,21 +47,20 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         this.setContentView(R.layout.activity_chat)
 
         mAdapter = RoomAdapter(roomList, applicationContext)
-
+        mAdapter.notifyDataSetChanged()
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
-        loadUserData()
         toggle.syncState()
+        loadUserData()
 
         mDrawerList = findViewById(R.id.lst_menu_items) as ListView
         mDrawerList.adapter = mAdapter
         mDrawerList.onItemClickListener = OnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
             val roomNum = mAdapter.getItem(position).roomID.toInt()
-            Log.wtf("OMGSO", roomNum.toString())
             loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, roomNum))
             drawer_layout.closeDrawers()
         }
@@ -77,14 +76,32 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
     fun loadUserData() {
         val userID = defaultSharedPreferences.getInt("SOID", -1)
-        if(userID != -1) {
+        val seID = defaultSharedPreferences.getInt("SEID", -1)
+        Log.e("USERID", userID.toString())
+        if (userID != -1) {
             Ion.with(applicationContext)
                     .load("https://chat.stackoverflow.com/users/thumbs/$userID")
                     .asJsonObject()
                     .setCallback { e, result ->
+                        if (e != null) {
+                            Log.e("loadUserData()", e.message)
+                        }
                         userName.text = result.get("name").asString
                         userEmail.text = defaultSharedPreferences.getString("email", "")
                     }
+        } else if (seID != -1) {
+            Ion.with(applicationContext)
+                    .load("https://chat.stackexchange.com/users/thumbs/$userID")
+                    .asJsonObject()
+                    .setCallback { e, result ->
+                        if (e != null) {
+                            Log.e("loadUserData()", e.message)
+                        }
+                        userName.text = result.get("name").asString
+                        userEmail.text = defaultSharedPreferences.getString("email", "")
+                    }
+        } else {
+            Log.e("ChatActivity", "Userid not found")
         }
     }
 
@@ -112,6 +129,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
                 roomList.add(Room(roomName, roomNum.toLong(), 0))
             }
+            mAdapter.notifyDataSetChanged()
+            Log.w("ROOMLIST", roomList.size.toString())
         }
     }
 
@@ -161,7 +180,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         serviceBinder.joinRoom(room, roomInfo.fkey)
         val chatFragment = ChatFragment.createInstance(room, roomInfo.name, roomInfo.fkey)
         serviceBinder.registerListener(room, chatFragment)
-
+        runOnUiThread {
+            supportActionBar?.title = roomInfo.name
+        }
         return chatFragment
     }
 
