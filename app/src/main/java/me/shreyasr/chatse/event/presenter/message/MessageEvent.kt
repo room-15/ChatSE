@@ -1,10 +1,9 @@
 package me.shreyasr.chatse.event.presenter.message
 
 import me.shreyasr.chatse.event.ChatEvent
-import timber.log.Timber
 
 class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
-    val content: String?
+    var content: String?
     val timestamp: Long
     val id: Long
     val userId: Long
@@ -20,7 +19,7 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
     internal var previous: MessageEvent? = null
 
     init {
-        Timber.wtf(baseEvent.toString())
+//        Log.wtf("BRUH", baseEvent.onebox_type)
         this.content = baseEvent.contents
         this.timestamp = baseEvent.time_stamp
         this.id = baseEvent.id.toLong()
@@ -37,7 +36,7 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
     }
 
     val isDeleted: Boolean
-        get() = content == null
+        get() = content == null || content == ""
 
     val isEdited: Boolean
         get() = (previous != null || editCount != 0) && !isDeleted

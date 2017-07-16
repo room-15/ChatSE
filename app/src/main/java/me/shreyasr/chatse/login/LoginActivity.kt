@@ -12,6 +12,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
+import kotlinx.android.synthetic.main.activity_login.*
 import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.ChatActivity
@@ -183,12 +184,10 @@ class LoginActivity : AppCompatActivity() {
         val responseDoc = Jsoup.parse(soLoginResponse.body().string())
         val scriptElements = responseDoc.getElementsByTag("script")
         val initElement = scriptElements.toMutableList().filter { it.html().contains("userId") && it.html().contains("accountId") }[0].html()
-        Log.e("USERID", initElement)
         if (initElement.contains("StackExchange.init(")) {
             var json = initElement.replace("StackExchange.init(", "")
             json = json.substring(0, json.length - 2)
             val userObj = JSONObject(json).getJSONObject("user")
-            Log.e("JSON", json)
             if (userObj.has("userId") && userObj.has("accountId")) {
                 val SOID = JSONObject(json).getJSONObject("user").getInt("userId")
                 val SEID = JSONObject(json).getJSONObject("user").getInt("accountId")

@@ -71,18 +71,5 @@
         app:layout_constraintBottom_toTopOf="@+id/login_email"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include3"
-        app:srcCompat="@drawable/sologo"/>
-
-    <!--<TextView-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="center"-->
-    <!--android:text="OR" />-->
-    <!--<com.google.android.gms.common.SignInButton-->
-    <!--android:id="@+id/sign_in_button"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content" />-->
-
-
+        app:srcCompat="@drawable/sologo" />
 </android.support.constraint.ConstraintLayout>

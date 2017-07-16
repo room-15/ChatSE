@@ -15,4 +15,5 @@
     <string name="choose_from_gallery">Choose from Gallery</string>
     <string name="upload_from_url">Upload from URL</string>
     <string name="upload">Upload</string>
+    <string name="log_in_with_google">Log in With Google</string>
 </resources>
