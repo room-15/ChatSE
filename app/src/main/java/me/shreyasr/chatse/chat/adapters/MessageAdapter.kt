@@ -69,7 +69,6 @@ class MessageAdapter(val events: EventList, var messages: List<MessageEvent> = A
                             .load(message.onebox_content)
                             .intoImageView(itemView.message_image)
                     messageView.text = ""
-                    //TODO fix the images, reverting to just showing the image URL for now
                 }
             }
 
