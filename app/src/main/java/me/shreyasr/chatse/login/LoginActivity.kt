@@ -12,6 +12,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
+import kotlinx.android.synthetic.main.activity_login.*
 import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.ChatActivity
@@ -22,7 +23,6 @@ import org.json.JSONObject
 import org.jsoup.Jsoup
 import timber.log.Timber
 import java.io.IOException
-import java.util.regex.Pattern
 
 
 /**
@@ -183,24 +183,18 @@ class LoginActivity : AppCompatActivity() {
         val soLoginResponse = client.newCall(soLoginRequest).execute()
         val responseDoc = Jsoup.parse(soLoginResponse.body().string())
         val scriptElements = responseDoc.getElementsByTag("script")
-        val els = scriptElements.toMutableList().filter { it.html().contains("userId") && it.html().contains("accountId") }
-        if (els.isNotEmpty()) {
-            val initElement = els[0].html()
-
-            if (initElement.contains("StackExchange.init(")) {
-                var json = initElement.replace("StackExchange.init(", "")
-                json = json.substring(0, json.length - 2)
-                val userObj = JSONObject(json).getJSONObject("user")
-                if (userObj.has("userId") && userObj.has("accountId")) {
-                    val SOID = JSONObject(json).getJSONObject("user").getInt("userId")
-                    val SEID = JSONObject(json).getJSONObject("user").getInt("accountId")
-                    defaultSharedPreferences.edit().putInt("SOID", SOID).putInt("SEID", SEID).putString("email", email).apply()
-                } else {
-                    return false
-                }
+        val initElement = scriptElements.toMutableList().filter { it.html().contains("userId") && it.html().contains("accountId") }[0].html()
+        if (initElement.contains("StackExchange.init(")) {
+            var json = initElement.replace("StackExchange.init(", "")
+            json = json.substring(0, json.length - 2)
+            val userObj = JSONObject(json).getJSONObject("user")
+            if (userObj.has("userId") && userObj.has("accountId")) {
+                val SOID = JSONObject(json).getJSONObject("user").getInt("userId")
+                val SEID = JSONObject(json).getJSONObject("user").getInt("accountId")
+                defaultSharedPreferences.edit().putInt("SOID", SOID).putInt("SEID", SEID).putString("email", email).apply()
+            } else {
+                return false
             }
-        } else {
-            return false
         }
         Timber.i("Site login: " + soLoginResponse.toString())
         return true
@@ -230,15 +224,8 @@ class LoginActivity : AppCompatActivity() {
                 .post(data.build())
                 .build()
         val loginResponse = client.newCall(loginRequest).execute()
-        val menuElement = Jsoup.parse(loginResponse.body().string()).getElementsByClass("topbar-menu-links")
-        if (menuElement.isNotEmpty()) {
-            val regex = ".*\\/(\\d+)\\/.*"
-            val pattern = Pattern.compile(regex)
-            val matcher = pattern.matcher(menuElement[0].child(0).attr("href"))
-            if (matcher.matches()) {
-                defaultSharedPreferences.edit().putInt("SEID", matcher.group(1).toInt()).apply()
-            }
-        }
+
+        Timber.i("So login: " + loginResponse.toString())
     }
 
     @Throws(IOException::class)

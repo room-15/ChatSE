@@ -14,6 +14,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
+import android.widget.ListView
 import com.koushikdutta.ion.Ion
 import com.squareup.okhttp.Request
 import kotlinx.android.synthetic.main.activity_chat.*
@@ -34,23 +35,20 @@ import java.io.IOException
 
 class ChatActivity : AppCompatActivity(), ServiceConnection {
 
+    private lateinit var mDrawerList: ListView
     private lateinit var serviceBinder: IncomingEventServiceBinder
     private var networkHandler: Handler? = null
     private val uiThreadHandler = Handler(Looper.getMainLooper())
-    val soRoomList = mutableListOf<Room>()
-    val seRoomList = mutableListOf<Room>()
-    lateinit var soRoomAdapter: RoomAdapter
-    lateinit var seRoomAdapter: RoomAdapter
+    val roomList = mutableListOf<Room>()
+    lateinit var mAdapter: RoomAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.activity_chat)
 
-        soRoomAdapter = RoomAdapter(soRoomList, applicationContext)
-        seRoomAdapter = RoomAdapter(seRoomList, applicationContext)
+        mAdapter = RoomAdapter(roomList, applicationContext)
         runOnUiThread {
-            soRoomAdapter.notifyDataSetChanged()
-            seRoomAdapter.notifyDataSetChanged()
+            mAdapter.notifyDataSetChanged()
         }
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
@@ -61,26 +59,13 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         toggle.syncState()
         loadUserData()
 
-        val soID = defaultSharedPreferences.getInt("SOID", -1)
-        if (soID != -1) {
-            stackoverflow_room_list.adapter = soRoomAdapter
-            stackoverflow_room_list.onItemClickListener = OnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
-                val roomNum = soRoomAdapter.getItem(position).roomID.toInt()
-                loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, roomNum))
-                drawer_layout.closeDrawers()
-            }
+        mDrawerList = findViewById(R.id.lst_menu_items) as ListView
+        mDrawerList.adapter = mAdapter
+        mDrawerList.onItemClickListener = OnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
+            val roomNum = mAdapter.getItem(position).roomID.toInt()
+            loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, roomNum))
+            drawer_layout.closeDrawers()
         }
-
-        val seID = defaultSharedPreferences.getInt("SEID", -1)
-        if (seID != -1) {
-            stackexchange_room_list.adapter = seRoomAdapter
-            stackexchange_room_list.onItemClickListener = OnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
-                val roomNum = seRoomAdapter.getItem(position).roomID.toInt()
-                loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, roomNum))
-                drawer_layout.closeDrawers()
-            }
-        }
-
 
         val serviceIntent = Intent(this, IncomingEventService::class.java)
         this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
@@ -131,39 +116,24 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
     private fun addRoomsToDrawer() {
         val client = ClientManager.client
-        soRoomList.clear()
-        seRoomList.clear()
+        roomList.clear()
         doAsync {
-            val soChatPageRequest = Request.Builder()
+            val chatPageRequest = Request.Builder()
                     .url("https://chat.stackoverflow.com/rooms?tab=favorite&sort=active")
                     .build()
-            val soChatPageResponse = client.newCall(soChatPageRequest).execute()
-            val soChatPage = Jsoup.parse(soChatPageResponse.body().string())
+            val chatPageResponse = client.newCall(chatPageRequest).execute()
+            val chatPage = Jsoup.parse(chatPageResponse.body().string())
 
-            val soRooms = soChatPage.getElementsByClass("room-name").filter { it.children()[0].hasAttr("href") }
-            soRooms.forEach {
+            val rooms = chatPage.getElementsByClass("room-name").filter { it.children()[0].hasAttr("href") }
+            rooms.forEach {
                 val roomName = it.attr("title")
                 val roomNum = it.child(0).attr("href").split("/")[2].toInt()
 
-                soRoomList.add(Room(roomName, roomNum.toLong(), 0))
-            }
-
-            val seChatPageRequest = Request.Builder()
-                    .url("https://chat.stackexchange.com/rooms?tab=favorite&sort=active")
-                    .build()
-            val seChatPageResponse = client.newCall(seChatPageRequest).execute()
-            val seChatPage = Jsoup.parse(seChatPageResponse.body().string())
-
-            val seRooms = seChatPage.getElementsByClass("room-name").filter { it.children()[0].hasAttr("href") }
-            seRooms.forEach {
-                val roomName = it.attr("title")
-                val roomNum = it.child(0).attr("href").split("/")[2].toInt()
-
-                seRoomList.add(Room(roomName, roomNum.toLong(), 0))
+                roomList.add(Room(roomName, roomNum.toLong(), 0))
             }
             runOnUiThread {
-                soRoomAdapter.notifyDataSetChanged()
-                seRoomAdapter.notifyDataSetChanged()
+                mAdapter.notifyDataSetChanged()
+                Log.w("ROOMLIST", roomList.size.toString())
             }
         }
     }

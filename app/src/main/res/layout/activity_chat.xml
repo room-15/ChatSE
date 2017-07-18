@@ -24,27 +24,9 @@
             android:orientation="vertical">
 
             <include layout="@layout/room_nav_header" />
-            <TextView
-                android:id="@+id/so_header_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Stackoverflow"
-                android:textSize="17dp"
-                android:padding="5dp"/>
+
             <ListView
-                android:id="@+id/stackoverflow_room_list"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-            <TextView
-                android:id="@+id/se_header_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Stackoverflow"
-                android:textSize="17dp"
-                android:padding="5dp"/>
-            <ListView
-                android:id="@+id/stackexchange_room_list"
+                android:id="@+id/lst_menu_items"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
