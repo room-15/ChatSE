@@ -17,6 +17,7 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
     val onebox_type: String
     var message_stars: Int
     val onebox_content: String
+    var onebox_extra: String
     var message_starred: Boolean
     internal var previous: MessageEvent? = null
 
@@ -36,6 +37,7 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
         this.onebox = baseEvent.message_onebox
         this.onebox_type = baseEvent.onebox_type
         this.onebox_content = baseEvent.onebox_content
+        this.onebox_extra = baseEvent.onebox_extra
     }
 
     val isDeleted: Boolean

@@ -1,11 +1,14 @@
 package me.shreyasr.chatse.chat.adapters
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.text.Html
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -82,12 +85,28 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                         messageView.text = Html.fromHtml(message.content)
                     }
                 } else {
-                    oneboxImage.visibility = View.VISIBLE
+                    Log.wtf("ONEBOX_TYPE", message.onebox_type)
+                    when (message.onebox_type) {
+                        "image" -> {
+                            oneboxImage.visibility = View.VISIBLE
 
-                    Ion.with(itemView.context)
-                            .load(message.onebox_content)
-                            .intoImageView(itemView.message_image)
-                    messageView.text = ""
+                            Ion.with(itemView.context)
+                                    .load(message.onebox_content)
+                                    .intoImageView(itemView.message_image)
+                            messageView.text = ""
+                        }
+                        "youtube" -> {
+                            itemView.setOnClickListener {
+                                mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.onebox_extra)))
+                            }
+                            oneboxImage.visibility = View.VISIBLE
+
+                            Ion.with(itemView.context)
+                                    .load(message.onebox_content)
+                                    .intoImageView(itemView.message_image)
+                            messageView.text = message.content
+                        }
+                    }
                 }
             }
 

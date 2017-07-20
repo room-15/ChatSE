@@ -27,6 +27,7 @@ class ChatEvent {
     var message_onebox = false
     var onebox_type = ""
     var onebox_content = ""
+    var onebox_extra = ""
 
     var message_starred = false
 
@@ -34,14 +35,20 @@ class ChatEvent {
     fun setContent(content: String) {
         val doc = Jsoup.parse(content, "http://chat.stackexchange.com/")
         val elements = doc.select("div")
+        var shouldSetContent = true
 
         if (elements.size != 0) {
             val obType = elements[0].className()
 
             if (obType.contains("ob-message")) {
                 println("This is a quote")
-            } else if (obType.contains("ob-message")) {
-                println("This is a Youtube Video")
+            } else if (obType.contains("ob-youtube")) {
+                shouldSetContent = false
+                message_onebox = true
+                onebox_type = "youtube"
+                this.contents = elements[0].child(0).getElementsByClass("ob-youtube-title").text()
+                onebox_content = elements.select("img").attr("src")
+                onebox_extra = elements[0].child(0).attr("href")
             } else if (obType.contains("ob-wikipedia")) {
                 println("This is Wikipedia")
             } else if (obType.contains("ob-image")) {
@@ -55,10 +62,9 @@ class ChatEvent {
                 onebox_content = ""
             }
         }
-//                oneboxImage.setImageDrawable(null)
-
-
-        this.contents = HtmlEscape.unescapeHtml(content)
+        if (shouldSetContent) {
+            this.contents = HtmlEscape.unescapeHtml(content)
+        }
     }
 
     companion object {
