@@ -98,30 +98,14 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                         .setOnItemClickListener { plusDialog, _, _, position ->
                             when (position) {
                                 0 -> {
-                                    val builder = AlertDialog.Builder(mContext)
-                                    builder.setTitle("Title")
-
-                                    val l = LinearLayout(mContext)
-                                    l.setPadding(14, 14, 14, 14)
-                                    val input = EditText(mContext)
-                                    input.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
-                                    l.addView(input)
-                                    builder.setView(l)
-
-                                    builder.setPositiveButton("OK", { dialog, _ ->
-                                        editMessage(input.text.toString(), message.messageId, chatFkey)
-                                        dialog.dismiss()
-                                        plusDialog.dismiss()
-                                    })
-                                    builder.setNegativeButton("Cancel", { dialog, _ ->
-                                        dialog.cancel()
-                                    })
-
-                                    builder.show()
-
+                                    showEditDialog(message.messageId, mContext, plusDialog)
                                 }
                                 1 -> {
                                     starMessage(message.messageId, chatFkey)
+                                    plusDialog.dismiss()
+                                }
+                                2 -> {
+                                    deleteMessage(message.messageId, chatFkey)
                                     plusDialog.dismiss()
                                 }
                             }
@@ -130,7 +114,6 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                         .create()
 
                 dialog.show()
-                starMessage(message.messageId, chatFkey)
                 true
             }
 
@@ -151,6 +134,44 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                         .build()
                 client.newCall(soChatPageRequest).execute()
             }
+        }
+
+        fun deleteMessage(messageId: Int, chatFkey: String?) {
+            val client = ClientManager.client
+            doAsync {
+                val soLoginRequestBody = FormEncodingBuilder()
+                        .add("fkey", chatFkey)
+                        .build()
+                val soChatPageRequest = Request.Builder()
+                        .url("https://chat.stackoverflow.com/messages/$messageId/delete")
+                        .post(soLoginRequestBody)
+                        .build()
+                client.newCall(soChatPageRequest).execute()
+            }
+        }
+
+        fun showEditDialog(messageId: Int, mContext: Context, plusDialog: DialogPlus) {
+            val builder = AlertDialog.Builder(mContext)
+            builder.setTitle("Title")
+
+            val l = LinearLayout(mContext)
+            l.setPadding(14, 14, 14, 14)
+            val input = EditText(mContext)
+            input.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+            l.addView(input)
+            builder.setView(l)
+
+            builder.setPositiveButton("OK", { dialog, _ ->
+                editMessage(input.text.toString(), messageId, chatFkey)
+                dialog.dismiss()
+                plusDialog.dismiss()
+            })
+            builder.setNegativeButton("Cancel", { dialog, _ ->
+                dialog.cancel()
+            })
+
+            builder.show()
+
         }
 
         fun editMessage(editText: String, messageId: Int, chatFkey: String?) {

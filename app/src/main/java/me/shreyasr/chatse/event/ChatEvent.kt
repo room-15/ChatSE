@@ -9,7 +9,7 @@ class ChatEvent {
     var time_stamp: Long = 0
     var room_id: Int = 0
     var user_id: Int = 0
-    lateinit var user_name: String
+    var user_name: String = ""
     var message_id: Int = 0
 
     var show_parent = false

@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.ImageView
 import android.widget.TextView
 import me.shreyasr.chatse.R
 
@@ -14,7 +13,7 @@ class ModifyMessageAdapter(context: Context) : BaseAdapter() {
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
 
     override fun getCount(): Int {
-        return 2
+        return 3
     }
 
     override fun getItem(position: Int): Any {
@@ -42,15 +41,14 @@ class ModifyMessageAdapter(context: Context) : BaseAdapter() {
         val context = parent.context
         when (position) {
             0 -> {
-                viewHolder.textView?.text = "Edit Message"
+                viewHolder.textView?.text = context.getString(R.string.edit_message)
             }
             1 -> {
-                viewHolder.textView?.text = "Star Message"
+                viewHolder.textView?.text = context.getString(R.string.star_message)
             }
-//            2 -> {
-//                viewHolder.textView?.text = context.getString(R.string.upload_from_url)
-//                viewHolder.imageView?.setImageResource(R.drawable.ic_link)
-//            }
+            2 -> {
+                viewHolder.textView?.text = context.getString(R.string.delete_message)
+            }
         }
 
         return view
