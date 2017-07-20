@@ -9,8 +9,8 @@
         android:icon="@drawable/ic_add"
         app:showAsAction="ifRoom"/>
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_logout"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="@string/action_logout"
         app:showAsAction="never" />
 </menu>

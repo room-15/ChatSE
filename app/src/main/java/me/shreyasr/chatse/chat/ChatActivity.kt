@@ -22,6 +22,7 @@ import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.adapters.RoomAdapter
 import me.shreyasr.chatse.chat.service.IncomingEventService
 import me.shreyasr.chatse.chat.service.IncomingEventServiceBinder
+import me.shreyasr.chatse.login.LoginActivity
 import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
 import org.jetbrains.anko.defaultSharedPreferences
@@ -178,6 +179,10 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         if (item != null) {
             when (item.itemId) {
                 R.id.search_rooms -> startActivity(intentFor<RoomSearchActivity>())
+                R.id.action_logout -> {
+                    startActivity(Intent(applicationContext, LoginActivity::class.java))
+                    defaultSharedPreferences.edit().clear().apply()
+                }
             }
         }
         return super.onOptionsItemSelected(item)

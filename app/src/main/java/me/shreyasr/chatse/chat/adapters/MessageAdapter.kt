@@ -78,6 +78,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         messageView.text = Html.fromHtml(message.content, Html.FROM_HTML_MODE_LEGACY)
                     } else {
+                        @Suppress("DEPRECATION")
                         messageView.text = Html.fromHtml(message.content)
                     }
                 } else {
