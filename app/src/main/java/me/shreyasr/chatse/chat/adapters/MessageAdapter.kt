@@ -95,7 +95,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                         .setContentHolder(ListHolder())
                         .setGravity(Gravity.CENTER)
                         .setAdapter(ModifyMessageAdapter(mContext))
-                        .setOnItemClickListener { _, _, _, position ->
+                        .setOnItemClickListener { plusDialog, _, _, position ->
                             when (position) {
                                 0 -> {
                                     val builder = AlertDialog.Builder(mContext)
@@ -108,13 +108,21 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                                     l.addView(input)
                                     builder.setView(l)
 
-                                    builder.setPositiveButton("OK", { _, _ -> editMessage(input.text.toString(), message.messageId, chatFkey) })
-                                    builder.setNegativeButton("Cancel", { dialog, _ -> dialog.cancel() })
+                                    builder.setPositiveButton("OK", { dialog, _ ->
+                                        editMessage(input.text.toString(), message.messageId, chatFkey)
+                                        dialog.dismiss()
+                                        plusDialog.dismiss()
+                                    })
+                                    builder.setNegativeButton("Cancel", { dialog, _ ->
+                                        dialog.cancel()
+                                    })
 
                                     builder.show()
+
                                 }
                                 1 -> {
                                     starMessage(message.messageId, chatFkey)
+                                    plusDialog.dismiss()
                                 }
                             }
                         }
