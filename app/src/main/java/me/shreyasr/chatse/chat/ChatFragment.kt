@@ -127,7 +127,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
         input = view.findViewById(R.id.chat_input_text) as EditText
         messageList = view.findViewById(R.id.chat_message_list) as RecyclerView
 
-        messageAdapter = MessageAdapter(events, chatFkey)
+        messageAdapter = MessageAdapter(activity, events, chatFkey)
         messageList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, true)
         messageList.adapter = messageAdapter
         messageList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))
