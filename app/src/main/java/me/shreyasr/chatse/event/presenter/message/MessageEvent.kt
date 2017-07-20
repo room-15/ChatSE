@@ -6,8 +6,8 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
     var content: String?
     val timestamp: Long
     val id: Long
-    val userId: Long
-    val userName: String
+    var userId: Long
+    var userName: String
     val roomId: Long
     val roomName: String
     val messageId: Int

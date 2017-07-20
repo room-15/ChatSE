@@ -1,5 +1,6 @@
 package me.shreyasr.chatse.event.presenter.message
 
+import android.util.Log
 import me.shreyasr.chatse.event.ChatEvent
 import me.shreyasr.chatse.event.presenter.EventPresenter
 import timber.log.Timber
@@ -27,11 +28,16 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                 val newMessage = MessageEvent(event)
                 val originalMessage = messages.floor(newMessage)
                 if (originalMessage != null) {
-                    originalMessage.message_stars = event.message_stars
-                    originalMessage.message_starred = event.message_starred
+                    newMessage.userId = originalMessage.userId
+                    newMessage.userName = originalMessage.userName
+                    newMessage.message_stars = event.message_stars
+                    newMessage.message_starred = event.message_starred
                     messages.remove(originalMessage)
                     messages.add(newMessage)
                 }
+            }
+            ChatEvent.EVENT_TYPE_MENTION -> {
+                Log.wtf("MENTION", "MENTION " + event.user_id)
             }
         }
     }
