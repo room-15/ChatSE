@@ -15,11 +15,12 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
     val editCount: Int
     val onebox: Boolean
     val onebox_type: String
+    var message_stars: Int
     val onebox_content: String
+    var message_starred: Boolean
     internal var previous: MessageEvent? = null
 
     init {
-//        Log.wtf("BRUH", baseEvent.onebox_type)
         this.content = baseEvent.contents
         this.timestamp = baseEvent.time_stamp
         this.id = baseEvent.id.toLong()
@@ -30,6 +31,8 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
         this.messageId = baseEvent.message_id
         this.parentId = baseEvent.parent_id.toLong()
         this.editCount = baseEvent.message_edits
+        this.message_stars = baseEvent.message_stars
+        this.message_starred = baseEvent.message_starred
         this.onebox = baseEvent.message_onebox
         this.onebox_type = baseEvent.onebox_type
         this.onebox_content = baseEvent.onebox_content

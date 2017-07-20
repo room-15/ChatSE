@@ -18,6 +18,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -25,14 +26,34 @@
 
             <include layout="@layout/room_nav_header" />
 
+            <TextView
+                android:id="@+id/so_header_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="@string/stackoverflow"
+                android:textSize="17sp" />
+
             <ListView
-                android:id="@+id/lst_menu_items"
+                android:id="@+id/stackoverflow_room_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/se_header_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="@string/stackexchange"
+                android:textSize="17sp" />
+
+            <ListView
+                android:id="@+id/stackexchange_room_list"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
         </LinearLayout>
     </android.support.design.widget.NavigationView>
-        <!--app:headerLayout="@layout/room_nav_header"-->
-        <!--app:menu="@menu/activity_main_drawer" />-->
 
 </android.support.v4.widget.DrawerLayout>

@@ -23,6 +23,14 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                 messages.remove(originalMessage)
                 messages.add(newMessage)
             }
+            ChatEvent.EVENT_TYPE_STAR -> {
+                val newMessage = MessageEvent(event)
+                val originalMessage = messages.floor(newMessage)
+                originalMessage.message_stars = event.message_stars
+                originalMessage.message_starred = event.message_starred
+                messages.remove(originalMessage)
+                messages.add(newMessage)
+            }
         }
     }
 

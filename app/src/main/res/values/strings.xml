@@ -15,5 +15,7 @@
     <string name="choose_from_gallery">Choose from Gallery</string>
     <string name="upload_from_url">Upload from URL</string>
     <string name="upload">Upload</string>
-    <string name="log_in_with_google">Log in With Google</string>
+    <string name="stackoverflow">Stackoverflow</string>
+    <string name="stackexchange">Stackexchange</string>
+    <string name="upload_image">Upload an Image</string>
 </resources>
