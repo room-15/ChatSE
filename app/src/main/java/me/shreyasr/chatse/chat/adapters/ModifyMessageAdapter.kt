@@ -6,14 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
-import me.shreyasr.chatse.R
 
-class ModifyMessageAdapter(context: Context) : BaseAdapter() {
+class ModifyMessageAdapter(val dialogMessages: MutableList<String>, context: Context) : BaseAdapter() {
 
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
 
     override fun getCount(): Int {
-        return 3
+        return dialogMessages.size
     }
 
     override fun getItem(position: Int): Any {
@@ -39,17 +38,8 @@ class ModifyMessageAdapter(context: Context) : BaseAdapter() {
         }
 
         val context = parent.context
-        when (position) {
-            0 -> {
-                viewHolder.textView?.text = context.getString(R.string.edit_message)
-            }
-            1 -> {
-                viewHolder.textView?.text = context.getString(R.string.star_message)
-            }
-            2 -> {
-                viewHolder.textView?.text = context.getString(R.string.delete_message)
-            }
-        }
+
+        viewHolder.textView?.text = dialogMessages[position]
 
         return view
     }

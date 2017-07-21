@@ -24,16 +24,19 @@ import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import kotlinx.android.synthetic.main.list_item_message.view.*
 import me.shreyasr.chatse.R
+import me.shreyasr.chatse.chat.ChatRoom
 import me.shreyasr.chatse.event.EventList
 import me.shreyasr.chatse.event.presenter.message.MessageEvent
+import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
+import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey: String?, var messages: List<MessageEvent> = ArrayList()) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
+class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey: String?, val room: ChatRoom?, var messages: List<MessageEvent> = ArrayList()) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
     override fun onBindViewHolder(viewHolder: MessageViewHolder?, pos: Int) {
         val message = messages[pos]
@@ -48,12 +51,12 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): MessageViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.list_item_message, parent, false)
-        return MessageViewHolder(mContext, view, chatFkey)
+        return MessageViewHolder(mContext, view, chatFkey, room)
     }
 
     override fun getItemCount() = messages.size
 
-    class MessageViewHolder(val mContext: Context, itemView: View, val chatFkey: String?) : RecyclerView.ViewHolder(itemView) {
+    class MessageViewHolder(val mContext: Context, itemView: View, val chatFkey: String?, val room: ChatRoom?) : RecyclerView.ViewHolder(itemView) {
         val timestampFormat = SimpleDateFormat("hh:mm aa", Locale.getDefault())
         val messageView = itemView.findViewById(R.id.message_content) as TextView
         val userNameView = itemView.findViewById(R.id.message_user_name) as TextView
@@ -111,22 +114,46 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
             }
 
             itemView.setOnLongClickListener {
+                val dialogMessages = mutableListOf<String>()
+                val curUserId: Int
+                val isUserMessage: Boolean
+
+                if (room?.site == Client.SITE_STACK_OVERFLOW) {
+                    curUserId = mContext.defaultSharedPreferences.getInt("SOID", -1)
+                } else {
+                    curUserId = mContext.defaultSharedPreferences.getInt("SEID", -1)
+                }
+                Log.wtf("USERID", curUserId.toString() + " " + message.userId.toString())
+                isUserMessage = curUserId == message.userId.toInt()
+                if (curUserId != -1) {
+                    if (isUserMessage) {
+                        dialogMessages.add(mContext.getString(R.string.edit_message))
+                        dialogMessages.add(mContext.getString(R.string.delete_message))
+                    } else {
+                        dialogMessages.add(mContext.getString(R.string.star_message))
+                    }
+                }
                 val dialog = DialogPlus.newDialog(mContext)
                         .setContentHolder(ListHolder())
                         .setGravity(Gravity.CENTER)
-                        .setAdapter(ModifyMessageAdapter(mContext))
-                        .setOnItemClickListener { plusDialog, _, _, position ->
-                            when (position) {
-                                0 -> {
-                                    showEditDialog(message.messageId, mContext, plusDialog)
+                        .setAdapter(ModifyMessageAdapter(dialogMessages, mContext))
+                        .setOnItemClickListener { plusDialog, item, _, position ->
+                            if (isUserMessage) {
+                                when (position) {
+                                    0 -> {
+                                        showEditDialog(message, mContext, plusDialog)
+                                    }
+                                    1 -> {
+                                        deleteMessage(message.messageId, chatFkey)
+                                        plusDialog.dismiss()
+                                    }
                                 }
-                                1 -> {
-                                    starMessage(message.messageId, chatFkey)
-                                    plusDialog.dismiss()
-                                }
-                                2 -> {
-                                    deleteMessage(message.messageId, chatFkey)
-                                    plusDialog.dismiss()
+                            } else {
+                                when (position) {
+                                    0 -> {
+                                        starMessage(message.messageId, chatFkey)
+                                        plusDialog.dismiss()
+                                    }
                                 }
                             }
                         }
@@ -170,19 +197,20 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
             }
         }
 
-        fun showEditDialog(messageId: Int, mContext: Context, plusDialog: DialogPlus) {
+        fun showEditDialog(message: MessageEvent, mContext: Context, plusDialog: DialogPlus) {
             val builder = AlertDialog.Builder(mContext)
-            builder.setTitle("Title")
+            builder.setTitle("Edit message")
 
             val l = LinearLayout(mContext)
             l.setPadding(14, 14, 14, 14)
             val input = EditText(mContext)
+            input.setText(message.content, TextView.BufferType.EDITABLE)
             input.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
             l.addView(input)
             builder.setView(l)
 
             builder.setPositiveButton("OK", { dialog, _ ->
-                editMessage(input.text.toString(), messageId, chatFkey)
+                editMessage(input.text.toString(), message.messageId, chatFkey)
                 dialog.dismiss()
                 plusDialog.dismiss()
             })
