@@ -36,7 +36,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey: String?, val room: ChatRoom?, var messages: List<MessageEvent> = ArrayList()) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
+class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey: String?, val room: ChatRoom?, var messages: ArrayList<MessageEvent> = ArrayList()) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
     override fun onBindViewHolder(viewHolder: MessageViewHolder?, pos: Int) {
         val message = messages[pos]
@@ -45,8 +45,10 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
     }
 
     fun update() {
-        messages = events.messagePresenter.getEventsList()
-        notifyDataSetChanged()
+        Log.wtf("MessageAdapter", "NEW EVENT")
+        messages.clear()
+        messages.addAll(events.messagePresenter.getEventsList())
+        this.notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): MessageViewHolder {

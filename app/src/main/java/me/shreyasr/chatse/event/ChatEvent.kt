@@ -72,6 +72,7 @@ class ChatEvent {
         val EVENT_TYPE_MESSAGE = 1
         val EVENT_TYPE_EDIT = 2
         val EVENT_TYPE_JOIN = 3
+        val EVENT_TYPE_LEAVE = 4
         val EVENT_TYPE_STAR = 6
         val EVENT_TYPE_MENTION = 8
         val EVENT_TYPE_DELETE = 10

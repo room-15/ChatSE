@@ -1,5 +1,6 @@
 package me.shreyasr.chatse.event.presenter.message
 
+import android.util.Log
 import me.shreyasr.chatse.event.ChatEvent
 
 class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
@@ -54,8 +55,10 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
 
     override fun compareTo(other: MessageEvent): Int {
         if (this == other) {
+            Log.d("compareTo", "This is equal - 0")
             return 0
         }
+        Log.d("compareTo", "This is not equal, comparing timestamps")
         return other.timestamp.compareTo(this.timestamp)
     }
 

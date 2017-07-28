@@ -14,6 +14,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
+import android.widget.Toast
 import com.koushikdutta.ion.Ion
 import com.squareup.okhttp.Request
 import kotlinx.android.synthetic.main.activity_chat.*
@@ -128,6 +129,10 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         serviceBinder = binder as IncomingEventServiceBinder
         addRoomsToDrawer()
         loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, 15))
+    }
+
+    fun addNewUser(user: String){
+        Toast.makeText(applicationContext, "bruh nice" + user, Toast.LENGTH_SHORT).show()
     }
 
     private fun addRoomsToDrawer() {

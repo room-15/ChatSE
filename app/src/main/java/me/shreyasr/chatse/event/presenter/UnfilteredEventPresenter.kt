@@ -5,6 +5,7 @@ import java.util.*
 
 class UnfilteredEventPresenter : EventPresenter<ChatEvent> {
 
+
     val events = ArrayList<ChatEvent>()
 
     override fun addEvent(event: ChatEvent, roomNum: Int) {
@@ -14,6 +15,10 @@ class UnfilteredEventPresenter : EventPresenter<ChatEvent> {
     }
 
     override fun getEventsList(): List<ChatEvent> {
+        return Collections.unmodifiableList(ArrayList(events))
+    }
+
+    override fun getUsersList(): List<ChatEvent> {
         return Collections.unmodifiableList(ArrayList(events))
     }
 }

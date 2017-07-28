@@ -7,4 +7,5 @@ interface EventPresenter<out T> {
     fun addEvent(event: ChatEvent, roomNum: Int)
 
     fun getEventsList(): List<T>
+    fun getUsersList(): List<T>
 }

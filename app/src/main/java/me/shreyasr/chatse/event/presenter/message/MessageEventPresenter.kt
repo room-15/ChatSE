@@ -5,10 +5,12 @@ import me.shreyasr.chatse.event.ChatEvent
 import me.shreyasr.chatse.event.presenter.EventPresenter
 import timber.log.Timber
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MessageEventPresenter : EventPresenter<MessageEvent> {
 
     internal var messages = TreeSet<MessageEvent>()
+    internal var users = arrayListOf<MessageEvent>()
 
     override fun addEvent(event: ChatEvent, roomNum: Int) {
         when (event.event_type) {
@@ -39,10 +41,20 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
             ChatEvent.EVENT_TYPE_MENTION -> {
                 Log.wtf("MENTION", "MENTION " + event.user_id)
             }
+            ChatEvent.EVENT_TYPE_JOIN -> {
+                val userObj = MessageEvent(event)
+                userObj.content = "Someone just joined"
+                users.add(userObj)
+                Log.wtf("User", users.size.toString())
+            }
         }
     }
 
     override fun getEventsList(): List<MessageEvent> {
         return Collections.unmodifiableList(ArrayList(messages))
+    }
+
+    override fun getUsersList(): List<MessageEvent> {
+        return Collections.unmodifiableList(users)
     }
 }
