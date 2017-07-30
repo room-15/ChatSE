@@ -15,6 +15,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import com.koushikdutta.ion.Ion
+import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.room_nav_header.*
@@ -130,6 +131,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, 15))
     }
 
+
     private fun addRoomsToDrawer() {
         val client = ClientManager.client
         soRoomList.clear()
@@ -217,6 +219,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     @Throws(IOException::class, JSONException::class)
     private fun createChatFragment(room: ChatRoom): ChatFragment {
         val roomInfo = serviceBinder.loadRoom(room)
+        rejoinFavoriteRooms(roomInfo.fkey)
         serviceBinder.joinRoom(room, roomInfo.fkey)
         val chatFragment = ChatFragment.createInstance(room, roomInfo.name, roomInfo.fkey)
         serviceBinder.registerListener(room, chatFragment)
@@ -224,6 +227,28 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
             supportActionBar?.title = roomInfo.name
         }
         return chatFragment
+    }
+
+
+    fun rejoinFavoriteRooms(fkey: String) {
+        val client = ClientManager.client
+        doAsync {
+            val soRequestBody = FormEncodingBuilder()
+                    .add("fkey", fkey)
+                    .add("immediate", "true")
+                    .add("quiet", "true")
+                    .build()
+            val soChatPageRequest = Request.Builder()
+                    .url(Client.SITE_STACK_OVERFLOW + "/chats/join/favorite")
+                    .post(soRequestBody)
+                    .build()
+            client.newCall(soChatPageRequest).execute()
+            val seChatPageRequest = Request.Builder()
+                    .url(Client.SITE_STACK_EXCHANGE + "/chats/join/favorite")
+                    .post(soRequestBody)
+                    .build()
+            client.newCall(seChatPageRequest).execute()
+        }
     }
 
 }

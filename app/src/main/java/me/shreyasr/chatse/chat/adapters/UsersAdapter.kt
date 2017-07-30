@@ -59,7 +59,7 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
 
             itemView.setOnClickListener {
                 Ion.with(mContext)
-                        .load("https://chat.stackoverflow.com/rooms/thumbs/${user.userId}")
+                        .load("https://chat.stackoverflow.com/users/thumbs/${user.userId}")
                         .asJsonObject()
                         .setCallback { e, result ->
                             if (e != null) {
@@ -72,10 +72,10 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
                                         })
                                 val s: SpannableString
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    s = SpannableString(Html.fromHtml(result.get("description").asString, Html.FROM_HTML_MODE_COMPACT))
+                                    s = SpannableString(Html.fromHtml(result.get("user_message").asString, Html.FROM_HTML_MODE_COMPACT))
                                 } else {
                                     @Suppress("DEPRECATION")
-                                    s = SpannableString(Html.fromHtml(result.get("description").asString))
+                                    s = SpannableString(Html.fromHtml(result.get("user_message").asString))
                                 }
                                 Linkify.addLinks(s, Linkify.ALL)
                                 builder.setMessage(s)

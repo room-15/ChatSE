@@ -83,6 +83,16 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
             siteStatuses.put(room.site, WebsocketConnectionStatus.CREATING)
             initWs(client, wsUrl, room.site)
         }
+        val soRequestBody = FormEncodingBuilder()
+                .add("fkey", chatFkey)
+                .add("immediate", "true")
+                .add("quiet", "true")
+                .build()
+        val soChatPageRequest = Request.Builder()
+                .url(Client.SITE_STACK_OVERFLOW + "/chats/join/" + room.num)
+                .post(soRequestBody)
+                .build()
+        client.newCall(soChatPageRequest).execute()
     }
 
     @Throws(IOException::class, JSONException::class)
