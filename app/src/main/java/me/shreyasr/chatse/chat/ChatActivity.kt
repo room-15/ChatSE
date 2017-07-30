@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.*
 import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
@@ -15,12 +14,10 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
-import android.widget.Toast
 import com.koushikdutta.ion.Ion
 import com.squareup.okhttp.Request
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.room_nav_header.*
-import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.adapters.RoomAdapter
 import me.shreyasr.chatse.chat.service.IncomingEventService
@@ -131,10 +128,6 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         serviceBinder = binder as IncomingEventServiceBinder
         addRoomsToDrawer()
         loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, 15))
-    }
-
-    fun addNewUser(user: String) {
-        Toast.makeText(applicationContext, "bruh nice" + user, Toast.LENGTH_SHORT).show()
     }
 
     private fun addRoomsToDrawer() {

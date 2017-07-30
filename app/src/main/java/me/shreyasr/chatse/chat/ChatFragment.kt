@@ -150,7 +150,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
 
         networkHandler?.post {
             try {
-                val messages = getMessagesObject(client, room, 50)
+                val messages = getMessagesObject(client, room, 100)
                 handleNewEvents(messages.get("events"))
             } catch (e: IOException) {
                 Timber.e(e)
@@ -251,6 +251,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
         uiThreadHandler.post {
             messageAdapter?.update()
             usersAdapter?.update()
+            usersAdapter?.notifyDataSetChanged()
         }
     }
 
