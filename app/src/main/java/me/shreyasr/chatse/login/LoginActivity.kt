@@ -12,7 +12,6 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
-import kotlinx.android.synthetic.main.activity_login.*
 import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.ChatActivity

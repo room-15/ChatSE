@@ -31,6 +31,7 @@ class ChatEvent {
 
     var message_starred = false
     var isForUsersList = false
+    var email_hash = ""
 
     //TODO:
     fun setContent(content: String) {

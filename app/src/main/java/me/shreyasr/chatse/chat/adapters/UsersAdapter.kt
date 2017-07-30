@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.koushikdutta.ion.Ion
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.event.EventList
 import me.shreyasr.chatse.event.presenter.message.MessageEvent
@@ -44,6 +45,11 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
 
         fun bindMessage(user: MessageEvent) {
             userName.text = user.userName
+            Log.wtf("UserIcon", user.email_hash)
+            Ion.with(mContext)
+                    .load(user.email_hash)
+                    .setLogging("ION", Log.ERROR)
+                    .intoImageView(userPicture)
         }
     }
 }

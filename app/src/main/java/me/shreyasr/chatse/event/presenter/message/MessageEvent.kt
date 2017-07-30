@@ -20,6 +20,7 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
     var onebox_extra: String
     var message_starred: Boolean
     var isForUsersList: Boolean
+    var email_hash: String
     internal var previous: MessageEvent? = null
 
     init {
@@ -40,6 +41,7 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
         this.onebox_content = baseEvent.onebox_content
         this.onebox_extra = baseEvent.onebox_extra
         this.isForUsersList = baseEvent.isForUsersList
+        this.email_hash = baseEvent.email_hash
     }
 
     val isDeleted: Boolean

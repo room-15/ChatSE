@@ -34,7 +34,7 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
         //Just clearing for now, need to make sure the filter actually works 100% of the time.
         listeners.clear()
 //        if (listeners.filter { room.num == it.room.num }.isEmpty()) {
-            listeners.add(MessageListenerHolder(room, listener))
+        listeners.add(MessageListenerHolder(room, listener))
 //        }
     }
 

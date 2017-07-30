@@ -133,7 +133,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
         messageList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, true)
         messageList.adapter = messageAdapter
         messageList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))
-        userList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, true)
+        userList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         userList.adapter = usersAdapter
         userList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))
 
@@ -212,7 +212,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
         messagesJson
                 .mapNotNull { chatEventGenerator.createEvent(it) }
                 .filter { it.room_id == room?.num }
-                .forEach { events.addEvent(it) }
+                .forEach { events.addEvent(it, activity) }
 
         uiThreadHandler.post {
             messageAdapter?.update()

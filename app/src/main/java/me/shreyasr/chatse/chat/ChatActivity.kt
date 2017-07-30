@@ -131,7 +131,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, 15))
     }
 
-    fun addNewUser(user: String){
+    fun addNewUser(user: String) {
         Toast.makeText(applicationContext, "bruh nice" + user, Toast.LENGTH_SHORT).show()
     }
 
