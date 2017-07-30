@@ -10,14 +10,15 @@ import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.Html
+import android.text.SpannableString
+import android.text.util.Linkify
 import android.util.Base64
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageButton
@@ -66,9 +67,9 @@ class ChatFragment : Fragment(), IncomingEventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val args = arguments
+        setHasOptionsMenu(true)
         chatFkey = args.getString(EXTRA_FKEY)
         room = args.getParcelable<ChatRoom>(EXTRA_ROOM)
-
         assert(chatFkey != null)
         assert(room != null)
 
@@ -158,6 +159,39 @@ class ChatFragment : Fragment(), IncomingEventListener {
 
         input.requestFocus()
         return view
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.room_information -> {
+                Ion.with(activity)
+                        .load("https://chat.stackoverflow.com/rooms/thumbs/${room?.num}")
+                        .asJsonObject()
+                        .setCallback { e, result ->
+                            if (e != null) {
+                                Log.wtf("ChatFragment", e.message)
+                            } else {
+                                val builder = AlertDialog.Builder(activity)
+                                        .setTitle(result.get("name").asString)
+                                        .setNegativeButton("Close", { dialog, _ ->
+                                            dialog.cancel()
+                                        })
+                                val s: SpannableString
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    s = SpannableString(Html.fromHtml(result.get("description").asString, Html.FROM_HTML_MODE_COMPACT))
+                                } else {
+                                    @Suppress("DEPRECATION")
+                                    s = SpannableString(Html.fromHtml(result.get("description").asString))
+                                }
+                                Linkify.addLinks(s, Linkify.ALL)
+                                builder.setMessage(s)
+                                builder.show()
+                            }
+                        }
+                return true
+            }
+        }
+        return false
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

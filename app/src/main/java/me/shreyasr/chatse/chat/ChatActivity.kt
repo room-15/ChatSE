@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.*
 import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
@@ -19,6 +20,7 @@ import com.koushikdutta.ion.Ion
 import com.squareup.okhttp.Request
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.room_nav_header.*
+import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.adapters.RoomAdapter
 import me.shreyasr.chatse.chat.service.IncomingEventService
@@ -188,9 +190,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     startActivity(Intent(applicationContext, LoginActivity::class.java))
                     defaultSharedPreferences.edit().clear().apply()
                 }
-                R.id.room_information -> {
-
-                }
+                R.id.room_information -> return false
             }
         }
         return super.onOptionsItemSelected(item)
