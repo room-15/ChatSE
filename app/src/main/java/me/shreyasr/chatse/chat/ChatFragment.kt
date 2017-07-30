@@ -32,6 +32,7 @@ import kotlinx.android.synthetic.main.picker_footer.view.*
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.adapters.MessageAdapter
 import me.shreyasr.chatse.chat.adapters.UploadImageAdapter
+import me.shreyasr.chatse.chat.adapters.UsersAdapter
 import me.shreyasr.chatse.chat.service.IncomingEventListener
 import me.shreyasr.chatse.event.ChatEventGenerator
 import me.shreyasr.chatse.event.EventList
@@ -49,6 +50,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
 
     private lateinit var input: EditText
     private lateinit var messageList: RecyclerView
+    private lateinit var userList: RecyclerView
     private lateinit var events: EventList
     private var chatFkey: String? = null
     private var room: ChatRoom? = null
@@ -56,6 +58,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
     private var networkHandler: Handler? = null
     private val uiThreadHandler = Handler(Looper.getMainLooper())
     private var messageAdapter: MessageAdapter? = null
+    private var usersAdapter: UsersAdapter? = null
     private val mapper = ObjectMapper()
     private val chatEventGenerator = ChatEventGenerator()
     lateinit var dialog: DialogPlus
@@ -100,14 +103,11 @@ class ChatFragment : Fragment(), IncomingEventListener {
                             1 -> {
                                 if (ContextCompat.checkSelfPermission(activity, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                        Log.wtf("PERMISSION", "REQUESTOPEN")
                                         ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
                                     } else {
-                                        Log.wtf("SDK Version", "SHOULD OPEN")
                                         openFileChooser()
                                     }
                                 } else {
-                                    Log.wtf("HAS PERMISSION", "SHOULD OPEN")
                                     openFileChooser()
                                 }
                             }
@@ -126,11 +126,16 @@ class ChatFragment : Fragment(), IncomingEventListener {
 
         input = view.findViewById(R.id.chat_input_text) as EditText
         messageList = view.findViewById(R.id.chat_message_list) as RecyclerView
+        userList = activity.findViewById(R.id.room_users) as RecyclerView
 
         messageAdapter = MessageAdapter(activity, events, chatFkey, room)
+        usersAdapter = UsersAdapter(activity, events)
         messageList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, true)
         messageList.adapter = messageAdapter
         messageList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))
+        userList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, true)
+        userList.adapter = usersAdapter
+        userList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))
 
         input.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
@@ -162,7 +167,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
             0 -> {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.wtf("GOT PERMISSION", "SHOULD OPEN")
                     openFileChooser()
                 } else {
                     Toast.makeText(activity, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
@@ -210,11 +214,13 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 .filter { it.room_id == room?.num }
                 .forEach { events.addEvent(it) }
 
-        uiThreadHandler.post { messageAdapter?.update() }
+        uiThreadHandler.post {
+            messageAdapter?.update()
+            usersAdapter?.update()
+        }
     }
 
     fun openFileChooser() {
-        Log.wtf("OPENFILECHOOSER", "OPENING")
         val getIntent = Intent(Intent.ACTION_GET_CONTENT)
         getIntent.type = "image/*"
 

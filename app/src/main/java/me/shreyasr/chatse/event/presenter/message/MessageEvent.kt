@@ -1,6 +1,5 @@
 package me.shreyasr.chatse.event.presenter.message
 
-import android.util.Log
 import me.shreyasr.chatse.event.ChatEvent
 
 class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
@@ -20,6 +19,7 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
     val onebox_content: String
     var onebox_extra: String
     var message_starred: Boolean
+    var isForUsersList: Boolean
     internal var previous: MessageEvent? = null
 
     init {
@@ -39,6 +39,7 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
         this.onebox_type = baseEvent.onebox_type
         this.onebox_content = baseEvent.onebox_content
         this.onebox_extra = baseEvent.onebox_extra
+        this.isForUsersList = baseEvent.isForUsersList
     }
 
     val isDeleted: Boolean
@@ -55,11 +56,17 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
 
     override fun compareTo(other: MessageEvent): Int {
         if (this == other) {
-            Log.d("compareTo", "This is equal - 0")
+//            Log.d("compareTo", "This is equal - 0")
             return 0
         }
-        Log.d("compareTo", "This is not equal, comparing timestamps")
-        return other.timestamp.compareTo(this.timestamp)
+        if (other.isForUsersList) {
+            return other.userId.compareTo(this.userId)
+
+        } else {
+            return other.timestamp.compareTo(this.timestamp)
+
+        }
+//        Log.d("compareTo", "This is not equal, comparing timestamps")
     }
 
     override fun hashCode(): Int {

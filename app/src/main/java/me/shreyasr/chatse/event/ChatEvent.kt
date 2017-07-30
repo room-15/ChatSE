@@ -30,6 +30,7 @@ class ChatEvent {
     var onebox_extra = ""
 
     var message_starred = false
+    var isForUsersList = false
 
     //TODO:
     fun setContent(content: String) {

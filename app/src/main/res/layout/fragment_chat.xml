@@ -1,47 +1,56 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/chat_message_list"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:openDrawer="start">
 
     <LinearLayout
-        android:id="@+id/chat_input_group"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <ImageButton
-            android:id="@+id/chat_input_upload"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:background="@null"
-            android:contentDescription="@string/upload_image"
-            android:src="@android:drawable/ic_menu_upload" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/chat_message_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-        <EditText
-            android:id="@+id/chat_input_text"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/chat_input_group"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:hint="@string/chat_input_hint"
-            android:imeOptions="actionSend"
-            android:inputType="textCapSentences" />
+            android:layout_gravity="bottom"
+            android:orientation="horizontal">
 
-        <ImageButton
-            android:id="@+id/chat_input_submit"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:background="@null"
-            android:contentDescription="@string/chat_send_description"
-            android:src="@drawable/ic_send_black_24dp" />
+            <ImageButton
+                android:id="@+id/chat_input_upload"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:background="@null"
+                android:contentDescription="@string/upload_image"
+                android:src="@android:drawable/ic_menu_upload" />
+
+            <EditText
+                android:id="@+id/chat_input_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:hint="@string/chat_input_hint"
+                android:imeOptions="actionSend"
+                android:inputType="textCapSentences" />
+
+            <ImageButton
+                android:id="@+id/chat_input_submit"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:background="@null"
+                android:contentDescription="@string/chat_send_description"
+                android:src="@drawable/ic_send_black_24dp" />
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</android.support.v4.widget.DrawerLayout>

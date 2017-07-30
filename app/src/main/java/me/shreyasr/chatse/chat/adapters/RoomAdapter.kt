@@ -26,7 +26,6 @@ class RoomAdapter(val list: MutableList<Room>, context: Context) : BaseAdapter()
             view = convertView
             vh = view.tag as ListRowHolder
         }
-//            Log.wtf("TESTING", list.size.toString())
         if (list.isNotEmpty()) {
             vh.name.text = list[position].name
         }

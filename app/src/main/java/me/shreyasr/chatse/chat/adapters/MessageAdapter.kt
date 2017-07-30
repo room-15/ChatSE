@@ -35,7 +35,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-
 class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey: String?, val room: ChatRoom?, var messages: ArrayList<MessageEvent> = ArrayList()) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
     override fun onBindViewHolder(viewHolder: MessageViewHolder?, pos: Int) {
@@ -45,7 +44,6 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
     }
 
     fun update() {
-        Log.wtf("MessageAdapter", "NEW EVENT")
         messages.clear()
         messages.addAll(events.messagePresenter.getEventsList())
         this.notifyDataSetChanged()
@@ -90,7 +88,6 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                         messageView.text = Html.fromHtml(message.content)
                     }
                 } else {
-                    Log.wtf("ONEBOX_TYPE", message.onebox_type)
                     when (message.onebox_type) {
                         "image" -> {
                             oneboxImage.visibility = View.VISIBLE
@@ -125,7 +122,6 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                 } else {
                     curUserId = mContext.defaultSharedPreferences.getInt("SEID", -1)
                 }
-                Log.wtf("USERID", curUserId.toString() + " " + message.userId.toString())
                 isUserMessage = curUserId == message.userId.toInt()
                 if (curUserId != -1) {
                     if (isUserMessage) {

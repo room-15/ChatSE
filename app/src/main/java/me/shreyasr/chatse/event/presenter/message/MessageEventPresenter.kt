@@ -10,9 +10,14 @@ import kotlin.collections.ArrayList
 class MessageEventPresenter : EventPresenter<MessageEvent> {
 
     internal var messages = TreeSet<MessageEvent>()
-    internal var users = arrayListOf<MessageEvent>()
+    internal var users = TreeSet<MessageEvent>()
 
     override fun addEvent(event: ChatEvent, roomNum: Int) {
+        if (event.event_type != ChatEvent.EVENT_TYPE_LEAVE) {
+            val newEvent = MessageEvent(event)
+            newEvent.isForUsersList = true
+            users.add(newEvent)
+        }
         when (event.event_type) {
             ChatEvent.EVENT_TYPE_MESSAGE -> messages.add(MessageEvent(event))
             ChatEvent.EVENT_TYPE_EDIT, ChatEvent.EVENT_TYPE_DELETE -> {
@@ -39,13 +44,11 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                 }
             }
             ChatEvent.EVENT_TYPE_MENTION -> {
-                Log.wtf("MENTION", "MENTION " + event.user_id)
             }
             ChatEvent.EVENT_TYPE_JOIN -> {
                 val userObj = MessageEvent(event)
                 userObj.content = "Someone just joined"
                 users.add(userObj)
-                Log.wtf("User", users.size.toString())
             }
         }
     }
@@ -55,6 +58,6 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
     }
 
     override fun getUsersList(): List<MessageEvent> {
-        return Collections.unmodifiableList(users)
+        return Collections.unmodifiableList(ArrayList(users))
     }
 }

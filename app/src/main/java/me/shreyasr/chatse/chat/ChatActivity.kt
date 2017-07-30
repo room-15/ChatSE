@@ -188,6 +188,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     startActivity(Intent(applicationContext, LoginActivity::class.java))
                     defaultSharedPreferences.edit().clear().apply()
                 }
+                R.id.room_information -> {
+
+                }
             }
         }
         return super.onOptionsItemSelected(item)
