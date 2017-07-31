@@ -14,7 +14,7 @@ class EventList(private val roomNum: Int) {
 
     private val presenters = arrayOf(unfilteredPresenter, messagePresenter)
 
-    fun addEvent(event: ChatEvent, context: Context) {
-        presenters.forEach { it.addEvent(event, roomNum, context) }
+    fun addEvent(event: ChatEvent, context: Context, site: String?) {
+        presenters.forEach { it.addEvent(event, roomNum, context, site) }
     }
 }

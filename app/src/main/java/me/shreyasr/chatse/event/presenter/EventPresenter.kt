@@ -5,7 +5,7 @@ import me.shreyasr.chatse.event.ChatEvent
 
 interface EventPresenter<out T> {
 
-    fun addEvent(event: ChatEvent, roomNum: Int, context: Context)
+    fun addEvent(event: ChatEvent, roomNum: Int, context: Context, site: String?)
 
     fun getEventsList(): List<T>
     fun getUsersList(): List<T>

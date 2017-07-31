@@ -15,7 +15,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.koushikdutta.ion.Ion
 import me.shreyasr.chatse.R
-import me.shreyasr.chatse.chat.ChatRoom
 import me.shreyasr.chatse.event.EventList
 import me.shreyasr.chatse.event.presenter.message.MessageEvent
 import java.util.*

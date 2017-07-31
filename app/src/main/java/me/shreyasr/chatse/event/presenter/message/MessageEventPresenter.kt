@@ -5,6 +5,7 @@ import android.util.Log
 import com.koushikdutta.ion.Ion
 import me.shreyasr.chatse.event.ChatEvent
 import me.shreyasr.chatse.event.presenter.EventPresenter
+import me.shreyasr.chatse.network.Client
 import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
@@ -14,32 +15,42 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
     internal var messages = TreeSet<MessageEvent>()
     internal var users = hashMapOf<Long, MessageEvent>()
 
-    override fun addEvent(event: ChatEvent, roomNum: Int, context: Context) {
+    override fun addEvent(event: ChatEvent, roomNum: Int, context: Context, site: String?) {
         if (event.event_type != ChatEvent.EVENT_TYPE_LEAVE) {
             if (users.containsKey(event.user_id.toLong())) {
                 val newEvent = MessageEvent(event)
                 newEvent.isForUsersList = true
                 users.put(event.user_id.toLong(), newEvent)
             } else {
+                val url: String
+                if (site == Client.SITE_STACK_OVERFLOW) {
+                    url = "https://chat.stackoverflow.com/users/thumbs/${event.user_id}"
+                } else {
+                    url = "https://chat.stackexchange.com/users/thumbs/${event.user_id}"
+                }
                 Ion.with(context)
-                        .load("https://chat.stackoverflow.com/users/thumbs/${event.user_id}")
+                        .load(url)
                         .asJsonObject()
                         .setCallback { e, result ->
                             if (e != null) {
                                 Log.wtf("MessageEventPresenter", e.message)
                             }
-                            val rooms = result.get("rooms").asJsonArray
-                            val room = rooms.find { it.asJsonObject.get("id").asInt == roomNum }
-                            if (room != null) {
-                                val newEvent = MessageEvent(event)
-                                newEvent.isForUsersList = true
-                                val image_url = result.get("email_hash").asString.replace("!", "")
-                                if (image_url.contains(".")) {
-                                    newEvent.email_hash = image_url
-                                } else {
-                                    newEvent.email_hash = "https://www.gravatar.com/avatar/$image_url"
+                            if (result != null) {
+                                val rooms = result.get("rooms").asJsonArray
+                                val room = rooms.find { it.asJsonObject.get("id").asInt == roomNum }
+                                if (room != null) {
+                                    val newEvent = MessageEvent(event)
+                                    newEvent.isForUsersList = true
+                                    val image_url = result.get("email_hash").asString.replace("!", "")
+                                    if (image_url.contains(".")) {
+                                        newEvent.email_hash = image_url
+                                    } else {
+                                        newEvent.email_hash = "https://www.gravatar.com/avatar/$image_url"
+                                    }
+                                    users.put(newEvent.userId, newEvent)
                                 }
-                                users.put(newEvent.userId, newEvent)
+                            } else {
+                                Log.wtf("resultStuff", site + " " + event.user_id)
                             }
                         }
             }

@@ -8,12 +8,12 @@
 
     <EditText
         android:id="@+id/footer_url_box"
-        android:inputType="textUri"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:hint="@string/upload_from_url"
-        android:textColor="@color/dialogplus_black_overlay"/>
+        android:inputType="textUri"
+        android:textColor="@color/dialogplus_black_overlay" />
 
     <Button
         android:id="@+id/footer_confirm_button"

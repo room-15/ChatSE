@@ -132,7 +132,6 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
 
     fun addRoomsToDrawer() {
-        val client = ClientManager.client
         soRoomList.clear()
         seRoomList.clear()
         val soID = defaultSharedPreferences.getInt("SOID", -1)
@@ -149,17 +148,12 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                                 val room = it.asJsonObject
                                 val roomName = room.get("name").asString
                                 val roomNum = room.get("id").asLong
-                                val last_post: Long
-//                                if (room.get("last_post").isJsonNull) {
-//                                    last_post = room.get("last_post").asLong
-//                                } else {
-//                                    last_post = 0
-//                                }
 
                                 soRoomList.add(Room(roomName, roomNum, 0))
                             }
                             runOnUiThread {
                                 soRoomAdapter.notifyDataSetChanged()
+                                Log.wtf("addRoomsToDrawer", soRoomAdapter.list.size.toString())
                             }
                         }
                     }
@@ -272,7 +266,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     @Throws(IOException::class, JSONException::class)
     private fun createChatFragment(room: ChatRoom): ChatFragment {
         val roomInfo = serviceBinder.loadRoom(room)
-        rejoinFavoriteRooms(roomInfo.fkey)
+        rejoinFavoriteRooms()
         serviceBinder.joinRoom(room, roomInfo.fkey)
         val chatFragment = ChatFragment.createInstance(room, roomInfo.name, roomInfo.fkey)
         serviceBinder.registerListener(room, chatFragment)
@@ -283,7 +277,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     }
 
 
-    fun rejoinFavoriteRooms(fkey: String) {
+    fun rejoinFavoriteRooms() {
         val client = ClientManager.client
         doAsync {
             val soRoomInfo = serviceBinder.loadRoom(ChatRoom(Client.SITE_STACK_OVERFLOW, 1))

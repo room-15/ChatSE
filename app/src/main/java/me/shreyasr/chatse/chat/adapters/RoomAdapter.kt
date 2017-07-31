@@ -1,7 +1,6 @@
 package me.shreyasr.chatse.chat.adapters
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,13 +9,11 @@ import android.widget.TextView
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.Room
 
-
 class RoomAdapter(val list: MutableList<Room>, context: Context) : BaseAdapter() {
     val mInflater: LayoutInflater = LayoutInflater.from(context)
     val mContext = context
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
-
         val view: View?
         val vh: ListRowHolder
         if (convertView == null) {

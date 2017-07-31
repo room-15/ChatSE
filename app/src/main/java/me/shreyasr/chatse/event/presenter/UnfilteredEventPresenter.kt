@@ -9,7 +9,7 @@ class UnfilteredEventPresenter : EventPresenter<ChatEvent> {
 
     val events = ArrayList<ChatEvent>()
 
-    override fun addEvent(event: ChatEvent, roomNum: Int, context: Context) {
+    override fun addEvent(event: ChatEvent, roomNum: Int, context: Context, site: String?) {
         if (event.room_id == roomNum) {
             events.add(event)
         }
