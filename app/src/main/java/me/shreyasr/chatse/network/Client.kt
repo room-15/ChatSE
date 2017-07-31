@@ -94,11 +94,11 @@ class Client internal constructor(val httpClient: OkHttpClient, private val cook
         /**
          * URL to the stack exchange site.
          */
-        val SITE_STACK_EXCHANGE = "http://chat.stackexchange.com"
+        val SITE_STACK_EXCHANGE = "https://chat.stackexchange.com"
 
         /**
          * URL to the stack overflow site.
          */
-        val SITE_STACK_OVERFLOW = "http://chat.stackoverflow.com"
+        val SITE_STACK_OVERFLOW = "https://chat.stackoverflow.com"
     }
 }

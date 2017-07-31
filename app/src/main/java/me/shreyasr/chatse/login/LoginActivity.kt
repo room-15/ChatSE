@@ -190,7 +190,7 @@ class LoginActivity : AppCompatActivity() {
             if (userObj.has("userId") && userObj.has("accountId")) {
                 val SOID = JSONObject(json).getJSONObject("user").getInt("userId")
                 val SEID = JSONObject(json).getJSONObject("user").getInt("accountId")
-                defaultSharedPreferences.edit().putInt("SOID", SOID).putInt("SEID", SEID).putString("email", email).apply()
+                defaultSharedPreferences.edit().putInt("SOID", SOID).putInt("SEMAINID", SEID).putString("email", email).apply()
             } else {
                 return false
             }
@@ -224,6 +224,11 @@ class LoginActivity : AppCompatActivity() {
                 .build()
         val loginResponse = client.newCall(loginRequest).execute()
 
+        val SEID = defaultSharedPreferences.getInt("SEMAINID", -1)
+        if (SEID != -1) {
+            setSEChatId(client, defaultSharedPreferences.getInt("SEMAINID", -1))
+        }
+
         Timber.i("So login: " + loginResponse.toString())
     }
 
@@ -249,5 +254,17 @@ class LoginActivity : AppCompatActivity() {
                 .build()
         val seLoginResponse = client.newCall(seLoginRequest).execute()
         Timber.i("Se openid login: " + seLoginResponse.toString())
+    }
+
+    private fun setSEChatId(client: Client, seID: Int) {
+        val sePageRequest = Request.Builder()
+                .url("https://chat.stackexchange.com/")
+                .build()
+        val sePageResponse = client.newCall(sePageRequest).execute()
+
+        val sePageDoc = Jsoup.parse(sePageResponse.body().string())
+        val url = sePageDoc.getElementsByClass("topbar-menu-links")[0].child(0).attr("href")
+        val res = url.split("/")[2]
+        defaultSharedPreferences.edit().putInt("SEID", res.toInt()).apply()
     }
 }

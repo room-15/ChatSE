@@ -51,7 +51,6 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
 
         fun bindMessage(user: MessageEvent) {
             userName.text = user.userName
-            Log.wtf("UserIcon", user.email_hash)
             Ion.with(mContext)
                     .load(user.email_hash)
                     .setLogging("ION", Log.ERROR)

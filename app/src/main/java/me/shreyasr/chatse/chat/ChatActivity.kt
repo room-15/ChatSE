@@ -30,7 +30,6 @@ import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.intentFor
 import org.json.JSONException
-import org.jsoup.Jsoup
 import timber.log.Timber
 import java.io.IOException
 
@@ -132,43 +131,97 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     }
 
 
-    private fun addRoomsToDrawer() {
+    fun addRoomsToDrawer() {
         val client = ClientManager.client
         soRoomList.clear()
         seRoomList.clear()
-        doAsync {
-            val soChatPageRequest = Request.Builder()
-                    .url("https://chat.stackoverflow.com/rooms?tab=favorite&sort=active")
-                    .build()
-            val soChatPageResponse = client.newCall(soChatPageRequest).execute()
-            val soChatPage = Jsoup.parse(soChatPageResponse.body().string())
+        val soID = defaultSharedPreferences.getInt("SOID", -1)
+        if (soID != -1) {
+            Ion.with(applicationContext)
+                    .load("${Client.SITE_STACK_OVERFLOW}/users/thumbs/$soID")
+                    .asJsonObject()
+                    .setCallback { e, result ->
+                        if (e != null) {
+                            Log.wtf("addRoomsToDrawer", e.message)
+                        } else {
+                            val rooms = result.get("rooms").asJsonArray
+                            rooms.forEach {
+                                val room = it.asJsonObject
+                                val roomName = room.get("name").asString
+                                val roomNum = room.get("id").asLong
+                                val last_post: Long
+//                                if (room.get("last_post").isJsonNull) {
+//                                    last_post = room.get("last_post").asLong
+//                                } else {
+//                                    last_post = 0
+//                                }
 
-            val soRooms = soChatPage.getElementsByClass("room-name").filter { it.children()[0].hasAttr("href") }
-            soRooms.forEach {
-                val roomName = it.attr("title")
-                val roomNum = it.child(0).attr("href").split("/")[2].toInt()
+                                soRoomList.add(Room(roomName, roomNum, 0))
+                            }
+                            runOnUiThread {
+                                soRoomAdapter.notifyDataSetChanged()
+                            }
+                        }
+                    }
 
-                soRoomList.add(Room(roomName, roomNum.toLong(), 0))
-            }
-
-            val seChatPageRequest = Request.Builder()
-                    .url("https://chat.stackexchange.com/rooms?tab=favorite&sort=active")
-                    .build()
-            val seChatPageResponse = client.newCall(seChatPageRequest).execute()
-            val seChatPage = Jsoup.parse(seChatPageResponse.body().string())
-
-            val seRooms = seChatPage.getElementsByClass("room-name").filter { it.children()[0].hasAttr("href") }
-            seRooms.forEach {
-                val roomName = it.attr("title")
-                val roomNum = it.child(0).attr("href").split("/")[2].toInt()
-
-                seRoomList.add(Room(roomName, roomNum.toLong(), 0))
-            }
-            runOnUiThread {
-                soRoomAdapter.notifyDataSetChanged()
-                seRoomAdapter.notifyDataSetChanged()
-            }
         }
+
+        val seID = defaultSharedPreferences.getInt("SEID", -1)
+        if (seID != -1) {
+            Ion.with(applicationContext)
+                    .load("${Client.SITE_STACK_EXCHANGE}/users/thumbs/$seID")
+                    .asJsonObject()
+                    .setCallback { e, result ->
+                        if (e != null) {
+                            Log.wtf("addRoomsToDrawer", e.message)
+                        } else {
+                            val rooms = result.get("rooms").asJsonArray
+                            rooms.forEach {
+                                val room = it.asJsonObject
+                                val roomName = room.get("name").asString
+                                val roomNum = room.get("id").asLong
+
+                                seRoomList.add(Room(roomName, roomNum, 0))
+                            }
+                            runOnUiThread {
+                                seRoomAdapter.notifyDataSetChanged()
+                            }
+                        }
+                    }
+
+        }
+
+
+//        doAsync {
+//            val soChatPageRequest = Request.Builder()
+//                    .url("https://chat.stackoverflow.com/rooms?tab=favorite&sort=active")
+//                    .build()
+//            val soChatPageResponse = client.newCall(soChatPageRequest).execute()
+//            val soChatPage = Jsoup.parse(soChatPageResponse.body().string())
+//
+//            val soRooms = soChatPage.getElementsByClass("room-name").filter { it.children()[0].hasAttr("href") }
+//            soRooms.forEach {
+//                val roomName = it.attr("title")
+//                val roomNum = it.child(0).attr("href").split("/")[2].toInt()
+//
+//                soRoomList.add(Room(roomName, roomNum.toLong(), 0))
+//            }
+//
+//            val seChatPageRequest = Request.Builder()
+//                    .url("https://chat.stackexchange.com/rooms?tab=favorite&sort=active")
+//                    .build()
+//            val seChatPageResponse = client.newCall(seChatPageRequest).execute()
+//            val seChatPage = Jsoup.parse(seChatPageResponse.body().string())
+//
+//            val seRooms = seChatPage.getElementsByClass("room-name").filter { it.children()[0].hasAttr("href") }
+//            seRooms.forEach {
+//                val roomName = it.attr("title")
+//                val roomNum = it.child(0).attr("href").split("/")[2].toInt()
+//
+//                seRoomList.add(Room(roomName, roomNum.toLong(), 0))
+//            }
+
+//        }
     }
 
 
@@ -233,8 +286,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     fun rejoinFavoriteRooms(fkey: String) {
         val client = ClientManager.client
         doAsync {
+            val soRoomInfo = serviceBinder.loadRoom(ChatRoom(Client.SITE_STACK_OVERFLOW, 1))
             val soRequestBody = FormEncodingBuilder()
-                    .add("fkey", fkey)
+                    .add("fkey", soRoomInfo.fkey)
                     .add("immediate", "true")
                     .add("quiet", "true")
                     .build()
@@ -243,9 +297,16 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     .post(soRequestBody)
                     .build()
             client.newCall(soChatPageRequest).execute()
+
+            val seRoomInfo = serviceBinder.loadRoom(ChatRoom(Client.SITE_STACK_EXCHANGE, 1))
+            val seRequestBody = FormEncodingBuilder()
+                    .add("fkey", seRoomInfo.fkey)
+                    .add("immediate", "true")
+                    .add("quiet", "true")
+                    .build()
             val seChatPageRequest = Request.Builder()
                     .url(Client.SITE_STACK_EXCHANGE + "/chats/join/favorite")
-                    .post(soRequestBody)
+                    .post(seRequestBody)
                     .build()
             client.newCall(seChatPageRequest).execute()
         }
