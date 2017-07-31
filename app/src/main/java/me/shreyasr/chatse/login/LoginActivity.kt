@@ -226,7 +226,7 @@ class LoginActivity : AppCompatActivity() {
 
         val SEID = defaultSharedPreferences.getInt("SEMAINID", -1)
         if (SEID != -1) {
-            setSEChatId(client, defaultSharedPreferences.getInt("SEMAINID", -1))
+            setSEChatId(client)
         }
 
         Timber.i("So login: " + loginResponse.toString())
