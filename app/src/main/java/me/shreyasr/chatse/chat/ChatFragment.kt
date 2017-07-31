@@ -253,7 +253,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
             usersAdapter?.update()
             usersAdapter?.notifyDataSetChanged()
         }
-//        (activity as ChatActivity).addRoomsToDrawer()
+        (activity as ChatActivity).addRoomsToDrawer()
     }
 
     fun openFileChooser() {
