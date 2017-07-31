@@ -256,7 +256,7 @@ class LoginActivity : AppCompatActivity() {
         Timber.i("Se openid login: " + seLoginResponse.toString())
     }
 
-    private fun setSEChatId(client: Client, seID: Int) {
+    private fun setSEChatId(client: Client) {
         val sePageRequest = Request.Builder()
                 .url("https://chat.stackexchange.com/")
                 .build()
@@ -265,6 +265,7 @@ class LoginActivity : AppCompatActivity() {
         val sePageDoc = Jsoup.parse(sePageResponse.body().string())
         val url = sePageDoc.getElementsByClass("topbar-menu-links")[0].child(0).attr("href")
         val res = url.split("/")[2]
+        Log.d("SEID", res)
         defaultSharedPreferences.edit().putInt("SEID", res.toInt()).apply()
     }
 }
