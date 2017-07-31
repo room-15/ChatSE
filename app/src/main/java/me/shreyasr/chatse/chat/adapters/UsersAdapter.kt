@@ -69,13 +69,17 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
                                             dialog.cancel()
                                         })
                                 val s: SpannableString
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    s = SpannableString(Html.fromHtml(result.get("user_message").asString, Html.FROM_HTML_MODE_COMPACT))
+                                if (!result.get("user_message").isJsonNull) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        s = SpannableString(Html.fromHtml(result.get("user_message").asString, Html.FROM_HTML_MODE_COMPACT))
+                                    } else {
+                                        @Suppress("DEPRECATION")
+                                        s = SpannableString(Html.fromHtml(result.get("user_message").asString))
+                                    }
+                                    Linkify.addLinks(s, Linkify.ALL)
                                 } else {
-                                    @Suppress("DEPRECATION")
-                                    s = SpannableString(Html.fromHtml(result.get("user_message").asString))
+                                    s = SpannableString("There's no user bio! :(")
                                 }
-                                Linkify.addLinks(s, Linkify.ALL)
                                 builder.setMessage(s)
                                 builder.show()
                             }
