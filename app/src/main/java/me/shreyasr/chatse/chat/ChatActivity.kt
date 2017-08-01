@@ -126,19 +126,12 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, 15))
     }
 
-    fun addRoom(site: String, room: Room) {
-        if (site == Client.SITE_STACK_OVERFLOW) {
-            soRoomList.add(room)
-            soRoomAdapter.notifyDataSetChanged()
-        } else {
-            seRoomList.add(room)
-            seRoomAdapter.notifyDataSetChanged()
-        }
-    }
-
     fun addRoomsToDrawer() {
         soRoomList.clear()
         seRoomList.clear()
+
+        seRoomAdapter.notifyDataSetChanged()
+        soRoomAdapter.notifyDataSetChanged()
         val soID = defaultSharedPreferences.getInt("SOID", -1)
         if (soID != -1) {
             Ion.with(applicationContext)
