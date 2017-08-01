@@ -246,14 +246,15 @@ class ChatFragment : Fragment(), IncomingEventListener {
         messagesJson
                 .mapNotNull { chatEventGenerator.createEvent(it) }
                 .filter { it.room_id == room?.num }
-                .forEach { events.addEvent(it, activity, room?.site) }
+                .forEach {
+                    events.addEvent(it, activity, room?.site)
+                }
 
         uiThreadHandler.post {
             messageAdapter?.update()
             usersAdapter?.update()
             usersAdapter?.notifyDataSetChanged()
         }
-        (activity as ChatActivity).addRoomsToDrawer()
     }
 
     fun openFileChooser() {
@@ -372,4 +373,3 @@ class ChatFragment : Fragment(), IncomingEventListener {
         }
     }
 }
-

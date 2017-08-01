@@ -12,12 +12,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.koushikdutta.ion.Ion
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.event.EventList
 import me.shreyasr.chatse.event.presenter.message.MessageEvent
-import java.util.*
+
 
 /**
  * Created by Tristan on 7/30/17
@@ -52,7 +53,6 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
             userName.text = user.userName
             Ion.with(mContext)
                     .load(user.email_hash)
-                    .setLogging("ION", Log.ERROR)
                     .intoImageView(userPicture)
 
             itemView.setOnClickListener {
@@ -65,9 +65,7 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
                             } else {
                                 val builder = AlertDialog.Builder(mContext)
                                         .setTitle(result.get("name").asString)
-                                        .setNegativeButton("Close", { dialog, _ ->
-                                            dialog.cancel()
-                                        })
+                                val layout = LinearLayout(mContext)
                                 val s: SpannableString
                                 if (!result.get("user_message").isJsonNull) {
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -80,7 +78,16 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
                                 } else {
                                     s = SpannableString("There's no user bio! :(")
                                 }
-                                builder.setMessage(s)
+                                val tv = TextView(mContext)
+                                tv.text = s
+                                layout.addView(tv)
+
+                                builder.setView(tv)
+
+                                builder.setNegativeButton("Cancel", { dialog, _ ->
+                                    dialog.cancel()
+                                })
+
                                 builder.show()
                             }
                         }

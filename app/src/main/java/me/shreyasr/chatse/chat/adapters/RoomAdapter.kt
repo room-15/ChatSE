@@ -1,49 +1,45 @@
 package me.shreyasr.chatse.chat.adapters
 
 import android.content.Context
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.widget.TextView
+import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
+import me.shreyasr.chatse.chat.ChatActivity
+import me.shreyasr.chatse.chat.ChatRoom
 import me.shreyasr.chatse.chat.Room
 
-class RoomAdapter(val list: MutableList<Room>, context: Context) : BaseAdapter() {
-    val mInflater: LayoutInflater = LayoutInflater.from(context)
-    val mContext = context
+class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Context) : RecyclerView.Adapter<RoomAdapter.ListRowHolder>() {
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
-        val view: View?
-        val vh: ListRowHolder
-        if (convertView == null) {
-            view = mInflater.inflate(R.layout.drawer_list_item, parent, false)
-            vh = ListRowHolder(view)
-            view?.tag = vh
-        } else {
-            view = convertView
-            vh = view.tag as ListRowHolder
+    override fun onBindViewHolder(viewHolder: ListRowHolder?, position: Int) {
+        val room = list[position]
+        val holder = viewHolder
+        holder?.bindMessage(context, room)
+    }
+
+    override fun getItemCount() = list.size
+
+
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ListRowHolder {
+        val view = LayoutInflater.from(parent?.context).inflate(R.layout.drawer_list_item, parent, false)
+        return ListRowHolder(context, view, site)
+    }
+
+    class ListRowHolder(val mContext: Context, itemView: View, val site: String) : RecyclerView.ViewHolder(itemView) {
+        val name = itemView.findViewById(R.id.room_name) as TextView
+
+        fun bindMessage(context: Context, room: Room) {
+            name.text = room.name
+
+            itemView.setOnClickListener {
+                val roomNum = room.roomID.toInt()
+                (mContext as ChatActivity).loadChatFragment(ChatRoom(site, roomNum))
+            }
         }
-        if (list.isNotEmpty()) {
-            vh.name.text = list[position].name
-        }
-        return view
-    }
 
-    private class ListRowHolder(row: View?) {
-        val name = row?.findViewById(R.id.room_name) as TextView
-    }
-
-    override fun getItem(position: Int): Room {
-        return list[position]
-    }
-
-    override fun getCount(): Int {
-        return list.size
-    }
-
-    override fun getItemId(position: Int): Long {
-        return getItem(position).roomID
     }
 
 }

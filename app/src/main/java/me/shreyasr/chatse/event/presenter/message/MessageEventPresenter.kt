@@ -10,13 +10,14 @@ import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
 
+
 class MessageEventPresenter : EventPresenter<MessageEvent> {
 
     internal var messages = TreeSet<MessageEvent>()
     internal var users = hashMapOf<Long, MessageEvent>()
 
     override fun addEvent(event: ChatEvent, roomNum: Int, context: Context, site: String?) {
-        if (event.event_type != ChatEvent.EVENT_TYPE_LEAVE) {
+        if (event.event_type != ChatEvent.EVENT_TYPE_LEAVE && event.user_id != 0) {
             if (users.containsKey(event.user_id.toLong())) {
                 val newEvent = MessageEvent(event)
                 newEvent.isForUsersList = true
@@ -33,7 +34,7 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                         .asJsonObject()
                         .setCallback { e, result ->
                             if (e != null) {
-                                Log.wtf("MessageEventPresenter", e.message)
+                                Log.w("MessageEventPresenter", e.message)
                             }
                             if (result != null) {
                                 val rooms = result.get("rooms").asJsonArray

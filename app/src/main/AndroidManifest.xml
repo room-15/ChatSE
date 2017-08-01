@@ -29,7 +29,6 @@
             android:exported="false" />
 
         <activity android:name=".chat.RoomSearchActivity" />
-        <activity android:name=".login.GoogleLogin"></activity>
     </application>
 
 </manifest>

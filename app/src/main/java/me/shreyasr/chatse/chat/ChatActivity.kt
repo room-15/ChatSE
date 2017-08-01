@@ -5,15 +5,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.*
+import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemClickListener
 import com.koushikdutta.ion.Ion
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
@@ -38,8 +38,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     private lateinit var serviceBinder: IncomingEventServiceBinder
     private var networkHandler: Handler? = null
     private val uiThreadHandler = Handler(Looper.getMainLooper())
-    val soRoomList = mutableListOf<Room>()
-    val seRoomList = mutableListOf<Room>()
+    val soRoomList = arrayListOf<Room>()
+    val seRoomList = arrayListOf<Room>()
     lateinit var soRoomAdapter: RoomAdapter
     lateinit var seRoomAdapter: RoomAdapter
 
@@ -47,8 +47,13 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.activity_chat)
 
-        soRoomAdapter = RoomAdapter(soRoomList, applicationContext)
-        seRoomAdapter = RoomAdapter(seRoomList, applicationContext)
+        soRoomAdapter = RoomAdapter(Client.SITE_STACK_OVERFLOW, soRoomList, this)
+        seRoomAdapter = RoomAdapter(Client.SITE_STACK_EXCHANGE, seRoomList, this)
+        stackoverflow_room_list.adapter = soRoomAdapter
+        stackoverflow_room_list.layoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
+        stackexchange_room_list.adapter = seRoomAdapter
+        stackexchange_room_list.layoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
+
         runOnUiThread {
             soRoomAdapter.notifyDataSetChanged()
             seRoomAdapter.notifyDataSetChanged()
@@ -59,33 +64,25 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
+        drawer_layout.addDrawerListener(object : DrawerLayout.DrawerListener {
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+            }
+
+            override fun onDrawerStateChanged(newState: Int) {
+                addRoomsToDrawer()
+            }
+        })
         toggle.syncState()
         loadUserData()
 
-        val soID = defaultSharedPreferences.getInt("SOID", -1)
-        if (soID != -1) {
-            stackoverflow_room_list.adapter = soRoomAdapter
-            stackoverflow_room_list.onItemClickListener = OnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
-                val roomNum = soRoomAdapter.getItem(position).roomID.toInt()
-                loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, roomNum))
-                drawer_layout.closeDrawers()
-            }
-        }
-
-        val seID = defaultSharedPreferences.getInt("SEID", -1)
-        if (seID != -1) {
-            stackexchange_room_list.adapter = seRoomAdapter
-            stackexchange_room_list.onItemClickListener = OnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
-                val roomNum = seRoomAdapter.getItem(position).roomID.toInt()
-                loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, roomNum))
-                drawer_layout.closeDrawers()
-            }
-        }
-
-
         val serviceIntent = Intent(this, IncomingEventService::class.java)
         this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
-
 
         val handlerThread = HandlerThread("ChatActivityNetworkHandlerThread")
         handlerThread.start()
@@ -95,7 +92,6 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     fun loadUserData() {
         val userID = defaultSharedPreferences.getInt("SOID", -1)
         val seID = defaultSharedPreferences.getInt("SEID", -1)
-        Log.e("USERID", userID.toString())
         if (userID != -1) {
             Ion.with(applicationContext)
                     .load("https://chat.stackoverflow.com/users/thumbs/$userID")
@@ -130,6 +126,15 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, 15))
     }
 
+    fun addRoom(site: String, room: Room) {
+        if (site == Client.SITE_STACK_OVERFLOW) {
+            soRoomList.add(room)
+            soRoomAdapter.notifyDataSetChanged()
+        } else {
+            seRoomList.add(room)
+            seRoomAdapter.notifyDataSetChanged()
+        }
+    }
 
     fun addRoomsToDrawer() {
         soRoomList.clear()
@@ -148,7 +153,6 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                                 val room = it.asJsonObject
                                 val roomName = room.get("name").asString
                                 val roomNum = room.get("id").asLong
-
                                 soRoomList.add(Room(roomName, roomNum, 0))
                             }
                             runOnUiThread {
@@ -182,40 +186,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                             }
                         }
                     }
-
         }
-
-
-//        doAsync {
-//            val soChatPageRequest = Request.Builder()
-//                    .url("https://chat.stackoverflow.com/rooms?tab=favorite&sort=active")
-//                    .build()
-//            val soChatPageResponse = client.newCall(soChatPageRequest).execute()
-//            val soChatPage = Jsoup.parse(soChatPageResponse.body().string())
-//
-//            val soRooms = soChatPage.getElementsByClass("room-name").filter { it.children()[0].hasAttr("href") }
-//            soRooms.forEach {
-//                val roomName = it.attr("title")
-//                val roomNum = it.child(0).attr("href").split("/")[2].toInt()
-//
-//                soRoomList.add(Room(roomName, roomNum.toLong(), 0))
-//            }
-//
-//            val seChatPageRequest = Request.Builder()
-//                    .url("https://chat.stackexchange.com/rooms?tab=favorite&sort=active")
-//                    .build()
-//            val seChatPageResponse = client.newCall(seChatPageRequest).execute()
-//            val seChatPage = Jsoup.parse(seChatPageResponse.body().string())
-//
-//            val seRooms = seChatPage.getElementsByClass("room-name").filter { it.children()[0].hasAttr("href") }
-//            seRooms.forEach {
-//                val roomName = it.attr("title")
-//                val roomNum = it.child(0).attr("href").split("/")[2].toInt()
-//
-//                seRoomList.add(Room(roomName, roomNum.toLong(), 0))
-//            }
-
-//        }
     }
 
 
@@ -252,6 +223,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                 Timber.e("Failed to create chat fragment", e)
             }
         }
+        drawer_layout.closeDrawers()
     }
 
     private fun addChatFragment(fragment: ChatFragment) {
@@ -275,7 +247,6 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         }
         return chatFragment
     }
-
 
     fun rejoinFavoriteRooms() {
         val client = ClientManager.client
