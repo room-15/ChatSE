@@ -70,6 +70,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
             starIndicator.visibility = View.GONE
             if (message.message_starred) {
                 starIndicator.visibility = View.VISIBLE
+                starCount.visibility = View.VISIBLE
                 starCount.text = message.message_stars.toString()
             }
             if (message.isDeleted) {
@@ -106,6 +107,14 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                                     .load(message.onebox_content)
                                     .intoImageView(itemView.message_image)
                             messageView.text = message.content
+                        }
+                        else -> {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                messageView.text = Html.fromHtml(message.content, Html.FROM_HTML_MODE_LEGACY)
+                            } else {
+                                @Suppress("DEPRECATION")
+                                messageView.text = Html.fromHtml(message.content)
+                            }
                         }
                     }
                 }

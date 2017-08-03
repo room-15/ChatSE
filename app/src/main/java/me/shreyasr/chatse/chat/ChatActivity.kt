@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.*
-import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -64,20 +63,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
-        drawer_layout.addDrawerListener(object : DrawerLayout.DrawerListener {
-            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-            }
 
-            override fun onDrawerOpened(drawerView: View) {
-            }
-
-            override fun onDrawerClosed(drawerView: View) {
-            }
-
-            override fun onDrawerStateChanged(newState: Int) {
-                addRoomsToDrawer()
-            }
-        })
         toggle.syncState()
         loadUserData()
 
@@ -99,9 +85,12 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     .setCallback { e, result ->
                         if (e != null) {
                             Log.e("loadUserData()", e.message)
+                        } else {
+                            if (result != null) {
+                                userName.text = result.get("name").asString
+                                userEmail.text = defaultSharedPreferences.getString("email", "")
+                            }
                         }
-                        userName.text = result.get("name").asString
-                        userEmail.text = defaultSharedPreferences.getString("email", "")
                     }
         } else if (seID != -1) {
             Ion.with(applicationContext)
@@ -110,9 +99,12 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     .setCallback { e, result ->
                         if (e != null) {
                             Log.e("loadUserData()", e.message)
+                        } else {
+                            if (result != null) {
+                                userName.text = result.get("name").asString
+                                userEmail.text = defaultSharedPreferences.getString("email", "")
+                            }
                         }
-                        userName.text = result.get("name").asString
-                        userEmail.text = defaultSharedPreferences.getString("email", "")
                     }
         } else {
             Log.e("ChatActivity", "Userid not found")
@@ -126,12 +118,16 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, 15))
     }
 
-    fun addRoomsToDrawer() {
-        soRoomList.clear()
-        seRoomList.clear()
+    fun addRoom(room: Room) {
+        if (!soRoomList.contains(room)) {
+            soRoomList.add(room)
+            runOnUiThread {
+                soRoomAdapter.notifyDataSetChanged()
+            }
+        }
+    }
 
-        seRoomAdapter.notifyDataSetChanged()
-        soRoomAdapter.notifyDataSetChanged()
+    fun addRoomsToDrawer() {
         val soID = defaultSharedPreferences.getInt("SOID", -1)
         if (soID != -1) {
             Ion.with(applicationContext)
@@ -141,6 +137,10 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                         if (e != null) {
                             Log.wtf("addRoomsToDrawer", e.message)
                         } else {
+                            soRoomList.clear()
+                            so_header_text.visibility = View.VISIBLE
+                            stackoverflow_room_list.visibility = View.VISIBLE
+
                             val rooms = result.get("rooms").asJsonArray
                             rooms.forEach {
                                 val room = it.asJsonObject
@@ -148,6 +148,12 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                                 val roomNum = room.get("id").asLong
                                 soRoomList.add(Room(roomName, roomNum, 0))
                             }
+
+                            if (soRoomList.isEmpty()) {
+                                so_header_text.visibility = View.GONE
+                                stackoverflow_room_list.visibility = View.GONE
+                            }
+
                             runOnUiThread {
                                 soRoomAdapter.notifyDataSetChanged()
                                 Log.wtf("addRoomsToDrawer", soRoomAdapter.list.size.toString())
@@ -155,6 +161,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                         }
                     }
 
+        } else {
+            so_header_text.visibility = View.GONE
+            stackoverflow_room_list.visibility = View.GONE
         }
 
         val seID = defaultSharedPreferences.getInt("SEID", -1)
@@ -166,6 +175,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                         if (e != null) {
                             Log.wtf("addRoomsToDrawer", e.message)
                         } else {
+                            seRoomList.clear()
+                            se_header_text.visibility = View.VISIBLE
+                            stackexchange_room_list.visibility = View.VISIBLE
                             val rooms = result.get("rooms").asJsonArray
                             rooms.forEach {
                                 val room = it.asJsonObject
@@ -174,11 +186,18 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
                                 seRoomList.add(Room(roomName, roomNum, 0))
                             }
+                            if (seRoomList.isEmpty()) {
+                                se_header_text.visibility = View.GONE
+                                stackexchange_room_list.visibility = View.GONE
+                            }
                             runOnUiThread {
                                 seRoomAdapter.notifyDataSetChanged()
                             }
                         }
                     }
+        } else {
+            se_header_text.visibility = View.GONE
+            stackexchange_room_list.visibility = View.GONE
         }
     }
 

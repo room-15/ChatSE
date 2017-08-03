@@ -20,10 +20,7 @@ import android.util.Base64
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.koushikdutta.ion.Ion
 import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.GridHolder
@@ -176,6 +173,8 @@ class ChatFragment : Fragment(), IncomingEventListener {
                                         .setNegativeButton("Close", { dialog, _ ->
                                             dialog.cancel()
                                         })
+                                val l = LinearLayout(activity)
+                                l
                                 val s: SpannableString
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                     s = SpannableString(Html.fromHtml(result.get("description").asString, Html.FROM_HTML_MODE_COMPACT))
@@ -247,13 +246,14 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 .mapNotNull { chatEventGenerator.createEvent(it) }
                 .filter { it.room_id == room?.num }
                 .forEach {
-                    events.addEvent(it, activity, room?.site)
+                    events.addEvent(it, this.activity, room)
                 }
 
         uiThreadHandler.post {
             messageAdapter?.update()
             usersAdapter?.update()
             usersAdapter?.notifyDataSetChanged()
+            (activity as ChatActivity).addRoomsToDrawer()
         }
     }
 
