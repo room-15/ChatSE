@@ -61,7 +61,7 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
                         .asJsonObject()
                         .setCallback { e, result ->
                             if (e != null) {
-                                Log.wtf("ChatFragment", e.message)
+                                Log.e("ChatFragment", e.message.toString())
                             } else {
                                 val builder = AlertDialog.Builder(mContext)
                                         .setTitle(result.get("name").asString)

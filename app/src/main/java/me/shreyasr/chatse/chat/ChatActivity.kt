@@ -84,7 +84,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     .asJsonObject()
                     .setCallback { e, result ->
                         if (e != null) {
-                            Log.e("loadUserData()", e.message)
+                            Log.e("loadUserData()", e.message.toString())
                         } else {
                             if (result != null) {
                                 userName.text = result.get("name").asString
@@ -98,7 +98,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     .asJsonObject()
                     .setCallback { e, result ->
                         if (e != null) {
-                            Log.e("loadUserData()", e.message)
+                            Log.e("loadUserData()", e.message.toString())
                         } else {
                             if (result != null) {
                                 userName.text = result.get("name").asString
@@ -135,28 +135,30 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     .asJsonObject()
                     .setCallback { e, result ->
                         if (e != null) {
-                            Log.wtf("addRoomsToDrawer", e.message)
+                            Log.e("addRoomsToDrawer", e.message.toString())
                         } else {
-                            soRoomList.clear()
-                            so_header_text.visibility = View.VISIBLE
-                            stackoverflow_room_list.visibility = View.VISIBLE
+                            if (result != null) {
+                                soRoomList.clear()
+                                so_header_text.visibility = View.VISIBLE
+                                stackoverflow_room_list.visibility = View.VISIBLE
 
-                            val rooms = result.get("rooms").asJsonArray
-                            rooms.forEach {
-                                val room = it.asJsonObject
-                                val roomName = room.get("name").asString
-                                val roomNum = room.get("id").asLong
-                                soRoomList.add(Room(roomName, roomNum, 0))
-                            }
+                                val rooms = result.get("rooms").asJsonArray
+                                rooms.forEach {
+                                    val room = it.asJsonObject
+                                    val roomName = room.get("name").asString
+                                    val roomNum = room.get("id").asLong
+                                    soRoomList.add(Room(roomName, roomNum, 0))
+                                }
 
-                            if (soRoomList.isEmpty()) {
-                                so_header_text.visibility = View.GONE
-                                stackoverflow_room_list.visibility = View.GONE
-                            }
+                                if (soRoomList.isEmpty()) {
+                                    so_header_text.visibility = View.GONE
+                                    stackoverflow_room_list.visibility = View.GONE
+                                }
 
-                            runOnUiThread {
-                                soRoomAdapter.notifyDataSetChanged()
-                                Log.wtf("addRoomsToDrawer", soRoomAdapter.list.size.toString())
+                                runOnUiThread {
+                                    soRoomAdapter.notifyDataSetChanged()
+                                    Log.e("addRoomsToDrawer", soRoomAdapter.list.size.toString())
+                                }
                             }
                         }
                     }
@@ -173,25 +175,27 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     .asJsonObject()
                     .setCallback { e, result ->
                         if (e != null) {
-                            Log.wtf("addRoomsToDrawer", e.message)
+                            Log.e("addRoomsToDrawer", e.message.toString())
                         } else {
-                            seRoomList.clear()
-                            se_header_text.visibility = View.VISIBLE
-                            stackexchange_room_list.visibility = View.VISIBLE
-                            val rooms = result.get("rooms").asJsonArray
-                            rooms.forEach {
-                                val room = it.asJsonObject
-                                val roomName = room.get("name").asString
-                                val roomNum = room.get("id").asLong
+                            if (result != null) {
+                                seRoomList.clear()
+                                se_header_text.visibility = View.VISIBLE
+                                stackexchange_room_list.visibility = View.VISIBLE
+                                val rooms = result.get("rooms").asJsonArray
+                                rooms.forEach {
+                                    val room = it.asJsonObject
+                                    val roomName = room.get("name").asString
+                                    val roomNum = room.get("id").asLong
 
-                                seRoomList.add(Room(roomName, roomNum, 0))
-                            }
-                            if (seRoomList.isEmpty()) {
-                                se_header_text.visibility = View.GONE
-                                stackexchange_room_list.visibility = View.GONE
-                            }
-                            runOnUiThread {
-                                seRoomAdapter.notifyDataSetChanged()
+                                    seRoomList.add(Room(roomName, roomNum, 0))
+                                }
+                                if (seRoomList.isEmpty()) {
+                                    se_header_text.visibility = View.GONE
+                                    stackexchange_room_list.visibility = View.GONE
+                                }
+                                runOnUiThread {
+                                    seRoomAdapter.notifyDataSetChanged()
+                                }
                             }
                         }
                     }

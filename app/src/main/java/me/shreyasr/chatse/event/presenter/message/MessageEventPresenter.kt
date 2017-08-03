@@ -37,7 +37,7 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                         .asJsonObject()
                         .setCallback { e, result ->
                             if (e != null) {
-                                Log.w("MessageEventPresenter", e.message)
+                                Log.w("MessageEventPresenter", e.message.toString())
                             }
                             if (result != null) {
                                 val rooms = result.get("rooms").asJsonArray
@@ -54,7 +54,7 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                                     users.put(newEvent.userId, newEvent)
                                 }
                             } else {
-                                Log.wtf("resultStuff", room?.site + " " + event.user_id)
+                                Log.e("resultStuff", room?.site + " " + event.user_id)
                             }
                         }
             }
@@ -93,7 +93,7 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                     val userObj = MessageEvent(event)
                     userObj.content = "Someone just joined"
                     users.put(userObj.userId, userObj)
-                    Log.wtf("JOINED", userObj.userId.toString())
+                    Log.e("JOINED", userObj.userId.toString())
                     if (userObj.roomId == roomNum.toLong()) {
                         (context as ChatActivity).addRoom(Room(userObj.roomName, userObj.roomId, 0))
                     }

@@ -165,7 +165,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
                         .asJsonObject()
                         .setCallback { e, result ->
                             if (e != null) {
-                                Log.wtf("ChatFragment", e.message)
+                                Log.e("ChatFragment", e.message.toString())
                             } else {
                                 val builder = AlertDialog.Builder(context)
                                 builder.setTitle(result.get("name").asString)
@@ -290,7 +290,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 .setCallback { e, result ->
                     if (e != null) {
                         Toast.makeText(activity, "Failed to Upload Image", Toast.LENGTH_SHORT).show()
-                        Log.w("OnImgurUpload", e.message)
+                        Log.w("OnImgurUpload", e.message.toString())
                     }
                     if (result.has("data") && result.get("data").asJsonObject.has("link")) {
                         onSubmit(result.get("data").asJsonObject.get("link").asString)
@@ -311,7 +311,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 .setCallback { e, result ->
                     if (e != null) {
                         Toast.makeText(activity, "Failed to Upload Image", Toast.LENGTH_SHORT).show()
-                        Log.w("OnFileUploadImgur", e.message)
+                        Log.w("OnFileUploadImgur", e.message.toString())
                     } else {
                         onSubmit(result.get("data").asJsonObject.get("link").asString)
                         dialog.dismiss()
