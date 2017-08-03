@@ -14,7 +14,6 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Html
-import android.text.SpannableString
 import android.text.util.Linkify
 import android.util.Base64
 import android.util.Log
@@ -168,22 +167,23 @@ class ChatFragment : Fragment(), IncomingEventListener {
                             if (e != null) {
                                 Log.wtf("ChatFragment", e.message)
                             } else {
-                                val builder = AlertDialog.Builder(activity)
-                                        .setTitle(result.get("name").asString)
-                                        .setNegativeButton("Close", { dialog, _ ->
-                                            dialog.cancel()
-                                        })
-                                val l = LinearLayout(activity)
-                                l
-                                val s: SpannableString
+                                val builder = AlertDialog.Builder(context)
+                                builder.setTitle(result.get("name").asString)
+
+                                val l = LinearLayout(context)
+                                l.setPadding(24, 24, 24, 24)
+                                val roomText = TextView(context)
+                                roomText.textSize = 18F
+                                roomText.autoLinkMask = Linkify.WEB_URLS
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    s = SpannableString(Html.fromHtml(result.get("description").asString, Html.FROM_HTML_MODE_COMPACT))
+                                    roomText.text = Html.fromHtml(result.get("description").asString, Html.FROM_HTML_MODE_COMPACT)
                                 } else {
                                     @Suppress("DEPRECATION")
-                                    s = SpannableString(Html.fromHtml(result.get("description").asString))
+                                    roomText.text = Html.fromHtml(result.get("description").asString)
                                 }
-                                Linkify.addLinks(s, Linkify.ALL)
-                                builder.setMessage(s)
+                                roomText.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+                                l.addView(roomText)
+                                builder.setView(l)
                                 builder.show()
                             }
                         }
