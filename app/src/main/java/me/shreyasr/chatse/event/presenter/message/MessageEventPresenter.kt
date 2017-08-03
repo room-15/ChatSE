@@ -53,8 +53,6 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                                     }
                                     users.put(newEvent.userId, newEvent)
                                 }
-                            } else {
-                                Log.e("resultStuff", room?.site + " " + event.user_id)
                             }
                         }
             }

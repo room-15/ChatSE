@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.text.Html
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -109,6 +110,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                             messageView.text = message.content
                         }
                         else -> {
+                            Log.d("Onebox", "Type: ${message.onebox_type}")
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 messageView.text = Html.fromHtml(message.content, Html.FROM_HTML_MODE_LEGACY)
                             } else {

@@ -6,13 +6,17 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.*
 import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
+import android.text.InputType
 import android.util.Log
+import android.view.ContextThemeWrapper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.*
 import com.koushikdutta.ion.Ion
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
@@ -27,13 +31,11 @@ import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.intentFor
 import org.json.JSONException
 import timber.log.Timber
 import java.io.IOException
 
 class ChatActivity : AppCompatActivity(), ServiceConnection {
-
     private lateinit var serviceBinder: IncomingEventServiceBinder
     private var networkHandler: Handler? = null
     private val uiThreadHandler = Handler(Looper.getMainLooper())
@@ -75,6 +77,11 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         networkHandler = Handler(handlerThread.looper)
     }
 
+    override fun onResume() {
+        super.onResume()
+        addRoomsToDrawer()
+    }
+
     fun loadUserData() {
         val userID = defaultSharedPreferences.getInt("SOID", -1)
         val seID = defaultSharedPreferences.getInt("SEID", -1)
@@ -83,13 +90,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     .load("https://chat.stackoverflow.com/users/thumbs/$userID")
                     .asJsonObject()
                     .setCallback { e, result ->
-                        if (e != null) {
-                            Log.e("loadUserData()", e.message.toString())
-                        } else {
-                            if (result != null) {
-                                userName.text = result.get("name").asString
-                                userEmail.text = defaultSharedPreferences.getString("email", "")
-                            }
+                        if (result != null) {
+                            userName.text = result.get("name").asString
+                            userEmail.text = defaultSharedPreferences.getString("email", "")
                         }
                     }
         } else if (seID != -1) {
@@ -97,13 +100,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     .load("https://chat.stackexchange.com/users/thumbs/$userID")
                     .asJsonObject()
                     .setCallback { e, result ->
-                        if (e != null) {
-                            Log.e("loadUserData()", e.message.toString())
-                        } else {
-                            if (result != null) {
-                                userName.text = result.get("name").asString
-                                userEmail.text = defaultSharedPreferences.getString("email", "")
-                            }
+                        if (result != null) {
+                            userName.text = result.get("name").asString
+                            userEmail.text = defaultSharedPreferences.getString("email", "")
                         }
                     }
         } else {
@@ -134,31 +133,27 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     .load("${Client.SITE_STACK_OVERFLOW}/users/thumbs/$soID")
                     .asJsonObject()
                     .setCallback { e, result ->
-                        if (e != null) {
-                            Log.e("addRoomsToDrawer", e.message.toString())
-                        } else {
-                            if (result != null) {
-                                soRoomList.clear()
-                                so_header_text.visibility = View.VISIBLE
-                                stackoverflow_room_list.visibility = View.VISIBLE
+                        if (result != null) {
+                            soRoomList.clear()
+                            so_header_text.visibility = View.VISIBLE
+                            stackoverflow_room_list.visibility = View.VISIBLE
 
-                                val rooms = result.get("rooms").asJsonArray
-                                rooms.forEach {
-                                    val room = it.asJsonObject
-                                    val roomName = room.get("name").asString
-                                    val roomNum = room.get("id").asLong
-                                    soRoomList.add(Room(roomName, roomNum, 0))
-                                }
+                            val rooms = result.get("rooms").asJsonArray
+                            rooms.forEach {
+                                val room = it.asJsonObject
+                                val roomName = room.get("name").asString
+                                val roomNum = room.get("id").asLong
+                                soRoomList.add(Room(roomName, roomNum, 0))
+                            }
 
-                                if (soRoomList.isEmpty()) {
-                                    so_header_text.visibility = View.GONE
-                                    stackoverflow_room_list.visibility = View.GONE
-                                }
+                            if (soRoomList.isEmpty()) {
+                                so_header_text.visibility = View.GONE
+                                stackoverflow_room_list.visibility = View.GONE
+                            }
 
-                                runOnUiThread {
-                                    soRoomAdapter.notifyDataSetChanged()
-                                    Log.e("addRoomsToDrawer", soRoomAdapter.list.size.toString())
-                                }
+                            runOnUiThread {
+                                soRoomAdapter.notifyDataSetChanged()
+                                Log.e("addRoomsToDrawer", soRoomAdapter.list.size.toString())
                             }
                         }
                     }
@@ -214,7 +209,54 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item != null) {
             when (item.itemId) {
-                R.id.search_rooms -> startActivity(intentFor<RoomSearchActivity>())
+                R.id.search_rooms -> {
+                    val builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
+                    builder.setTitle("Edit message")
+
+                    val l = LinearLayout(applicationContext)
+                    l.orientation = LinearLayout.VERTICAL
+                    val dpi = application.resources.displayMetrics.density.toInt()
+                    val input = EditText(applicationContext)
+                    l.setPadding((19 * dpi), (5 * dpi), (14 * dpi), (5 * dpi))
+                    input.hint = "Enter Room ID"
+                    input.inputType = InputType.TYPE_CLASS_NUMBER
+                    input.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+                    l.addView(input)
+
+                    val spinner = Spinner(applicationContext)
+                    input.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+                    spinner.adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, arrayListOf("Stackoverflow", "Stackexchange"))
+                    var site = Client.SITE_STACK_OVERFLOW
+                    l.addView(spinner)
+                    spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
+                        override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {
+                            when (pos) {
+                                0 -> site = Client.SITE_STACK_OVERFLOW
+                                1 -> site = Client.SITE_STACK_EXCHANGE
+                            }
+                        }
+
+                        override fun onNothingSelected(parent: AdapterView<out Adapter>?) {
+                            site = Client.SITE_STACK_OVERFLOW
+                        }
+
+                    }
+
+                    builder.setView(l)
+
+                    builder.setPositiveButton("Join Room", { dialog, _ ->
+                        Log.wtf("JOIN", site + " " + input.text.toString())
+                        loadChatFragment(ChatRoom(site, input.text.toString().toInt()))
+                        dialog.dismiss()
+                    })
+                    builder.setNegativeButton("Cancel", { dialog, _ ->
+                        dialog.cancel()
+                    })
+
+                    builder.show()
+
+                }
                 R.id.action_logout -> {
                     startActivity(Intent(applicationContext, LoginActivity::class.java))
                     defaultSharedPreferences.edit().clear().apply()
