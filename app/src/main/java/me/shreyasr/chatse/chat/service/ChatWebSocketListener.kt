@@ -10,6 +10,9 @@ import org.codehaus.jackson.map.ObjectMapper
 import timber.log.Timber
 import java.io.IOException
 
+/**
+ * WebSocketListener that listens to websocket
+ */
 class ChatWebSocketListener(private val site: String, private val listener: ServiceWebsocketListener) : WebSocketListener {
     private val mapper = ObjectMapper()
 

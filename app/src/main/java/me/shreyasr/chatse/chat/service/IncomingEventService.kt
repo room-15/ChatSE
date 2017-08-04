@@ -17,6 +17,9 @@ import timber.log.Timber
 import java.io.IOException
 import java.util.*
 
+/**
+ * Service that handles incoming events and listens to the websocket
+ */
 class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketListener {
     private val listeners = ArrayList<MessageListenerHolder>()
     private val siteStatuses = HashMap<String, WebsocketConnectionStatus>()
@@ -31,11 +34,8 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
     }
 
     fun registerListener(room: ChatRoom, listener: IncomingEventListener) {
-        //Just clearing for now, need to make sure the filter actually works 100% of the time.
         listeners.clear()
-//        if (listeners.filter { room.num == it.room.num }.isEmpty()) {
         listeners.add(MessageListenerHolder(room, listener))
-//        }
     }
 
     override fun onNewEvents(site: String, root: JsonNode) {
