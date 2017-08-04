@@ -169,9 +169,9 @@ class ChatFragment : Fragment(), IncomingEventListener {
                             } else {
                                 val builder = AlertDialog.Builder(context)
                                 builder.setTitle(result.get("name").asString)
-
+                                val dpi = activity.resources.displayMetrics.density.toInt()
                                 val l = LinearLayout(context)
-                                l.setPadding(24, 24, 24, 24)
+                                l.setPadding((19 * dpi), (5 * dpi), (14 * dpi), (5 * dpi))
                                 val roomText = TextView(context)
                                 roomText.textSize = 18F
                                 roomText.autoLinkMask = Linkify.WEB_URLS

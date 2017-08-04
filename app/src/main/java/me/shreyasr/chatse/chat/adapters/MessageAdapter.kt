@@ -74,6 +74,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                 starCount.visibility = View.VISIBLE
                 starCount.text = message.message_stars.toString()
             }
+
             if (message.isDeleted) {
                 messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.deleted))
                 messageView.text = itemView.context.getString(R.string.removed)
