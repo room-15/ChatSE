@@ -36,6 +36,18 @@ import org.json.JSONObject
 import timber.log.Timber
 import java.io.IOException
 
+/**
+ * ChatActivity is the main activity that sets the Fragment and Drawer layouts
+ *
+ * @param serviceBinder: IncomingEventServiceBinder that is used to load rooms
+ * @param networkHandler: Used to handle network tasks
+ * @param uiThreadHandler: Used to handle UI tasks
+ * @param soRoomList: A list of all the rooms the user is currently in for StackOverflow
+ * @param seRoomList: A list of all the rooms the user is currently in for StackExchange
+ * @param fkey: The glorious fkey used to authenticate requests
+ * @param soRoomAdapter: Adapter for StackOverflow Rooms the user is in
+ * @param seRoomAdapter: Adapter for StackExchange Rooms the user is in
+ */
 class ChatActivity : AppCompatActivity(), ServiceConnection {
     private lateinit var serviceBinder: IncomingEventServiceBinder
     private var networkHandler: Handler? = null
@@ -50,42 +62,52 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.activity_chat)
 
+        //Create adapters for current user's rooms
         soRoomAdapter = RoomAdapter(Client.SITE_STACK_OVERFLOW, soRoomList, this)
         seRoomAdapter = RoomAdapter(Client.SITE_STACK_EXCHANGE, seRoomList, this)
+
+        //Set adapters to RecyclerViews along with LayoutManagers
         stackoverflow_room_list.adapter = soRoomAdapter
         stackoverflow_room_list.layoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
         stackexchange_room_list.adapter = seRoomAdapter
         stackexchange_room_list.layoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
 
+        //Notify data is changed
         runOnUiThread {
             soRoomAdapter.notifyDataSetChanged()
             seRoomAdapter.notifyDataSetChanged()
         }
+
+        //Set toolbar as SupportActionBar
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
+        //On the toggle button pressed open the NavigationDrawer
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
-
         toggle.syncState()
+
+        //Load the user data for the NavigationDrawer header
         loadUserData()
 
         val serviceIntent = Intent(this, IncomingEventService::class.java)
         this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
 
+        //Start network thread handler
         val handlerThread = HandlerThread("ChatActivityNetworkHandlerThread")
         handlerThread.start()
         networkHandler = Handler(handlerThread.looper)
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
+    /**
+     * Function to load user data and set it to the NavigationDrawer header
+     */
     fun loadUserData() {
         val userID = defaultSharedPreferences.getInt("SOID", -1)
         val seID = defaultSharedPreferences.getInt("SEID", -1)
+
+        //Does the user have a SO account? What about SE?
         if (userID != -1) {
             Ion.with(applicationContext)
                     .load("https://chat.stackoverflow.com/users/thumbs/$userID")
@@ -111,37 +133,52 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         }
     }
 
+    /**
+     * When network is connected add the rooms to the drawer
+     */
     override fun onServiceConnected(name: ComponentName, binder: IBinder) {
         Timber.d("Service connect")
         serviceBinder = binder as IncomingEventServiceBinder
+
+        //Asynchronously add rooms to drawer
         doAsync {
             fkey = serviceBinder.loadRoom(ChatRoom(Client.SITE_STACK_OVERFLOW, 1)).fkey
             addRoomsToDrawer(fkey)
         }
+
+        //Load a default room
         loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, 15))
     }
 
+    /**
+     * Add all the rooms that the user is in to the NavigationDrawer
+     */
     fun addRoomsToDrawer(fkey: String) {
         val soID = defaultSharedPreferences.getInt("SOID", -1)
 
+        //If the user has a StackOverflow ID then load rooms
         if (soID != -1) {
             Ion.with(applicationContext)
                     .load("${Client.SITE_STACK_OVERFLOW}/users/thumbs/$soID")
                     .asJsonObject()
                     .setCallback { e, result ->
                         if (result != null) {
+                            //Clear all the rooms and make the text visible
                             soRoomList.clear()
                             so_header_text.visibility = View.VISIBLE
                             stackoverflow_room_list.visibility = View.VISIBLE
 
+                            //For each room, create a room and add it to the list
                             val rooms = result.get("rooms").asJsonArray
                             rooms.forEach {
                                 val room = it.asJsonObject
                                 val roomName = room.get("name").asString
                                 val roomNum = room.get("id").asLong
+                                //Create room and add it to the list
                                 createRoom(Client.SITE_STACK_OVERFLOW, roomName, roomNum, 0, fkey)
                             }
-                            if(rooms.size() == 0){
+                            //If the rooms are empty then remove the list and header
+                            if (rooms.size() == 0) {
                                 so_header_text.visibility = View.GONE
                                 stackoverflow_room_list.visibility = View.GONE
                             }
@@ -152,6 +189,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
             stackoverflow_room_list.visibility = View.GONE
         }
 
+        //If the user has a StackExchange ID then load rooms
         val seID = defaultSharedPreferences.getInt("SEID", -1)
         if (seID != -1) {
             Ion.with(applicationContext)
@@ -162,17 +200,22 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                             Log.e("addRoomsToDrawer", e.message.toString())
                         } else {
                             if (result != null) {
+                                //Clear all the rooms and make the text visible
                                 seRoomList.clear()
                                 se_header_text.visibility = View.VISIBLE
                                 stackexchange_room_list.visibility = View.VISIBLE
+
+                                //For each room, create a room and add it to the list
                                 val rooms = result.get("rooms").asJsonArray
                                 rooms.forEach {
                                     val room = it.asJsonObject
                                     val roomName = room.get("name").asString
                                     val roomNum = room.get("id").asLong
+                                    //Create room and add it to the list
                                     createRoom(Client.SITE_STACK_EXCHANGE, roomName, roomNum, 0, fkey)
                                 }
-                                if(rooms.size() == 0){
+                                //If the rooms are empty then remove the list and header
+                                if (rooms.size() == 0) {
                                     se_header_text.visibility = View.GONE
                                     stackexchange_room_list.visibility = View.GONE
                                 }
@@ -185,6 +228,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         }
     }
 
+    /**
+     * Create a room from the information we got in addRoomsToDrawer(), but get more information
+     */
     fun createRoom(site: String, roomName: String, roomNum: Long, lastActive: Long, fkey: String) {
         doAsync {
             val client = ClientManager.client
@@ -195,10 +241,18 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
             val response = client.newCall(soChatPageRequest).execute()
             val jsonData = response.body().string()
             val json = JSONObject(jsonData)
+
+            //Get description for room
             val description = json.getString("description")
+
+            //Is this a user's favorite?
             val isFavorite = json.getBoolean("isFavorite")
+
+            //Get the room's tags
             val tags = json.getString("tags")
 
+            //If this is for StackOverflow then add it to the SO list
+            //Otherwise, add it to the SE list
             if (site == Client.SITE_STACK_OVERFLOW) {
                 soRoomList.add(Room(roomName, roomNum, description, lastActive, isFavorite, tags, fkey))
                 runOnUiThread {
@@ -214,66 +268,98 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     }
 
 
+    //Inflate the menu for the Toolbar
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_chat, menu)
         return true
     }
 
+    /**
+     * Manage each menu item selected
+     * With search_rooms we allow the user to join a room by id (eventually search for rooms)
+     * With action_logout we log out of the app
+     */
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item != null) {
             when (item.itemId) {
                 R.id.search_rooms -> {
+                    //Create an AlertDialog to join a room
                     val builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
-                    builder.setTitle("Edit message")
 
+                    //Set the title
+                    builder.setTitle("Join Room")
+
+                    //Create a layout to set as Dialog view
                     val l = LinearLayout(applicationContext)
+
+                    //Set orientation
                     l.orientation = LinearLayout.VERTICAL
+
+                    //Get DPI so we can add padding and look natural
                     val dpi = application.resources.displayMetrics.density.toInt()
-                    val input = EditText(applicationContext)
                     l.setPadding((19 * dpi), (5 * dpi), (14 * dpi), (5 * dpi))
+
+                    //Input for inputting room ID
+                    val input = EditText(applicationContext)
+
+                    //Set hint, input type as a number, and match parent
                     input.hint = "Enter Room ID"
                     input.inputType = InputType.TYPE_CLASS_NUMBER
                     input.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+
+                    //Add EditText to view
                     l.addView(input)
 
+                    //Create dropdown to choose which site
                     val spinner = Spinner(applicationContext)
                     input.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
                     spinner.adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, arrayListOf("Stackoverflow", "Stackexchange"))
                     var site = Client.SITE_STACK_OVERFLOW
-                    l.addView(spinner)
-                    spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
+                    //Add dropdown to View
+                    l.addView(spinner)
+
+                    //On dropdown click set the site as the appropriate site
+                    spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                         override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {
                             when (pos) {
+                                //If the first item is clicked, set the site as SO
                                 0 -> site = Client.SITE_STACK_OVERFLOW
+                                //Otherwise set to SE
                                 1 -> site = Client.SITE_STACK_EXCHANGE
                             }
                         }
-
+                        //Default as StackOverflow
                         override fun onNothingSelected(parent: AdapterView<out Adapter>?) {
                             site = Client.SITE_STACK_OVERFLOW
                         }
-
                     }
 
+                    //Set the view to the layout built above
                     builder.setView(l)
 
+                    //Join the room the user chose and load it into the container
                     builder.setPositiveButton("Join Room", { dialog, _ ->
-                        Log.wtf("JOIN", site + " " + input.text.toString())
                         loadChatFragment(ChatRoom(site, input.text.toString().toInt()))
+                        //Dismiss the dialog
                         dialog.dismiss()
                     })
                     builder.setNegativeButton("Cancel", { dialog, _ ->
+                        //Dismiss the dialog and cancel
                         dialog.cancel()
                     })
 
+                    //Show the dialog
                     builder.show()
 
                 }
+                //Logout of app by clearing all SharedPreferences and loading the LoginActivity
                 R.id.action_logout -> {
                     startActivity(Intent(applicationContext, LoginActivity::class.java))
                     defaultSharedPreferences.edit().clear().apply()
+                    finish()
                 }
+                //This is handled by the ChatFragment
                 R.id.room_information -> return false
             }
         }
@@ -281,9 +367,10 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
-        Timber.d("Service disconnect")
+        Log.d("ChatActivity", "Service disconnect")
     }
 
+    //Load the chat fragment by creating it and adding it
     fun loadChatFragment(room: ChatRoom) {
         networkHandler?.post {
             try {
@@ -297,6 +384,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         drawer_layout.closeDrawers()
     }
 
+    //Add the fragment by replacing the current fragment with the new ChatFragment
     private fun addChatFragment(fragment: ChatFragment) {
         uiThreadHandler.post {
             supportFragmentManager
@@ -306,6 +394,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         }
     }
 
+    //Create the ChatFragment by joining room and creating an instance of the ChatFragment
     @Throws(IOException::class, JSONException::class)
     private fun createChatFragment(room: ChatRoom): ChatFragment {
         val roomInfo = serviceBinder.loadRoom(room)
@@ -319,21 +408,33 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         return chatFragment
     }
 
+    /**
+     * Function to rejoin the user's favorite rooms
+     */
+
     fun rejoinFavoriteRooms() {
         val client = ClientManager.client
         doAsync {
+            //Get the fkey to make a call
             val soRoomInfo = serviceBinder.loadRoom(ChatRoom(Client.SITE_STACK_OVERFLOW, 1))
+
+            //Create a body and add appropriate parameters
             val soRequestBody = FormEncodingBuilder()
                     .add("fkey", soRoomInfo.fkey)
                     .add("immediate", "true")
                     .add("quiet", "true")
                     .build()
+
+            //Add body and url and build call
             val soChatPageRequest = Request.Builder()
                     .url(Client.SITE_STACK_OVERFLOW + "/chats/join/favorite")
                     .post(soRequestBody)
                     .build()
+
+            //Execute call
             client.newCall(soChatPageRequest).execute()
 
+            //Do the same for StackExchange
             val seRoomInfo = serviceBinder.loadRoom(ChatRoom(Client.SITE_STACK_EXCHANGE, 1))
             val seRequestBody = FormEncodingBuilder()
                     .add("fkey", seRoomInfo.fkey)
@@ -349,4 +450,5 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     }
 }
 
+//A class for a room with all the things we get from /rooms/thumbs/{id}
 data class Room(val name: String, val roomID: Long, val description: String, val lastActive: Long?, var isFavorite: Boolean, val tags: String, val fkey: String)
