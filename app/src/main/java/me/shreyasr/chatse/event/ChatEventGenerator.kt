@@ -10,8 +10,13 @@ import java.io.IOException
  */
 class ChatEventGenerator {
 
+    //An ObjectMapper used to map incoming json to ChatEvent objects
     private val mapper = ObjectMapper()
 
+    /**
+     * @param json: is a JSONNode that is take in and mapped to a ChatEvent
+     * @return a ChatEvent
+     */
     fun createEvent(json: JsonNode): ChatEvent? {
         var c: ChatEvent? = null
         try {

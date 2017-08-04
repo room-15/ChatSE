@@ -5,6 +5,9 @@ import me.shreyasr.chatse.chat.ChatRoom
 import me.shreyasr.chatse.event.ChatEvent
 import java.util.*
 
+/**
+ * An unfiltered event presenter, used alongside MessageEventPresentor
+ */
 class UnfilteredEventPresenter : EventPresenter<ChatEvent> {
 
 

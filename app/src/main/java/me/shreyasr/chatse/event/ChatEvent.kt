@@ -3,6 +3,31 @@ package me.shreyasr.chatse.event
 import org.jsoup.Jsoup
 import org.unbescape.html.HtmlEscape
 
+/**
+ * ChatEvent class that is used for all new messages, contains all parameters that gets json mapped to it
+ *
+ * @param event_type: An integer which signifies what type of event an object is
+ * @param time_stamp: When the event occurred
+ * @param room_id: ID of the room in which the event occurred
+ * @param user_id: The ID of the user that did the event
+ * @param user_name: The user's username
+ * @param message_id: The ID of the message (if event_type is equal to 1)
+ * @param show_parent: Unused
+ * @param parent_id: Parent's ID
+ * @param id = ID of event
+ * @param room_name: Name of Room that event occurred
+ * @param contents: Content of event
+ * @param message_edits: Number of times the message was edited
+ * @param message_stars: Number of times the message was starred
+ * @param message_owner_stars: Unused
+ * @param target_user_id: Unused
+ * @param message_onebox: If the message is oneboxed (an image, wikipedia article, SO/SE post, etc.)
+ * @param onebox_type: Type of oneboxed content
+ * @param onebox_extra: Extra data from onebox
+ * @param message_starred: If the message is starred
+ * @param isForUsersList: If the message is for the list of users in MessageEventPresentor
+ * @param email_hash: Email hash used for profile picture
+ */
 class ChatEvent {
 
     var event_type: Int = 0
@@ -33,7 +58,6 @@ class ChatEvent {
     var isForUsersList = false
     var email_hash = ""
 
-    //TODO:
     fun setContent(content: String) {
         val doc = Jsoup.parse(content, "http://chat.stackexchange.com/")
         val elements = doc.select("div")
@@ -69,8 +93,11 @@ class ChatEvent {
         }
     }
 
-    companion object {
 
+    /**
+     * Different types of event types and their ID
+     */
+    companion object {
         val EVENT_TYPE_MESSAGE = 1
         val EVENT_TYPE_EDIT = 2
         val EVENT_TYPE_JOIN = 3

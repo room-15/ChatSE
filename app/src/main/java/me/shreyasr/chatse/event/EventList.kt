@@ -10,9 +10,12 @@ import me.shreyasr.chatse.event.presenter.message.MessageEventPresenter
  */
 class EventList(private val roomNum: Int) {
 
+    //List of unfilteredEvents
     var unfilteredPresenter = UnfilteredEventPresenter()
+    //List of events used for messages
     var messagePresenter = MessageEventPresenter()
 
+    //Array of the unfiltered and filtered events
     private val presenters = arrayOf(unfilteredPresenter, messagePresenter)
 
     fun addEvent(event: ChatEvent, context: Context, room: ChatRoom?) {
