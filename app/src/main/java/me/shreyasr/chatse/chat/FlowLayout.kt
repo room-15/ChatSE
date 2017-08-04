@@ -7,6 +7,8 @@ import android.view.ViewGroup
 
 /**
  * @author RAW
+ * From StackOverflow: https://stackoverflow.com/a/7895007/1064310
+ * Converted to Kotlin
  */
 class FlowLayout : ViewGroup {
 
