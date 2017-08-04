@@ -21,7 +21,9 @@ import me.shreyasr.chatse.event.presenter.message.MessageEvent
 
 
 /**
- * Created by Tristan on 7/30/17
+ * Adapter to display the users in the right NavigationDrawer of the activity.
+ * @param mContext: Context
+ * @param events: All the events to get the users from
  */
 
 class UsersAdapter(val mContext: Context, val events: EventList, var users: ArrayList<MessageEvent> = ArrayList()) : RecyclerView.Adapter<UsersAdapter.UsersViewHolder>() {
@@ -32,6 +34,7 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
         holder.bindMessage(user)
     }
 
+    //Used to update the list on new events
     fun update() {
         users.clear()
         users.addAll(events.messagePresenter.getUsersList())
@@ -50,11 +53,15 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
         val userName = itemView.findViewById(R.id.user_name) as TextView
 
         fun bindMessage(user: MessageEvent) {
+            //Set the username to the TextView
             userName.text = user.userName
+
+            //Load profile into ImageView with Ion
             Ion.with(mContext)
                     .load(user.email_hash)
                     .intoImageView(userPicture)
 
+            //On click, show information about user
             itemView.setOnClickListener {
                 Ion.with(mContext)
                         .load("https://chat.stackoverflow.com/users/thumbs/${user.userId}")
@@ -63,10 +70,15 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
                             if (e != null) {
                                 Log.e("ChatFragment", e.message.toString())
                             } else {
+                                //Create AlertDialog with title of their name
                                 val builder = AlertDialog.Builder(mContext)
                                         .setTitle(result.get("name").asString)
+
+                                //Create layout
                                 val layout = LinearLayout(mContext)
                                 val s: SpannableString
+
+                                //Set user message to the body of the AlertDialog and Linkify links
                                 if (!result.get("user_message").isJsonNull) {
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                         s = SpannableString(Html.fromHtml(result.get("user_message").asString, Html.FROM_HTML_MODE_COMPACT))
@@ -78,16 +90,21 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
                                 } else {
                                     s = SpannableString("There's no user bio! :(")
                                 }
+
+                                //Set SpannableString to TextView
                                 val tv = TextView(mContext)
                                 tv.text = s
-                                layout.addView(tv)
 
+                                //Add TextView to Layout and set Layout to AlertDialog view
+                                layout.addView(tv)
                                 builder.setView(tv)
 
+                                //Create cancel button to cancel dialog
                                 builder.setNegativeButton("Cancel", { dialog, _ ->
                                     dialog.cancel()
                                 })
 
+                                //Show Dialog
                                 builder.show()
                             }
                         }

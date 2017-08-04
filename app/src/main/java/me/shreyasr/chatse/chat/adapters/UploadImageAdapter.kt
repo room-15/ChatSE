@@ -9,6 +9,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import me.shreyasr.chatse.R
 
+/**
+ * Adapter for DialogPlus to display the different uploading options
+ * @param context: Application context
+ */
 class UploadImageAdapter(context: Context) : BaseAdapter() {
 
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
@@ -50,10 +54,6 @@ class UploadImageAdapter(context: Context) : BaseAdapter() {
                 viewHolder.textView?.text = context.getString(R.string.choose_from_gallery)
                 viewHolder.imageView?.setImageResource(R.drawable.ic_upload)
             }
-//            2 -> {
-//                viewHolder.textView?.text = context.getString(R.string.upload_from_url)
-//                viewHolder.imageView?.setImageResource(R.drawable.ic_link)
-//            }
         }
 
         return view

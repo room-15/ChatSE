@@ -16,6 +16,13 @@ import me.shreyasr.chatse.chat.Room
 import me.shreyasr.chatse.network.ClientManager
 import org.jetbrains.anko.doAsync
 
+/**
+ * An adapter used to display the rooms in the left NavigationDrawer of the activity
+ *
+ * @param site: String that is the site (SO or SE)
+ * @param list: MutableList of rooms
+ * @param context: Application Context
+ */
 class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Context) : RecyclerView.Adapter<RoomAdapter.ListRowHolder>() {
 
     override fun onBindViewHolder(viewHolder: ListRowHolder?, position: Int) {
@@ -32,25 +39,36 @@ class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Co
         return ListRowHolder(context, view, site)
     }
 
+    //Set the room to the RecyclerView
     class ListRowHolder(val mContext: Context, itemView: View, val site: String) : RecyclerView.ViewHolder(itemView) {
         val name = itemView.findViewById(R.id.room_name) as TextView
 
         fun bindMessage(room: Room) {
+
+            //Set the text to the itemView TextView
             name.text = room.name
 
+            //OnClick, load the chat fragment
             itemView.setOnClickListener {
                 val roomNum = room.roomID.toInt()
                 (mContext as ChatActivity).loadChatFragment(ChatRoom(site, roomNum))
             }
 
+            /*
+             On Long click, create an AlertDialog to allow the user to remove/add from/to favorites
+             or to leave the room
+            */
             itemView.setOnLongClickListener {
                 val favoriteToggleString: String
+
+                //Determine if already a favorite and if I should remove or add
                 if (room.isFavorite) {
                     favoriteToggleString = "Remove from Favorites"
                 } else {
                     favoriteToggleString = "Add to Favorites"
                 }
 
+                //Create AlertDialog, set the title, message, and three buttons. One for each action
                 AlertDialog.Builder(mContext)
                         .setTitle("Modify Room")
                         .setMessage("Would you like to modify room #${room.roomID}, ${room.name}?")
@@ -70,6 +88,11 @@ class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Co
             }
         }
 
+        /**
+         * Function to make network call to leave room
+         * @param roomID: ID of current room
+         * @param fkey: Magic. F. Key.
+         */
         fun leaveRoom(roomID: Long, fkey: String) {
             doAsync {
                 val client = ClientManager.client
@@ -86,6 +109,11 @@ class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Co
             }
         }
 
+        /**
+         * Call for add and removing from/to favorites is the same
+         * @param room: Current Room object
+         * @param fkey: ooooooooooh glorious fkey
+         */
         fun toggleFavoriteRoom(room: Room, fkey: String) {
             room.isFavorite = !room.isFavorite
 

@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 
+/**
+ * Adapter for DialogPlus to show options for modifying a message (edit, delete, star)
+ */
 class ModifyMessageAdapter(val dialogMessages: MutableList<String>, context: Context) : BaseAdapter() {
 
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
