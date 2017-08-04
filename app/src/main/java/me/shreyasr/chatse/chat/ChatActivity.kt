@@ -32,6 +32,7 @@ import me.shreyasr.chatse.network.ClientManager
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.json.JSONException
+import org.json.JSONObject
 import timber.log.Timber
 import java.io.IOException
 
@@ -41,6 +42,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     private val uiThreadHandler = Handler(Looper.getMainLooper())
     val soRoomList = arrayListOf<Room>()
     val seRoomList = arrayListOf<Room>()
+    lateinit var fkey: String
     lateinit var soRoomAdapter: RoomAdapter
     lateinit var seRoomAdapter: RoomAdapter
 
@@ -79,7 +81,6 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
     override fun onResume() {
         super.onResume()
-        addRoomsToDrawer()
     }
 
     fun loadUserData() {
@@ -113,21 +114,16 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     override fun onServiceConnected(name: ComponentName, binder: IBinder) {
         Timber.d("Service connect")
         serviceBinder = binder as IncomingEventServiceBinder
-        addRoomsToDrawer()
+        doAsync {
+            fkey = serviceBinder.loadRoom(ChatRoom(Client.SITE_STACK_OVERFLOW, 1)).fkey
+            addRoomsToDrawer(fkey)
+        }
         loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, 15))
     }
 
-    fun addRoom(room: Room) {
-        if (!soRoomList.contains(room)) {
-            soRoomList.add(room)
-            runOnUiThread {
-                soRoomAdapter.notifyDataSetChanged()
-            }
-        }
-    }
-
-    fun addRoomsToDrawer() {
+    fun addRoomsToDrawer(fkey: String) {
         val soID = defaultSharedPreferences.getInt("SOID", -1)
+
         if (soID != -1) {
             Ion.with(applicationContext)
                     .load("${Client.SITE_STACK_OVERFLOW}/users/thumbs/$soID")
@@ -143,21 +139,14 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                                 val room = it.asJsonObject
                                 val roomName = room.get("name").asString
                                 val roomNum = room.get("id").asLong
-                                soRoomList.add(Room(roomName, roomNum, 0))
+                                createRoom(Client.SITE_STACK_OVERFLOW, roomName, roomNum, 0, fkey)
                             }
-
-                            if (soRoomList.isEmpty()) {
+                            if(rooms.size() == 0){
                                 so_header_text.visibility = View.GONE
                                 stackoverflow_room_list.visibility = View.GONE
                             }
-
-                            runOnUiThread {
-                                soRoomAdapter.notifyDataSetChanged()
-                                Log.e("addRoomsToDrawer", soRoomAdapter.list.size.toString())
-                            }
                         }
                     }
-
         } else {
             so_header_text.visibility = View.GONE
             stackoverflow_room_list.visibility = View.GONE
@@ -181,15 +170,11 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                                     val room = it.asJsonObject
                                     val roomName = room.get("name").asString
                                     val roomNum = room.get("id").asLong
-
-                                    seRoomList.add(Room(roomName, roomNum, 0))
+                                    createRoom(Client.SITE_STACK_EXCHANGE, roomName, roomNum, 0, fkey)
                                 }
-                                if (seRoomList.isEmpty()) {
+                                if(rooms.size() == 0){
                                     se_header_text.visibility = View.GONE
                                     stackexchange_room_list.visibility = View.GONE
-                                }
-                                runOnUiThread {
-                                    seRoomAdapter.notifyDataSetChanged()
                                 }
                             }
                         }
@@ -197,6 +182,34 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         } else {
             se_header_text.visibility = View.GONE
             stackexchange_room_list.visibility = View.GONE
+        }
+    }
+
+    fun createRoom(site: String, roomName: String, roomNum: Long, lastActive: Long, fkey: String) {
+        doAsync {
+            val client = ClientManager.client
+
+            val soChatPageRequest = Request.Builder()
+                    .url("$site/rooms/thumbs/$roomNum/")
+                    .build()
+            val response = client.newCall(soChatPageRequest).execute()
+            val jsonData = response.body().string()
+            val json = JSONObject(jsonData)
+            val description = json.getString("description")
+            val isFavorite = json.getBoolean("isFavorite")
+            val tags = json.getString("tags")
+
+            if (site == Client.SITE_STACK_OVERFLOW) {
+                soRoomList.add(Room(roomName, roomNum, description, lastActive, isFavorite, tags, fkey))
+                runOnUiThread {
+                    soRoomAdapter.notifyDataSetChanged()
+                }
+            } else {
+                seRoomList.add(Room(roomName, roomNum, description, lastActive, isFavorite, tags, fkey))
+                runOnUiThread {
+                    seRoomAdapter.notifyDataSetChanged()
+                }
+            }
         }
     }
 
@@ -334,5 +347,6 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
             client.newCall(seChatPageRequest).execute()
         }
     }
-
 }
+
+data class Room(val name: String, val roomID: Long, val description: String, val lastActive: Long?, var isFavorite: Boolean, val tags: String, val fkey: String)

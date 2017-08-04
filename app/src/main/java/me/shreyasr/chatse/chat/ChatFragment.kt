@@ -49,8 +49,8 @@ class ChatFragment : Fragment(), IncomingEventListener {
     private lateinit var messageList: RecyclerView
     private lateinit var userList: RecyclerView
     private lateinit var events: EventList
-    private var chatFkey: String? = null
-    private var room: ChatRoom? = null
+    lateinit var chatFkey: String
+    lateinit var room: ChatRoom
     private val client = ClientManager.client
     private var networkHandler: Handler? = null
     private val uiThreadHandler = Handler(Looper.getMainLooper())
@@ -66,10 +66,8 @@ class ChatFragment : Fragment(), IncomingEventListener {
         setHasOptionsMenu(true)
         chatFkey = args.getString(EXTRA_FKEY)
         room = args.getParcelable<ChatRoom>(EXTRA_ROOM)
-        assert(chatFkey != null)
-        assert(room != null)
 
-        events = EventList(room?.num ?: 0)
+        events = EventList(room.num ?: 0)
 
         val handlerThread = HandlerThread("NetworkHandlerThread")
         handlerThread.start()
@@ -161,7 +159,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
         when (item.itemId) {
             R.id.room_information -> {
                 Ion.with(activity)
-                        .load("https://chat.stackoverflow.com/rooms/thumbs/${room?.num}")
+                        .load("https://chat.stackoverflow.com/rooms/thumbs/${room.num}")
                         .asJsonObject()
                         .setCallback { e, result ->
                             if (e != null) {
@@ -244,7 +242,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
         if (room == null) return
         messagesJson
                 .mapNotNull { chatEventGenerator.createEvent(it) }
-                .filter { it.room_id == room?.num }
+                .filter { it.room_id == room.num }
                 .forEach {
                     events.addEvent(it, this.activity, room)
                 }
@@ -253,7 +251,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
             messageAdapter?.update()
             usersAdapter?.update()
             usersAdapter?.notifyDataSetChanged()
-            (activity as ChatActivity).addRoomsToDrawer()
+            (activity as ChatActivity).addRoomsToDrawer(chatFkey as String)
         }
     }
 
@@ -320,7 +318,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
     }
 
     @Throws(IOException::class)
-    private fun getMessagesObject(client: Client, room: ChatRoom?, count: Int): JsonNode {
+    private fun getMessagesObject(client: Client, room: ChatRoom, count: Int): JsonNode {
         val getMessagesRequestBody = FormEncodingBuilder()
                 .add("since", 0.toString())
                 .add("mode", "Messages")
@@ -328,7 +326,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 .add("fkey", chatFkey)
                 .build()
         val getMessagesRequest = Request.Builder()
-                .url(room?.site + "/chats/" + room?.num + "/events")
+                .url(room.site + "/chats/" + room.num + "/events")
                 .post(getMessagesRequestBody)
                 .build()
 
@@ -337,14 +335,14 @@ class ChatFragment : Fragment(), IncomingEventListener {
     }
 
     @Throws(IOException::class)
-    private fun newMessage(client: Client, room: ChatRoom?,
+    private fun newMessage(client: Client, room: ChatRoom,
                            fkey: String?, message: String) {
         val newMessageRequestBody = FormEncodingBuilder()
                 .add("text", message)
                 .add("fkey", fkey)
                 .build()
         val newMessageRequest = Request.Builder()
-                .url(room?.site + "/chats/" + room?.num + "/messages/new/")
+                .url(room.site + "/chats/" + room.num + "/messages/new/")
                 .post(newMessageRequestBody)
                 .build()
 

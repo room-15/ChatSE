@@ -3,9 +3,7 @@ package me.shreyasr.chatse.event.presenter.message
 import android.content.Context
 import android.util.Log
 import com.koushikdutta.ion.Ion
-import me.shreyasr.chatse.chat.ChatActivity
 import me.shreyasr.chatse.chat.ChatRoom
-import me.shreyasr.chatse.chat.Room
 import me.shreyasr.chatse.event.ChatEvent
 import me.shreyasr.chatse.event.presenter.EventPresenter
 import me.shreyasr.chatse.network.Client
@@ -84,17 +82,6 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                     }
                 }
                 ChatEvent.EVENT_TYPE_MENTION -> {
-                }
-            }
-            when (event.event_type) {
-                ChatEvent.EVENT_TYPE_JOIN -> {
-                    val userObj = MessageEvent(event)
-                    userObj.content = "Someone just joined"
-                    users.put(userObj.userId, userObj)
-                    Log.e("JOINED", userObj.userId.toString())
-                    if (userObj.roomId == roomNum.toLong()) {
-                        (context as ChatActivity).addRoom(Room(userObj.roomName, userObj.roomId, 0))
-                    }
                 }
             }
         }
