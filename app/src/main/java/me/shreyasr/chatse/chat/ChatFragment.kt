@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
@@ -37,6 +39,7 @@ import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
 import org.codehaus.jackson.JsonNode
 import org.codehaus.jackson.map.ObjectMapper
+import org.jsoup.Jsoup
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -169,6 +172,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
                                 builder.setTitle(result.get("name").asString)
                                 val dpi = activity.resources.displayMetrics.density.toInt()
                                 val l = LinearLayout(context)
+                                l.orientation = LinearLayout.VERTICAL
                                 l.setPadding((19 * dpi), (5 * dpi), (14 * dpi), (5 * dpi))
                                 val roomText = TextView(context)
                                 roomText.textSize = 18F
@@ -181,6 +185,31 @@ class ChatFragment : Fragment(), IncomingEventListener {
                                 }
                                 roomText.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
                                 l.addView(roomText)
+
+                                val tagsLayout = FlowLayout(context)
+
+                                val tags = Jsoup.parse(result.get("tags").asString).getElementsByClass("tag")
+                                tags.forEach {
+                                    val tagview = TextView(context)
+                                    tagview.text = it.text()
+                                    val url = it.attr("href")
+                                    tagview.setOnClickListener {
+                                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                                    }
+                                    tagview.setTextColor(Color.WHITE)
+                                    tagview.setPadding(14, 14, 14, 14)
+                                    tagview.setSingleLine(true)
+                                    val layoutparam = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                                    layoutparam.setMargins(24, 0, 0, 0)
+                                    tagview.layoutParams = layoutparam
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                        tagview.background = ContextCompat.getDrawable(context, R.drawable.tag_background)
+                                    } else {
+                                        tagview.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.tag_background))
+                                    }
+                                    tagsLayout.addView(tagview)
+                                }
+                                l.addView(tagsLayout)
                                 builder.setView(l)
                                 builder.show()
                             }
