@@ -29,10 +29,10 @@ import java.io.IOException
 class LoginActivity : AppCompatActivity() {
     /**
      * Initiate variables to be used.
-     * @emailView: The EditText used to take in the user's email
-     * @passwordView: The EditText used to take in the user's password
-     * @progressBar: The ProgressBar displayed while the authentication is being performed
-     * @prefs: Variable used to contain the default SharedPreferences for the app. Set to App.sharedPreferences
+     * @param emailView: The EditText used to take in the user's email
+     * @param passwordView: The EditText used to take in the user's password
+     * @param progressBar: The ProgressBar displayed while the authentication is being performed
+     * @param prefs: Variable used to contain the default SharedPreferences for the app. Set to App.sharedPreferences
      */
     lateinit var emailView: EditText
     lateinit var passwordView: EditText
@@ -82,12 +82,12 @@ class LoginActivity : AppCompatActivity() {
 
     /**
      * Receives the input from the email and password views.
-     * @emailView gets it's errors reset
-     * @passwordView gets it's errors reset
+     * @param emailView gets it's errors reset
+     * @param passwordView gets it's errors reset
      * The inputs are validated
-     * @loginButton is re-enabled if the inputs are not valid
-     * @progressBar is visible if all inputs are valid and the login is attempted
-     * @LoginAsyncTask is called
+     * @param loginButton is re-enabled if the inputs are not valid
+     * @param progressBar is visible if all inputs are valid and the login is attempted
+     * @param LoginAsyncTask is called
      */
     fun attemptLogin() {
         loginButton.isEnabled = false
