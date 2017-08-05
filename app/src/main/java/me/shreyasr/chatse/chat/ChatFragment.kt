@@ -78,8 +78,8 @@ class ChatFragment : Fragment(), IncomingEventListener {
     lateinit var chatFkey: String
     lateinit var room: ChatRoom
     private val client = ClientManager.client
-    private var messageAdapter: MessageAdapter? = null
-    private var usersAdapter: UsersAdapter? = null
+    private lateinit var messageAdapter: MessageAdapter
+    private lateinit var usersAdapter: UsersAdapter
     private val mapper = ObjectMapper()
     private val chatEventGenerator = ChatEventGenerator()
     lateinit var dialog: DialogPlus
@@ -183,12 +183,8 @@ class ChatFragment : Fragment(), IncomingEventListener {
 
         //Get handle new events
         doAsync {
-            try {
-                val messages = getMessagesObject(client, room, 100)
-                handleNewEvents(messages.get("events"))
-            } catch (e: IOException) {
-                Log.e("ChatFragment", e.message)
-            }
+            val messages = getMessagesObject(client, room, 100)
+            handleNewEvents(messages.get("events"))
         }
 
         //Get focus of EditText input
@@ -392,11 +388,10 @@ class ChatFragment : Fragment(), IncomingEventListener {
                     events.addEvent(it, this.activity, room)
                 }
 
-        //Updates adapters so we know to check for new events
+        //Update adapters so we know to check for new events
         activity.runOnUiThread {
-            messageAdapter?.update()
-            usersAdapter?.update()
-            usersAdapter?.notifyDataSetChanged()
+            messageAdapter.update()
+            usersAdapter.update()
             (activity as ChatActivity).addRoomsToDrawer(chatFkey)
         }
     }
@@ -515,9 +510,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
         client.newCall(newMessageRequest).execute()
         Timber.i("New message")
     }
-
-    val pageTitle: String
-        get() = arguments.getString(EXTRA_NAME)
 
     companion object {
 

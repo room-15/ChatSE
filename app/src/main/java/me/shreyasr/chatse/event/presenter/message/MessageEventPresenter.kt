@@ -7,7 +7,6 @@ import me.shreyasr.chatse.chat.ChatRoom
 import me.shreyasr.chatse.event.ChatEvent
 import me.shreyasr.chatse.event.presenter.EventPresenter
 import me.shreyasr.chatse.network.Client
-import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -72,6 +71,7 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                                     } else {
                                         newEvent.email_hash = "https://www.gravatar.com/avatar/$image_url"
                                     }
+                                    Log.wtf("USERS", users.size.toString())
                                     users.put(newEvent.userId, newEvent)
                                 }
                             }
@@ -83,9 +83,9 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
         if (room?.num == event.room_id) {
             //Kotlin version of the switch statement, determine what to do with the event
             when (event.event_type) {
-                //If the event is a message, add it to the messages
+            //If the event is a message, add it to the messages
                 ChatEvent.EVENT_TYPE_MESSAGE -> messages.add(MessageEvent(event))
-                //If the event is an edit, or a delete, then add that new event in place of the old.
+            //If the event is an edit, or a delete, then add that new event in place of the old.
                 ChatEvent.EVENT_TYPE_EDIT, ChatEvent.EVENT_TYPE_DELETE -> {
                     val newMessage = MessageEvent(event)
                     val originalMessage = messages.floor(newMessage)
@@ -97,7 +97,7 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                     messages.remove(originalMessage)
                     messages.add(newMessage)
                 }
-                //If the event is a starred message, modify the original message with the stars to add it to the event
+            //If the event is a starred message, modify the original message with the stars to add it to the event
                 ChatEvent.EVENT_TYPE_STAR -> {
                     val newMessage = MessageEvent(event)
                     val originalMessage = messages.floor(newMessage)

@@ -31,7 +31,7 @@
                 android:layout_gravity="center_vertical"
                 android:background="@null"
                 android:contentDescription="@string/upload_image"
-                android:src="@android:drawable/ic_menu_upload" />
+                android:src="@drawable/ic_upload" />
 
             <EditText
                 android:id="@+id/chat_input_text"

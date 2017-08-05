@@ -52,7 +52,7 @@ class UploadImageAdapter(context: Context) : BaseAdapter() {
             }
             1 -> {
                 viewHolder.textView?.text = context.getString(R.string.choose_from_gallery)
-                viewHolder.imageView?.setImageResource(R.drawable.ic_upload)
+                viewHolder.imageView?.setImageResource(R.drawable.ic_gallery_pick)
             }
         }
 
