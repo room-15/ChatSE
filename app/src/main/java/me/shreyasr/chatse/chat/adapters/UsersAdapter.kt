@@ -76,6 +76,11 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
 
                                 //Create layout
                                 val layout = LinearLayout(mContext)
+
+                                //Get DPI so we can add padding and look natural
+                                val dpi = mContext.resources.displayMetrics.density.toInt()
+                                layout.setPadding((19 * dpi), (5 * dpi), (14 * dpi), (5 * dpi))
+
                                 val s: SpannableString
 
                                 //Set user message to the body of the AlertDialog and Linkify links
@@ -97,7 +102,7 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
 
                                 //Add TextView to Layout and set Layout to AlertDialog view
                                 layout.addView(tv)
-                                builder.setView(tv)
+                                builder.setView(layout)
 
                                 //Create cancel button to cancel dialog
                                 builder.setNegativeButton("Cancel", { dialog, _ ->

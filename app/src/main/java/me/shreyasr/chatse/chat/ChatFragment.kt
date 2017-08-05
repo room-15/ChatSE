@@ -7,7 +7,8 @@ import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
 import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
@@ -30,7 +31,7 @@ import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.GridHolder
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
-import kotlinx.android.synthetic.main.fragment_chat.*
+import kotlinx.android.synthetic.main.fragment_chat.view.*
 import kotlinx.android.synthetic.main.picker_footer.view.*
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.adapters.MessageAdapter
@@ -43,6 +44,7 @@ import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
 import org.codehaus.jackson.JsonNode
 import org.codehaus.jackson.map.ObjectMapper
+import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
@@ -76,8 +78,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
     lateinit var chatFkey: String
     lateinit var room: ChatRoom
     private val client = ClientManager.client
-    private var networkHandler: Handler? = null
-    private val uiThreadHandler = Handler(Looper.getMainLooper())
     private var messageAdapter: MessageAdapter? = null
     private var usersAdapter: UsersAdapter? = null
     private val mapper = ObjectMapper()
@@ -101,11 +101,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
 
         //Set the EventList by the room number
         events = EventList(room.num)
-
-        //Start network thread handler
-        val handlerThread = HandlerThread("NetworkHandlerThread")
-        handlerThread.start()
-        networkHandler = Handler(handlerThread.looper)
     }
 
     //When the fragment view is created
@@ -115,14 +110,14 @@ class ChatFragment : Fragment(), IncomingEventListener {
         val view = inflater.inflate(R.layout.fragment_chat, container, false)
 
         //Set a onClickListener for the submit button
-        chat_input_submit.setOnClickListener {
+        view.chat_input_submit.setOnClickListener {
             val content = input.text.toString()
             input.setText("")
             onSubmit(content)
         }
 
         //Set a long click listener for the image upload button and display a dialog using DialogPlus
-        chat_input_upload.setOnClickListener {
+        view.chat_input_upload.setOnClickListener {
             dialog = DialogPlus.newDialog(activity)
                     .setContentHolder(GridHolder(2))
                     .setGravity(Gravity.CENTER)
@@ -187,12 +182,12 @@ class ChatFragment : Fragment(), IncomingEventListener {
         })
 
         //Get handle new events
-        networkHandler?.post {
+        doAsync {
             try {
                 val messages = getMessagesObject(client, room, 100)
                 handleNewEvents(messages.get("events"))
             } catch (e: IOException) {
-                Timber.e(e)
+                Log.e("ChatFragment", e.message)
             }
         }
 
@@ -343,7 +338,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
         //If the data isn't null
         if (data != null) {
             when (requestCode) {
-                //If from the camera
+            //If from the camera
                 0 -> {
                     if (data.extras != null) {
                         //Get the photo from the data as a Bitmap
@@ -362,7 +357,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
                         uploadToImgur(photoBytes)
                     }
                 }
-                //If from the gallery
+            //If from the gallery
                 1 -> {
                     val cursor: Cursor
                     if (data.data != null) {
@@ -398,7 +393,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 }
 
         //Updates adapters so we know to check for new events
-        uiThreadHandler.post {
+        activity.runOnUiThread {
             messageAdapter?.update()
             usersAdapter?.update()
             usersAdapter?.notifyDataSetChanged()
@@ -423,11 +418,11 @@ class ChatFragment : Fragment(), IncomingEventListener {
     //On submit, post a new message
     private fun onSubmit(content: String) {
 
-        networkHandler?.post {
+        doAsync {
             try {
                 newMessage(client, room, chatFkey, content)
             } catch (e: IOException) {
-                Timber.e(e)
+                Log.e("handleNewEvents", e.message)
             }
         }
     }
