@@ -11,11 +11,17 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/chat_message_list"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/load_messages_layout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1" >
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/chat_message_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </android.support.v4.widget.SwipeRefreshLayout>
 
         <LinearLayout
             android:id="@+id/chat_input_group"

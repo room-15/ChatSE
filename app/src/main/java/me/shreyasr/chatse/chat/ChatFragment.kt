@@ -13,6 +13,7 @@ import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -75,6 +76,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
     private lateinit var messageList: RecyclerView
     private lateinit var userList: RecyclerView
     private lateinit var events: EventList
+    private lateinit var loadMessagesLayout: SwipeRefreshLayout
     lateinit var chatFkey: String
     lateinit var room: ChatRoom
     private val client = ClientManager.client
@@ -83,6 +85,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
     private val mapper = ObjectMapper()
     private val chatEventGenerator = ChatEventGenerator()
     lateinit var dialog: DialogPlus
+    var currentLoadCount = 50
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -160,6 +163,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
         input = view.findViewById(R.id.chat_input_text) as EditText
         messageList = view.findViewById(R.id.chat_message_list) as RecyclerView
         userList = activity.findViewById(R.id.room_users) as RecyclerView
+        loadMessagesLayout = view.findViewById(R.id.load_messages_layout) as SwipeRefreshLayout
 
         messageAdapter = MessageAdapter(activity, events, chatFkey, room)
         usersAdapter = UsersAdapter(activity, events)
@@ -169,6 +173,15 @@ class ChatFragment : Fragment(), IncomingEventListener {
         userList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         userList.adapter = usersAdapter
         userList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))
+
+        //When you reach the top and swipe to load more, add 25 to the current loaded amount and load more
+        loadMessagesLayout.setOnRefreshListener {
+            currentLoadCount += 25
+            doAsync {
+                val messages = getMessagesObject(client, room, currentLoadCount)
+                handleNewEvents(messages.get("events"))
+            }
+        }
 
         //On input send. Create message and set text to nothing ("")
         input.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
@@ -183,7 +196,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
 
         //Get handle new events
         doAsync {
-            val messages = getMessagesObject(client, room, 100)
+            val messages = getMessagesObject(client, room, 50)
             handleNewEvents(messages.get("events"))
         }
 
@@ -393,6 +406,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
             messageAdapter.update()
             usersAdapter.update()
             (activity as ChatActivity).addRoomsToDrawer(chatFkey)
+            loadMessagesLayout.isRefreshing = false
         }
     }
 
