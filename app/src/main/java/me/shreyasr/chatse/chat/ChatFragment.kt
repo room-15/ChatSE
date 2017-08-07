@@ -1,11 +1,13 @@
 package me.shreyasr.chatse.chat
 
 import android.Manifest
+import android.app.ActivityManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -102,6 +104,18 @@ class ChatFragment : Fragment(), IncomingEventListener {
         //Get the current ChatRoom from the arguments
         room = args.getParcelable<ChatRoom>(EXTRA_ROOM)
 
+        if (room.site == Client.SITE_STACK_OVERFLOW) {
+            //Set the multitasking color to orange
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                activity.setTaskDescription(ActivityManager.TaskDescription(ActivityManager.TaskDescription().label, ActivityManager.TaskDescription().icon, ContextCompat.getColor(activity, R.color.stackoverflow_orange)))
+            }
+
+        } else if (room.site == Client.SITE_STACK_EXCHANGE) {
+            //Set the multitasking color to blue
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                activity.setTaskDescription(ActivityManager.TaskDescription(ActivityManager.TaskDescription().label, ActivityManager.TaskDescription().icon, ContextCompat.getColor(activity, R.color.stackexchange_blue)))
+            }
+        }
         //Set the EventList by the room number
         events = EventList(room.num)
     }

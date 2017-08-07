@@ -8,7 +8,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.text.Html
-import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.util.Log
 import android.view.Gravity
@@ -124,7 +123,6 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                         messageView.text = Html.fromHtml(parsedHTML)
                     }
                     BetterLinkMovementMethod.linkify(Linkify.ALL, messageView)
-//                    messageView.movementMethod = LinkMovementMethod.getInstance()
                 } else {
                     //if it's a onebox, then display it specially
                     when (message.onebox_type) {

@@ -1,10 +1,12 @@
 package me.shreyasr.chatse.chat
 
+import android.app.ActivityManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.content.ContextCompat
@@ -403,8 +405,17 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
             //If the room is for StackOverflow set the color orange, otherwise SE is blue
             if (room.site == Client.SITE_STACK_OVERFLOW) {
                 supportActionBar?.setBackgroundDrawable(ColorDrawable(ContextCompat.getColor(applicationContext, R.color.stackoverflow_orange)))
+                //Set the multitasking color to orange
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    this.setTaskDescription(ActivityManager.TaskDescription(ActivityManager.TaskDescription().label, ActivityManager.TaskDescription().icon, ContextCompat.getColor(applicationContext, R.color.stackoverflow_orange)))
+                }
+
             } else if (room.site == Client.SITE_STACK_EXCHANGE) {
                 supportActionBar?.setBackgroundDrawable(ColorDrawable(ContextCompat.getColor(applicationContext, R.color.stackexchange_blue)))
+                //Set the multitasking color to blue
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    this.setTaskDescription(ActivityManager.TaskDescription(ActivityManager.TaskDescription().label, ActivityManager.TaskDescription().icon, ContextCompat.getColor(applicationContext, R.color.stackexchange_blue)))
+                }
             }
         }
         return chatFragment
