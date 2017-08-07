@@ -318,7 +318,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     //Create dropdown to choose which site
                     val spinner = Spinner(applicationContext)
                     input.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
-                    spinner.adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, arrayListOf("Stackoverflow", "Stackexchange"))
+                    spinner.adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, arrayListOf("StackOverflow", "StackExchange"))
                     var site = Client.SITE_STACK_OVERFLOW
 
                     //Add dropdown to View
