@@ -83,6 +83,19 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
             //Same with the indicator for starred messages
             starIndicator.visibility = View.GONE
 
+            if (room?.site == Client.SITE_STACK_OVERFLOW) {
+                if (message.userId == mContext.defaultSharedPreferences.getInt("SOID", -1).toLong()) {
+                    itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_stackoverflow_mine))
+                } else {
+                    itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_other))
+                }
+            } else {
+                if (message.userId == mContext.defaultSharedPreferences.getInt("SEID", -1).toLong()) {
+                    itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_stackexchange_mine))
+                } else {
+                    itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_other))
+                }
+            }
             //If the message is starred, show the indicator and set the count text to the star count
             if (message.message_starred) {
                 starIndicator.visibility = View.VISIBLE
