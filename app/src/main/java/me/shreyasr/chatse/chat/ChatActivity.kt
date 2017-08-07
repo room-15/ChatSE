@@ -150,6 +150,14 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     }
 
     /**
+     * On resume reload, just in case.
+     */
+    override fun onResume() {
+        super.onResume()
+        loadChatFragment(ChatRoom(defaultSharedPreferences.getString("lastRoomSite", Client.SITE_STACK_OVERFLOW), defaultSharedPreferences.getInt("lastRoomNum", 15)))
+    }
+
+    /**
      * Add all the rooms that the user is in to the NavigationDrawer
      */
     fun addRoomsToDrawer(fkey: String) {
