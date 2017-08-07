@@ -164,67 +164,12 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
 
             //On long clicking the itemView, show a dialog that allows you to edit, delete, or star, depending on the ownership of the message
             itemView.setOnLongClickListener {
-                //Initiate a list of Strings, the current user ID, and a Boolean to determine if it's the user's message
-                val dialogMessages = mutableListOf<String>()
-                val curUserId: Int
-                val isUserMessage: Boolean
+                loadMessageActionDialog(message)
+                true
+            }
 
-                //Set the user ID depending on the site
-                if (room?.site == Client.SITE_STACK_OVERFLOW) {
-                    curUserId = mContext.defaultSharedPreferences.getInt("SOID", -1)
-                } else {
-                    curUserId = mContext.defaultSharedPreferences.getInt("SEID", -1)
-                }
-
-                //Determine if it's the user's message
-                isUserMessage = curUserId == message.userId.toInt()
-
-                //If it's not the user's message, set the dialog messages to starring. Otherwise, let them delete and edit it!
-                if (curUserId != -1) {
-                    if (isUserMessage) {
-                        dialogMessages.add(mContext.getString(R.string.edit_message))
-                        dialogMessages.add(mContext.getString(R.string.delete_message))
-                    } else {
-                        dialogMessages.add(mContext.getString(R.string.star_message))
-                    }
-                }
-
-                //Show the dialog
-                val dialog = DialogPlus.newDialog(mContext)
-                        .setContentHolder(ListHolder())
-                        .setGravity(Gravity.CENTER)
-                        .setAdapter(ModifyMessageAdapter(dialogMessages, mContext))
-                        .setOnItemClickListener { plusDialog, item, _, position ->
-                            //The clicking of items depends on how many and whether it's the user's message
-                            if (isUserMessage) {
-                                when (position) {
-                                    0 -> {
-                                        //Show the dialog letting the user edit their message
-                                        showEditDialog(message, mContext, plusDialog)
-                                    }
-                                    1 -> {
-                                        //Delete message
-                                        deleteMessage(message.messageId, chatFkey)
-                                        plusDialog.dismiss()
-                                    }
-                                }
-                            } else {
-                                when (position) {
-                                    0 -> {
-                                        //Star the message
-                                        starMessage(message.messageId, chatFkey)
-                                        plusDialog.dismiss()
-                                    }
-                                }
-                            }
-                        }
-                        //Set some nice padding
-                        .setPadding(50, 50, 50, 50)
-                        //Create the dialog
-                        .create()
-
-                //Show the dialog
-                dialog.show()
+            messageView.setOnLongClickListener {
+                loadMessageActionDialog(message)
                 true
             }
 
@@ -236,6 +181,70 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
 
             //Show if it's been edited
             editIndicator.visibility = if (message.isEdited) View.VISIBLE else View.INVISIBLE
+        }
+
+        private fun loadMessageActionDialog(message: MessageEvent) {
+            //Initiate a list of Strings, the current user ID, and a Boolean to determine if it's the user's message
+            val dialogMessages = mutableListOf<String>()
+            val curUserId: Int
+            val isUserMessage: Boolean
+
+            //Set the user ID depending on the site
+            if (room?.site == Client.SITE_STACK_OVERFLOW) {
+                curUserId = mContext.defaultSharedPreferences.getInt("SOID", -1)
+            } else {
+                curUserId = mContext.defaultSharedPreferences.getInt("SEID", -1)
+            }
+
+            //Determine if it's the user's message
+            isUserMessage = curUserId == message.userId.toInt()
+
+            //If it's not the user's message, set the dialog messages to starring. Otherwise, let them delete and edit it!
+            if (curUserId != -1) {
+                if (isUserMessage) {
+                    dialogMessages.add(mContext.getString(R.string.edit_message))
+                    dialogMessages.add(mContext.getString(R.string.delete_message))
+                } else {
+                    dialogMessages.add(mContext.getString(R.string.star_message))
+                }
+            }
+
+            //Show the dialog
+            val dialog = DialogPlus.newDialog(mContext)
+                    .setContentHolder(ListHolder())
+                    .setGravity(Gravity.CENTER)
+                    .setAdapter(ModifyMessageAdapter(dialogMessages, mContext))
+                    .setOnItemClickListener { plusDialog, item, _, position ->
+                        //The clicking of items depends on how many and whether it's the user's message
+                        if (isUserMessage) {
+                            when (position) {
+                                0 -> {
+                                    //Show the dialog letting the user edit their message
+                                    showEditDialog(message, mContext, plusDialog)
+                                }
+                                1 -> {
+                                    //Delete message
+                                    deleteMessage(message.messageId, chatFkey)
+                                    plusDialog.dismiss()
+                                }
+                            }
+                        } else {
+                            when (position) {
+                                0 -> {
+                                    //Star the message
+                                    starMessage(message.messageId, chatFkey)
+                                    plusDialog.dismiss()
+                                }
+                            }
+                        }
+                    }
+                    //Set some nice padding
+                    .setPadding(50, 50, 50, 50)
+                    //Create the dialog
+                    .create()
+
+            //Show the dialog
+            dialog.show()
         }
 
         /**
