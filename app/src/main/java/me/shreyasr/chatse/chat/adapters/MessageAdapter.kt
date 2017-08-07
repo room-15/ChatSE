@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.text.Html
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -31,6 +32,7 @@ import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
+import org.jsoup.Jsoup
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -96,7 +98,17 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                 //If it's just a plain message, then set the text from HTML
                 if (!message.onebox) {
                     messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.primary_text))
-                    messageView.text = message.content
+                    //If Android version is 24 and above use the updated version, otherwise use the deprecated version
+                    val doc = Jsoup.parseBodyFragment("<span>" + message.content + "</span>")
+                    val parsedHTML = doc.body().unwrap().toString()
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        messageView.text = Html.fromHtml(parsedHTML, Html.FROM_HTML_MODE_LEGACY)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        messageView.text = Html.fromHtml(parsedHTML)
+                    }
+                    messageView.movementMethod = LinkMovementMethod.getInstance()
                 } else {
                     //if it's a onebox, then display it specially
                     when (message.onebox_type) {

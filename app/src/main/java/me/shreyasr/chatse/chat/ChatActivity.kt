@@ -5,7 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.drawable.ColorDrawable
-import android.os.*
+import android.os.Bundle
+import android.os.IBinder
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
@@ -42,8 +43,6 @@ import java.io.IOException
  * ChatActivity is the main activity that sets the Fragment and Drawer layouts
  *
  * @param serviceBinder: IncomingEventServiceBinder that is used to load rooms
- * @param networkHandler: Used to handle network tasks
- * @param uiThreadHandler: Used to handle UI tasks
  * @param soRoomList: A list of all the rooms the user is currently in for StackOverflow
  * @param seRoomList: A list of all the rooms the user is currently in for StackExchange
  * @param fkey: The glorious fkey used to authenticate requests
@@ -52,8 +51,6 @@ import java.io.IOException
  */
 class ChatActivity : AppCompatActivity(), ServiceConnection {
     private lateinit var serviceBinder: IncomingEventServiceBinder
-    private var networkHandler: Handler? = null
-    private val uiThreadHandler = Handler(Looper.getMainLooper())
     val soRoomList = arrayListOf<Room>()
     val seRoomList = arrayListOf<Room>()
     lateinit var fkey: String
@@ -98,11 +95,6 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
         val serviceIntent = Intent(this, IncomingEventService::class.java)
         this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
-
-        //Start network thread handler
-        val handlerThread = HandlerThread("ChatActivityNetworkHandlerThread")
-        handlerThread.start()
-        networkHandler = Handler(handlerThread.looper)
     }
 
     /**
@@ -386,7 +378,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
     //Add the fragment by replacing the current fragment with the new ChatFragment
     private fun addChatFragment(fragment: ChatFragment) {
-        uiThreadHandler.post {
+        runOnUiThread {
             supportFragmentManager
                     .beginTransaction()
                     .replace(R.id.fragmentContainer, fragment)
