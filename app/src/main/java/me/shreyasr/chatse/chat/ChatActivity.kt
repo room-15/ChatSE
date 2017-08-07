@@ -144,7 +144,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         }
 
         //Load a default room
-        loadChatFragment(ChatRoom(Client.SITE_STACK_OVERFLOW, 15))
+        loadChatFragment(ChatRoom(defaultSharedPreferences.getString("lastRoomSite", Client.SITE_STACK_OVERFLOW), defaultSharedPreferences.getInt("lastRoomNum", 15)))
     }
 
     /**
@@ -373,6 +373,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         doAsync {
             addChatFragment(createChatFragment(room))
         }
+        defaultSharedPreferences.edit().putString("lastRoomSite", room.site).putInt("lastRoomNum", room.num).apply()
         drawer_layout.closeDrawers()
     }
 
