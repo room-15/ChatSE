@@ -9,5 +9,7 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
 
+    <color name="stackoverflow_orange">#f48024</color>
+    <color name="stackexchange_blue">#283b5f</color>
     <color name="deleted">#BBBBBB</color>
 </resources>

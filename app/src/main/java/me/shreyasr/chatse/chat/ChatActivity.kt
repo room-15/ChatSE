@@ -4,7 +4,9 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.drawable.ColorDrawable
 import android.os.*
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -82,6 +84,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
+        //Color the toolbar for StackOverflow as a default
+        supportActionBar?.setBackgroundDrawable(ColorDrawable(ContextCompat.getColor(applicationContext, R.color.stackoverflow_orange)))
+
         //On the toggle button pressed open the NavigationDrawer
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -112,7 +117,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
             Ion.with(applicationContext)
                     .load("https://chat.stackoverflow.com/users/thumbs/$userID")
                     .asJsonObject()
-                    .setCallback { e, result ->
+                    .setCallback { _, result ->
                         if (result != null) {
                             userName.text = result.get("name").asString
                             userEmail.text = defaultSharedPreferences.getString("email", "")
@@ -122,7 +127,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
             Ion.with(applicationContext)
                     .load("https://chat.stackexchange.com/users/thumbs/$userID")
                     .asJsonObject()
-                    .setCallback { e, result ->
+                    .setCallback { _, result ->
                         if (result != null) {
                             userName.text = result.get("name").asString
                             userEmail.text = defaultSharedPreferences.getString("email", "")
@@ -161,7 +166,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
             Ion.with(applicationContext)
                     .load("${Client.SITE_STACK_OVERFLOW}/users/thumbs/$soID")
                     .asJsonObject()
-                    .setCallback { e, result ->
+                    .setCallback { _, result ->
                         if (result != null) {
                             //Clear all the rooms and make the text visible
                             soRoomList.clear()
@@ -323,12 +328,13 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                         override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {
                             when (pos) {
-                                //If the first item is clicked, set the site as SO
+                            //If the first item is clicked, set the site as SO
                                 0 -> site = Client.SITE_STACK_OVERFLOW
-                                //Otherwise set to SE
+                            //Otherwise set to SE
                                 1 -> site = Client.SITE_STACK_EXCHANGE
                             }
                         }
+
                         //Default as StackOverflow
                         override fun onNothingSelected(parent: AdapterView<out Adapter>?) {
                             site = Client.SITE_STACK_OVERFLOW
@@ -353,13 +359,13 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     builder.show()
 
                 }
-                //Logout of app by clearing all SharedPreferences and loading the LoginActivity
+            //Logout of app by clearing all SharedPreferences and loading the LoginActivity
                 R.id.action_logout -> {
                     startActivity(Intent(applicationContext, LoginActivity::class.java))
                     defaultSharedPreferences.edit().clear().apply()
                     finish()
                 }
-                //This is handled by the ChatFragment
+            //This is handled by the ChatFragment
                 R.id.room_information -> return false
             }
         }
@@ -372,14 +378,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
     //Load the chat fragment by creating it and adding it
     fun loadChatFragment(room: ChatRoom) {
-        networkHandler?.post {
-            try {
-                addChatFragment(createChatFragment(room))
-            } catch (e: IOException) {
-                Timber.e("Failed to create chat fragment", e)
-            } catch (e: JSONException) {
-                Timber.e("Failed to create chat fragment", e)
-            }
+        doAsync {
+            addChatFragment(createChatFragment(room))
         }
         drawer_layout.closeDrawers()
     }
@@ -402,8 +402,17 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         serviceBinder.joinRoom(room, roomInfo.fkey)
         val chatFragment = ChatFragment.createInstance(room, roomInfo.name, roomInfo.fkey)
         serviceBinder.registerListener(room, chatFragment)
+
+        //Set the title and color of Toolbar depending on room
         runOnUiThread {
             supportActionBar?.title = roomInfo.name
+
+            //If the room is for StackOverflow set the color orange, otherwise SE is blue
+            if (room.site == Client.SITE_STACK_OVERFLOW) {
+                supportActionBar?.setBackgroundDrawable(ColorDrawable(ContextCompat.getColor(applicationContext, R.color.stackoverflow_orange)))
+            } else if (room.site == Client.SITE_STACK_EXCHANGE) {
+                supportActionBar?.setBackgroundDrawable(ColorDrawable(ContextCompat.getColor(applicationContext, R.color.stackexchange_blue)))
+            }
         }
         return chatFragment
     }
