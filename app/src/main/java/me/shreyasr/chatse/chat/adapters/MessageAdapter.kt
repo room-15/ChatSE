@@ -97,13 +97,6 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                 if (!message.onebox) {
                     messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.primary_text))
                     messageView.text = message.content
-                    //If Android version is 24 and above use the updated version, otherwise use the deprecated version
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        messageView.text = Html.fromHtml(message.content, Html.FROM_HTML_MODE_LEGACY)
-                    } else {
-                        @Suppress("DEPRECATION")
-                        messageView.text = Html.fromHtml(message.content)
-                    }
                 } else {
                     //if it's a onebox, then display it specially
                     when (message.onebox_type) {
@@ -118,7 +111,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                             //Set the text to nothing just in case
                             messageView.text = ""
                         }
-                        //For Youtube videos, display the image and some text, linking the view to the video on Youtube
+                    //For Youtube videos, display the image and some text, linking the view to the video on Youtube
                         "youtube" -> {
                             itemView.setOnClickListener {
                                 mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.onebox_extra)))
@@ -130,7 +123,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                                     .intoImageView(itemView.message_image)
                             messageView.text = message.content
                         }
-                        //Other oneboxed items just display the HTML until we implement them all
+                    //Other oneboxed items just display the HTML until we implement them all
                         else -> {
                             Log.d("Onebox", "Type: ${message.onebox_type}")
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
