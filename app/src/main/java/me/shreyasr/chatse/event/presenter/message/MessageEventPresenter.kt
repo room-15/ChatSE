@@ -3,10 +3,13 @@ package me.shreyasr.chatse.event.presenter.message
 import android.content.Context
 import android.util.Log
 import com.koushikdutta.ion.Ion
+import kotlinx.android.synthetic.main.activity_chat.*
+import me.shreyasr.chatse.chat.ChatActivity
 import me.shreyasr.chatse.chat.ChatRoom
 import me.shreyasr.chatse.event.ChatEvent
 import me.shreyasr.chatse.event.presenter.EventPresenter
 import me.shreyasr.chatse.network.Client
+import org.jetbrains.anko.runOnUiThread
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -29,6 +32,7 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
     override fun addEvent(event: ChatEvent, roomNum: Int, context: Context, room: ChatRoom?) {
         //If the event type is not for leaving but definitely exists then continue so we can add the user to the UsersList
         if (event.event_type != ChatEvent.EVENT_TYPE_LEAVE && event.user_id != 0) {
+            Log.wtf("USERS", users.size.toString())
             //If the user is already in the room, move them to the top
             if (users.containsKey(event.user_id.toLong())) {
                 //Create a new MessageEvent and say it's for the users list
@@ -73,6 +77,9 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                                     }
                                     Log.wtf("USERS", users.size.toString())
                                     users.put(newEvent.userId, newEvent)
+//                                    context.runOnUiThread {
+//                                        (context as ChatActivity).room_users.
+//                                    }
                                 }
                             }
                         }

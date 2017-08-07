@@ -15,12 +15,12 @@
             android:id="@+id/load_messages_layout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" >
+            android:layout_weight="1">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/chat_message_list"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent" />
         </android.support.v4.widget.SwipeRefreshLayout>
 
         <LinearLayout
@@ -47,7 +47,7 @@
                 android:layout_weight="1"
                 android:hint="@string/chat_input_hint"
                 android:imeOptions="actionSend"
-                android:inputType="textCapSentences" />
+                android:inputType="textCapSentences|textMultiLine" />
 
             <ImageButton
                 android:id="@+id/chat_input_submit"

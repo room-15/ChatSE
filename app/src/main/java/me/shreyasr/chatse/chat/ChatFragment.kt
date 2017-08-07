@@ -390,7 +390,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
     /**
      * Important function that handles all new events
      * Maps the events to a ChatEvent and adds it to the events list
-     *
      * Also updates adapters to signify there was a new event
      */
     override fun handleNewEvents(messagesJson: JsonNode) {
