@@ -4,10 +4,9 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
-
     defaultConfig {
         applicationId "me.shreyasr.chatse"
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -23,6 +22,8 @@ android {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
     }
+    productFlavors {
+    }
 }
 
 dependencies {
@@ -34,7 +35,7 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.squareup.okhttp:okhttp:2.4.0'
     implementation 'com.squareup.okhttp:okhttp-ws:2.4.0'
-    implementation "org.jetbrains.anko:anko-commons:0.10.1"
+    implementation 'org.jetbrains.anko:anko-commons:0.10.1'
     implementation 'org.jsoup:jsoup:1.10.2'
     implementation 'org.codehaus.jackson:jackson-mapper-asl:1.8.5'
     implementation 'org.unbescape:unbescape:1.1.1.RELEASE'
@@ -42,6 +43,7 @@ dependencies {
     implementation 'com.orhanobut:dialogplus:1.11@aar'
     implementation 'com.koushikdutta.ion:ion:2.2.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation 'me.saket:better-link-movement-method:1.2'
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.9.5'
     testCompile 'com.squareup.okhttp:mockwebserver:2.4.0'

@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.text.Html
 import android.text.method.LinkMovementMethod
+import android.text.util.Linkify
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -24,6 +25,7 @@ import com.orhanobut.dialogplus.ListHolder
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import kotlinx.android.synthetic.main.list_item_message.view.*
+import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.ChatRoom
 import me.shreyasr.chatse.event.EventList
@@ -121,7 +123,8 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                         @Suppress("DEPRECATION")
                         messageView.text = Html.fromHtml(parsedHTML)
                     }
-                    messageView.movementMethod = LinkMovementMethod.getInstance()
+                    BetterLinkMovementMethod.linkify(Linkify.ALL, messageView)
+//                    messageView.movementMethod = LinkMovementMethod.getInstance()
                 } else {
                     //if it's a onebox, then display it specially
                     when (message.onebox_type) {
