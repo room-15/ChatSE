@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -17,6 +16,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Html
@@ -107,13 +107,13 @@ class ChatFragment : Fragment(), IncomingEventListener {
         if (room.site == Client.SITE_STACK_OVERFLOW) {
             //Set the multitasking color to orange
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                activity.setTaskDescription(ActivityManager.TaskDescription(ActivityManager.TaskDescription().label, ActivityManager.TaskDescription().icon, ContextCompat.getColor(activity, R.color.stackoverflow_orange)))
+                activity.setTaskDescription(ActivityManager.TaskDescription((activity as AppCompatActivity).supportActionBar?.title.toString(), ActivityManager.TaskDescription().icon, ContextCompat.getColor(activity, R.color.stackoverflow_orange)))
             }
 
         } else if (room.site == Client.SITE_STACK_EXCHANGE) {
             //Set the multitasking color to blue
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                activity.setTaskDescription(ActivityManager.TaskDescription(ActivityManager.TaskDescription().label, ActivityManager.TaskDescription().icon, ContextCompat.getColor(activity, R.color.stackexchange_blue)))
+                activity.setTaskDescription(ActivityManager.TaskDescription((activity as AppCompatActivity).supportActionBar?.title.toString(), ActivityManager.TaskDescription().icon, ContextCompat.getColor(activity, R.color.stackexchange_blue)))
             }
         }
         //Set the EventList by the room number

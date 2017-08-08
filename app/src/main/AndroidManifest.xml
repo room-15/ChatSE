@@ -27,8 +27,6 @@
             android:name=".chat.service.IncomingEventService"
             android:enabled="true"
             android:exported="false" />
-
-        <activity android:name=".chat.RoomSearchActivity" />
     </application>
 
 </manifest>
