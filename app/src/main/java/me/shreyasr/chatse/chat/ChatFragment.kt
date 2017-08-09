@@ -123,8 +123,28 @@ class ChatFragment : Fragment(), IncomingEventListener {
     //When the fragment view is created
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+
+        //Create a variable for changing the theme
+        var contextThemeWrapper = ContextThemeWrapper(activity, R.style.AppTheme_SO)
+
+        //Depending on the room, change the theme and status bar color
+        if (room.site == Client.SITE_STACK_OVERFLOW) {
+            //Check version and set status bar color, theme already defaulted to SO
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                activity.window.statusBarColor = ContextCompat.getColor(activity, R.color.primary_dark)
+            }
+        } else if (room.site == Client.SITE_STACK_EXCHANGE) {
+            //Set theme to SE and color to SE color
+            contextThemeWrapper = ContextThemeWrapper(activity, R.style.AppTheme_SE)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                activity.window.statusBarColor = ContextCompat.getColor(activity, R.color.se_primary_dark)
+            }
+        }
+
+        val localInflater = inflater.cloneInContext(contextThemeWrapper)
+
         //Inflate the chat fragment view
-        val view = inflater.inflate(R.layout.fragment_chat, container, false)
+        val view = localInflater.inflate(R.layout.fragment_chat, container, false)
 
         //Set a onClickListener for the submit button
         view.chat_input_submit.setOnClickListener {
@@ -345,7 +365,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     openFileChooser()
                 } else {
-                    Toast.makeText(activity, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show()
                 }
                 return
             }
