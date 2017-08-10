@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
@@ -19,7 +20,7 @@ import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import org.jsoup.Jsoup
-import timber.log.Timber
+
 import java.io.IOException
 
 
@@ -166,7 +167,7 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(this@LoginActivity, "Failed to log in, try again!", Toast.LENGTH_LONG).show()
                 }
             } catch (e: IOException) {
-                Timber.e(e)
+                Log.e("LoginActivity", e.message)
             }
         }
     }
@@ -303,7 +304,6 @@ class LoginActivity : AppCompatActivity() {
                 .post(seLoginRequestBody)
                 .build()
         val seLoginResponse = client.newCall(seLoginRequest).execute()
-        Timber.i("Se openid login: " + seLoginResponse.toString())
     }
 
     /**

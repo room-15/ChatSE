@@ -38,7 +38,7 @@ import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.json.JSONException
 import org.json.JSONObject
-import timber.log.Timber
+
 import java.io.IOException
 
 /**
@@ -74,10 +74,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         stackexchange_room_list.layoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
 
         //Notify data is changed
-        runOnUiThread {
-            soRoomAdapter.notifyDataSetChanged()
-            seRoomAdapter.notifyDataSetChanged()
-        }
+        soRoomAdapter.notifyDataSetChanged()
+        seRoomAdapter.notifyDataSetChanged()
 
         //Set toolbar as SupportActionBar
         val toolbar = findViewById(R.id.toolbar) as Toolbar
@@ -136,7 +134,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
      * When network is connected add the rooms to the drawer
      */
     override fun onServiceConnected(name: ComponentName, binder: IBinder) {
-        Timber.d("Service connect")
+        Log.d("onServiceConnected", "Service connect")
         serviceBinder = binder as IncomingEventServiceBinder
 
         //Asynchronously add rooms to drawer
@@ -150,11 +148,21 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     }
 
     /**
-     * On resume reload, just in case.
+     * onDestroy unbind the bound IncomingEventService
+     * Protects from leaking.
+     */
+    override fun onDestroy() {
+        super.onDestroy()
+        unbindService(this)
+    }
+
+    /**
+     * On resume rebind the service to listen for incoming events
      */
     override fun onResume() {
         super.onResume()
-        loadChatFragment(ChatRoom(defaultSharedPreferences.getString("lastRoomSite", Client.SITE_STACK_OVERFLOW), defaultSharedPreferences.getInt("lastRoomNum", 15)))
+        val serviceIntent = Intent(this, IncomingEventService::class.java)
+        this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
     }
 
     /**

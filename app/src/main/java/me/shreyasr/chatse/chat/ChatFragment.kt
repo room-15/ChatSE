@@ -49,7 +49,7 @@ import org.codehaus.jackson.JsonNode
 import org.codehaus.jackson.map.ObjectMapper
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
-import timber.log.Timber
+
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -427,12 +427,17 @@ class ChatFragment : Fragment(), IncomingEventListener {
      * Also updates adapters to signify there was a new event
      */
     override fun handleNewEvents(messagesJson: JsonNode) {
+        if (this.activity == null) {
+            Log.e("handleNewEvents", "this.activity is null")
+            return
+        }
         messagesJson
                 .mapNotNull { chatEventGenerator.createEvent(it) }
                 .filter { it.room_id == room.num }
                 .forEach {
                     events.addEvent(it, this.activity, room)
                 }
+
 
         //Update adapters so we know to check for new events
         activity.runOnUiThread {
@@ -555,7 +560,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 .build()
 
         client.newCall(newMessageRequest).execute()
-        Timber.i("New message")
     }
 
     companion object {

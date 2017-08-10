@@ -79,10 +79,10 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
         val oneboxImage = itemView.findViewById(R.id.message_image) as ImageView
 
         fun bindMessage(message: MessageEvent) {
-            //Make sure the image is gone unless needed later
+            //Hide elements in case not used
             oneboxImage.visibility = View.GONE
-            //Same with the indicator for starred messages
             starIndicator.visibility = View.GONE
+            starCount.visibility = View.GONE
 
             if (room?.site == Client.SITE_STACK_OVERFLOW) {
                 if (message.userId == mContext.defaultSharedPreferences.getInt("SOID", -1).toLong()) {

@@ -39,7 +39,6 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.10.2'
     implementation 'org.codehaus.jackson:jackson-mapper-asl:1.8.5'
     implementation 'org.unbescape:unbescape:1.1.1.RELEASE'
-    implementation 'com.jakewharton.timber:timber:4.5.1'
     implementation 'com.orhanobut:dialogplus:1.11@aar'
     implementation 'com.koushikdutta.ion:ion:2.2.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"

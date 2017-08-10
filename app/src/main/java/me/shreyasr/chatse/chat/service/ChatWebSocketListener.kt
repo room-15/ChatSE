@@ -1,5 +1,6 @@
 package me.shreyasr.chatse.chat.service
 
+import android.util.Log
 import com.squareup.okhttp.Response
 import com.squareup.okhttp.ws.WebSocket
 import com.squareup.okhttp.ws.WebSocketListener
@@ -7,7 +8,7 @@ import okio.Buffer
 import okio.BufferedSource
 import org.codehaus.jackson.JsonNode
 import org.codehaus.jackson.map.ObjectMapper
-import timber.log.Timber
+
 import java.io.IOException
 
 /**
@@ -17,14 +18,12 @@ class ChatWebSocketListener(private val site: String, private val listener: Serv
     private val mapper = ObjectMapper()
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
-        Timber.i("websocket open: " + site)
+        Log.i("ChatWebSocketListener", "websocket open: " + site)
         listener.onConnect(site, true)
     }
 
     override fun onFailure(e: IOException, response: Response?) {
-        Timber.i("websocket fail: $site")
         listener.onConnect(site, false)
-        Timber.e(e)
     }
 
     @Throws(IOException::class)
@@ -32,22 +31,21 @@ class ChatWebSocketListener(private val site: String, private val listener: Serv
                            type: WebSocket.PayloadType) {
         val message = payload.readUtf8()
         payload.close()
-        Timber.i("websocket message: $site: $message")
         try {
             val root = mapper.readTree(message)
             listener.onNewEvents(site, root)
         } catch (e: IOException) {
-            Timber.e(e)
+            Log.e("ChatWebSocketListener", e.message)
         }
 
     }
 
     override fun onPong(payload: Buffer) {
-        Timber.i("websocket pong: $site")
+        Log.i("ChatWebSocketListener", "websocket pong: $site")
     }
 
     override fun onClose(code: Int, reason: String) {
-        Timber.i("websocket close: $site: $code, $reason")
+        Log.i("ChatWebSocketListener", "websocket close: $site: $code, $reason")
     }
 
     interface ServiceWebsocketListener {

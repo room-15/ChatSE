@@ -13,7 +13,7 @@ import org.codehaus.jackson.JsonNode
 import org.json.JSONException
 import org.json.JSONObject
 import org.jsoup.Jsoup
-import timber.log.Timber
+
 import java.io.IOException
 import java.util.*
 
@@ -30,7 +30,7 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
 
     override fun onDestroy() {
         super.onDestroy()
-        Timber.d("onDestroy")
+        Log.d("IncomingEventService", "onDestroy")
     }
 
     fun registerListener(room: ChatRoom, listener: IncomingEventListener) {
@@ -67,8 +67,6 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
 
         val fkey = chatPage.select("input[name=fkey]").attr("value")
         val name = chatPage.select("span[id=roomname]").text()
-
-        Timber.i("Loaded room: $name")
 
         return RoomInfo(name, fkey)
     }
