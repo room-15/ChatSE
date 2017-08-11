@@ -315,7 +315,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
             when (item.itemId) {
                 R.id.search_rooms -> {
                     //Create an AlertDialog to join a room
-                    val builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
+                    val builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme_SO))
 
                     //Set the title
                     builder.setTitle("Join Room")
