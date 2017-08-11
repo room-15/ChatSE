@@ -329,7 +329,14 @@ class LoginActivity : AppCompatActivity() {
         val sePageDoc = Jsoup.parse(sePageResponse.body().string())
 
         //Get the URL from the topbar (to their profile)
-        val url = sePageDoc.getElementsByClass("topbar-menu-links")[0].child(0).attr("href")
+        val element = sePageDoc.getElementsByClass("topbar-menu-links")[0].child(0)
+
+        val url: String
+        if (element.hasAttr("title")) {
+            url = element.attr("href")
+        } else {
+            return
+        }
 
         //Split the URL and get's their id which is between two slashes /theirid/their-profile-name
         val res = url.split("/")[2]
