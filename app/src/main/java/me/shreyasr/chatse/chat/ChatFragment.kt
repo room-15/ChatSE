@@ -329,6 +329,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                                         tagview.background = ContextCompat.getDrawable(context, R.drawable.tag_background)
                                     } else {
+                                        @Suppress("DEPRECATION")
                                         tagview.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.tag_background))
                                     }
 

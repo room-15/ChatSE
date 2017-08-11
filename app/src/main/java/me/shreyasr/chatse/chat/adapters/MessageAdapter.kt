@@ -215,7 +215,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                     .setContentHolder(ListHolder())
                     .setGravity(Gravity.CENTER)
                     .setAdapter(ModifyMessageAdapter(dialogMessages, mContext))
-                    .setOnItemClickListener { plusDialog, item, _, position ->
+                    .setOnItemClickListener { plusDialog, _, _, position ->
                         //The clicking of items depends on how many and whether it's the user's message
                         if (isUserMessage) {
                             when (position) {
