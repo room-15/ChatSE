@@ -303,7 +303,7 @@ class LoginActivity : AppCompatActivity() {
                 .url("https://openid.stackexchange.com/account/login/submit/")
                 .post(seLoginRequestBody)
                 .build()
-        val seLoginResponse = client.newCall(seLoginRequest).execute()
+        client.newCall(seLoginRequest).execute()
     }
 
     /**

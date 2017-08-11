@@ -39,9 +39,6 @@ class ModifyMessageAdapter(val dialogMessages: MutableList<String>, context: Con
         } else {
             viewHolder = view.tag as ViewHolder
         }
-
-        val context = parent.context
-
         viewHolder.textView?.text = dialogMessages[position]
 
         return view
