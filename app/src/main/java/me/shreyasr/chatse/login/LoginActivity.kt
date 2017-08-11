@@ -91,15 +91,14 @@ class LoginActivity : AppCompatActivity() {
      * @param LoginAsyncTask is called
      */
     fun attemptLogin() {
-        // TODO change to set clickable.
-//        loginButton.isEnabled = false
+        loginButton.isEnabled = false
 
         // Reset errors.
         emailView.error = null
         passwordView.error = null
 
         if (!validateInputs()) {
-//            loginButton.isEnabled = true
+            loginButton.isEnabled = true
             return
         }
 
@@ -165,7 +164,7 @@ class LoginActivity : AppCompatActivity() {
                 } else {
                     runOnUiThread {
 //                        progressBar.visibility = View.GONE
-//                        loginButton.isEnabled = true
+                        loginButton.isEnabled = true
                         Toast.makeText(this@LoginActivity, "Failed to log in, try again!", Toast.LENGTH_LONG).show()
                     }
                 }
