@@ -162,9 +162,11 @@ class LoginActivity : AppCompatActivity() {
                         this@LoginActivity.finish()
                     }
                 } else {
-                    progressBar.visibility = View.GONE
-                    loginButton.isEnabled = false
-                    Toast.makeText(this@LoginActivity, "Failed to log in, try again!", Toast.LENGTH_LONG).show()
+                    runOnUiThread {
+                        progressBar.visibility = View.GONE
+                        loginButton.isEnabled = true
+                        Toast.makeText(this@LoginActivity, "Failed to log in, try again!", Toast.LENGTH_LONG).show()
+                    }
                 }
             } catch (e: IOException) {
                 Log.e("LoginActivity", e.message)
@@ -214,7 +216,15 @@ class LoginActivity : AppCompatActivity() {
          * @accountId is used for the StackExchange userID
          * @userId is used for the StackOverflow userID
          */
-        val initElement = scriptElements.toMutableList().filter { it.html().contains("userId") && it.html().contains("accountId") }[0].html()
+        val initElements = scriptElements.filter { it.html().contains("userId") && it.html().contains("accountId") }
+        val initElement: String
+
+        //Verify that there's the correct script tag, otherwise the login was bad
+        if (initElements.isNotEmpty()) {
+            initElement = initElements[0].html()
+        } else {
+            return false
+        }
 
         //Verify this element contains the following text, meaning it's the one we want
         if (initElement.contains("StackExchange.init(")) {
