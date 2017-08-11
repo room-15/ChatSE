@@ -3,12 +3,13 @@ package me.shreyasr.chatse.login
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.util.Log
-import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.*
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import me.shreyasr.chatse.App
@@ -20,7 +21,6 @@ import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import org.jsoup.Jsoup
-
 import java.io.IOException
 
 
@@ -37,8 +37,8 @@ class LoginActivity : AppCompatActivity() {
      */
     lateinit var emailView: EditText
     lateinit var passwordView: EditText
-    lateinit var progressBar: ProgressBar
-    lateinit var loginButton: Button
+//    lateinit var progressBar: ProgressBar
+    lateinit var loginButton: FloatingActionButton
     lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,17 +53,17 @@ class LoginActivity : AppCompatActivity() {
         }
 
         //If the user has not logged in already, display the chat login layout
-        setContentView(R.layout.activity_login)
+        setContentView(R.layout.activity_login_beautiful)
 
         // Set variables to the layout
         emailView = findViewById(R.id.login_email) as EditText
         passwordView = findViewById(R.id.login_password) as EditText
-        progressBar = findViewById(R.id.login_progress) as ProgressBar
-        loginButton = findViewById(R.id.login_submit) as Button
+//        progressBar = findViewById(R.id.login_progress) as ProgressBar
+        loginButton = findViewById(R.id.fab_submit) as FloatingActionButton
 
         //Set the toolbar as the SupportActionBar for the Activity
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
-        setSupportActionBar(toolbar)
+//        val toolbar = findViewById(R.id.toolbar) as Toolbar
+//        setSupportActionBar(toolbar)
 
         //If the loginButton is clicked attempt a login.
         loginButton.setOnClickListener { attemptLogin() }
@@ -102,7 +102,7 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        progressBar.visibility = View.VISIBLE
+//        progressBar.visibility = View.VISIBLE
 
         loginToSites(emailView.text.toString(), passwordView.text.toString())
     }
@@ -163,7 +163,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                 } else {
                     runOnUiThread {
-                        progressBar.visibility = View.GONE
+//                        progressBar.visibility = View.GONE
                         loginButton.isEnabled = true
                         Toast.makeText(this@LoginActivity, "Failed to log in, try again!", Toast.LENGTH_LONG).show()
                     }
