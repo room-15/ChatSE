@@ -20,7 +20,6 @@ import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import org.jsoup.Jsoup
-
 import java.io.IOException
 
 
@@ -47,8 +46,8 @@ class LoginActivity : AppCompatActivity() {
         //Determine if the user has logged in already, if they have, proceed to the ChatActivity and finish the LoginActivity
         prefs = App.sharedPreferences
         if (prefs.getBoolean(App.PREF_HAS_CREDS, false)) {
-            this.startActivity(Intent(this, ChatActivity::class.java))
-            this.finish()
+            startActivity(Intent(this, ChatActivity::class.java))
+            finish()
             return
         }
 
@@ -153,8 +152,8 @@ class LoginActivity : AppCompatActivity() {
             try {
                 val client = ClientManager.client
 
-                if (loginToSite(client, "https://stackoverflow.com", email, password)) {
-                    seOpenIdLogin(client, email, password)
+                if (seOpenIdLogin(client, email, password)) {
+                    loginToSite(client, "https://stackoverflow.com", email, password)
                     loginToSE(client)
                     runOnUiThread {
                         prefs.edit().putBoolean(App.PREF_HAS_CREDS, true).apply()
@@ -294,7 +293,7 @@ class LoginActivity : AppCompatActivity() {
      * @param client = the OkHttp ClientManager.client
      */
     @Throws(IOException::class)
-    private fun seOpenIdLogin(client: Client, email: String, password: String) {
+    private fun seOpenIdLogin(client: Client, email: String, password: String): Boolean {
         val seLoginPageRequest = Request.Builder()
                 .url("https://openid.stackexchange.com/account/login/")
                 .build()
@@ -313,7 +312,9 @@ class LoginActivity : AppCompatActivity() {
                 .url("https://openid.stackexchange.com/account/login/submit/")
                 .post(seLoginRequestBody)
                 .build()
-        client.newCall(seLoginRequest).execute()
+        val response = client.newCall(seLoginRequest).execute()
+        val title = Jsoup.parse(response.body().string()).title()
+        return !title.contains("error")
     }
 
     /**

@@ -44,7 +44,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.net.HttpCookie;
 
-public class SerializableHttpCookie implements Serializable {
+class SerializableHttpCookie implements Serializable {
     private static final String TAG = SerializableHttpCookie.class
             .getSimpleName();
 
@@ -57,10 +57,10 @@ public class SerializableHttpCookie implements Serializable {
     // need to access it using reflection
     private Field fieldHttpOnly;
 
-    public SerializableHttpCookie() {
+    SerializableHttpCookie() {
     }
 
-    public String encode(HttpCookie cookie) {
+    String encode(HttpCookie cookie) {
         this.cookie = cookie;
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -75,7 +75,7 @@ public class SerializableHttpCookie implements Serializable {
         return byteArrayToHexString(os.toByteArray());
     }
 
-    public HttpCookie decode(String encodedCookie) {
+    HttpCookie decode(String encodedCookie) {
         byte[] bytes = hexStringToByteArray(encodedCookie);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
                 bytes);

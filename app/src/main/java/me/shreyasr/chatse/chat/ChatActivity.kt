@@ -27,6 +27,7 @@ import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.room_nav_header.*
+import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.adapters.RoomAdapter
 import me.shreyasr.chatse.chat.service.IncomingEventService
@@ -34,6 +35,7 @@ import me.shreyasr.chatse.chat.service.IncomingEventServiceBinder
 import me.shreyasr.chatse.login.LoginActivity
 import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
+import me.shreyasr.chatse.network.cookie.PersistentCookieStore
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.json.JSONException
@@ -154,6 +156,10 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     override fun onDestroy() {
         super.onDestroy()
         unbindService(this)
+        if (!defaultSharedPreferences.contains(App.PREF_HAS_CREDS)) {
+            PersistentCookieStore(App.instance).removeAll()
+            startActivity(Intent(applicationContext, LoginActivity::class.java))
+        }
     }
 
     /**
@@ -180,9 +186,10 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                         if (result != null) {
                             //Clear all the rooms and make the text visible
                             soRoomList.clear()
-                            so_header_text.visibility = View.VISIBLE
-                            stackoverflow_room_list.visibility = View.VISIBLE
-
+                            runOnUiThread {
+                                so_header_text.visibility = View.VISIBLE
+                                stackoverflow_room_list.visibility = View.VISIBLE
+                            }
                             //For each room, create a room and add it to the list
                             val rooms = result.get("rooms").asJsonArray
                             rooms.forEach {
@@ -194,14 +201,18 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                             }
                             //If the rooms are empty then remove the list and header
                             if (rooms.size() == 0) {
-                                so_header_text.visibility = View.GONE
-                                stackoverflow_room_list.visibility = View.GONE
+                                runOnUiThread {
+                                    so_header_text.visibility = View.GONE
+                                    stackoverflow_room_list.visibility = View.GONE
+                                }
                             }
                         }
                     }
         } else {
-            so_header_text.visibility = View.GONE
-            stackoverflow_room_list.visibility = View.GONE
+            runOnUiThread {
+                so_header_text.visibility = View.GONE
+                stackoverflow_room_list.visibility = View.GONE
+            }
         }
 
         //If the user has a StackExchange ID then load rooms
@@ -217,9 +228,10 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                             if (result != null) {
                                 //Clear all the rooms and make the text visible
                                 seRoomList.clear()
-                                se_header_text.visibility = View.VISIBLE
-                                stackexchange_room_list.visibility = View.VISIBLE
-
+                                runOnUiThread {
+                                    se_header_text.visibility = View.VISIBLE
+                                    stackexchange_room_list.visibility = View.VISIBLE
+                                }
                                 //For each room, create a room and add it to the list
                                 val rooms = result.get("rooms").asJsonArray
                                 rooms.forEach {
@@ -231,15 +243,19 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                                 }
                                 //If the rooms are empty then remove the list and header
                                 if (rooms.size() == 0) {
-                                    se_header_text.visibility = View.GONE
-                                    stackexchange_room_list.visibility = View.GONE
+                                    runOnUiThread {
+                                        se_header_text.visibility = View.GONE
+                                        stackexchange_room_list.visibility = View.GONE
+                                    }
                                 }
                             }
                         }
                     }
         } else {
-            se_header_text.visibility = View.GONE
-            stackexchange_room_list.visibility = View.GONE
+            runOnUiThread {
+                se_header_text.visibility = View.GONE
+                stackexchange_room_list.visibility = View.GONE
+            }
         }
     }
 
@@ -367,11 +383,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
                     //Show the dialog
                     builder.show()
-
                 }
             //Logout of app by clearing all SharedPreferences and loading the LoginActivity
                 R.id.action_logout -> {
-                    startActivity(Intent(applicationContext, LoginActivity::class.java))
                     defaultSharedPreferences.edit().clear().apply()
                     finish()
                 }

@@ -429,7 +429,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
      */
     override fun handleNewEvents(messagesJson: JsonNode) {
         if (this.activity == null) {
-            Log.e("handleNewEvents", "this.activity is null")
             return
         }
         messagesJson
