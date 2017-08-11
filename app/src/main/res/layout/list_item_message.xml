@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
@@ -30,8 +31,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:alpha="0.2"
-            android:src="@drawable/ic_edit_black_18dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_edit_black_18dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -44,8 +45,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:alpha="0.2"
-                android:src="@drawable/ic_star_black"
-                android:visibility="gone" />
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_star_black" />
 
             <TextView
                 android:id="@+id/message_star_count"
