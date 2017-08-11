@@ -3,6 +3,7 @@
     <color name="primary">#f48024</color>
     <color name="primary_dark">#F16D1B</color>
     <color name="primary_light">#FCD9BD</color>
+    <color name="color_accent">#607D8B</color>
 
     <color name="se_primary">#283b5f</color>
     <color name="se_primary_dark">#1E2D4D</color>
@@ -13,6 +14,9 @@
     <color name="secondary_text">#727272</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
 
     <color name="stackoverflow_orange">#f48024</color>
     <color name="stackexchange_blue">#283b5f</color>

@@ -9,6 +9,8 @@
     <string name="join_room">Join Room</string>
     <string name="title_activity_main">MainActivity</string>
 
+    <string name="act_login_header">Login</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="take_photo">Take Photo</string>
