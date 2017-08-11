@@ -156,8 +156,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:clickable="false"
                 android:tint="@color/white"
+                android:elevation="16dp"
+                app:elevation="16dp"
                 app:srcCompat="@drawable/ic_done_black"
                 app:layout_anchor="@id/activity_login_card"
                 app:layout_anchorGravity="bottom|center_horizontal"/>
