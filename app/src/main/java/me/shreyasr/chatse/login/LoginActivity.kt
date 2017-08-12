@@ -237,7 +237,7 @@ class LoginActivity : AppCompatActivity() {
                 val SEID = JSONObject(json).getJSONObject("user").getInt("accountId")
 
                 //Save the two IDs in the shared preferences
-                defaultSharedPreferences.edit().putInt("SOID", SOID).putInt("SEMAINID", SEID).putString("email", email).apply()
+                defaultSharedPreferences.edit().putInt("SOID", SOID).putString("email", email).apply()
             } else {
                 return false
             }
@@ -285,10 +285,7 @@ class LoginActivity : AppCompatActivity() {
         body.close()
 
         //Get the main StackExchange ID (which is different from the SE user's chat ID and set the chat ID by calling setSEChatId
-        val SEID = defaultSharedPreferences.getInt("SEMAINID", -1)
-        if (SEID != -1) {
-            setSEChatId(client)
-        }
+        setSEChatId()
     }
 
     /**
@@ -327,11 +324,13 @@ class LoginActivity : AppCompatActivity() {
      * Gets the user's chat ID for StackExchange which is different from their normal ID
      * Sets it to the defaultSharedPreferences as "SEID"
      */
-    private fun setSEChatId(client: OkHttpClient) {
+    private fun setSEChatId() {
+        Log.wtf("Happening", "SECHATID")
+
         val sePageRequest = Request.Builder()
                 .url("https://chat.stackexchange.com/")
                 .build()
-        val sePageResponse = client.newCall(sePageRequest).execute()
+        val sePageResponse = ClientManager.client.newCall(sePageRequest).execute()
 
         val sePageDoc = Jsoup.parse(sePageResponse.body().string())
         sePageResponse.body().close()
@@ -348,6 +347,7 @@ class LoginActivity : AppCompatActivity() {
 
         //Split the URL and get's their id which is between two slashes /theirid/their-profile-name
         val res = url.split("/")[2]
+        Log.wtf("ResPONSE", "Res: $res \n HTML: ${sePageDoc.body()}")
         defaultSharedPreferences.edit().putInt("SEID", res.toInt()).apply()
     }
 }

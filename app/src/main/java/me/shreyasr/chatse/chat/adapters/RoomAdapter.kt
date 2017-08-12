@@ -105,7 +105,7 @@ class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Co
                         .url(site + "/chats/leave/" + roomID)
                         .post(soRequestBody)
                         .build()
-                client.newCall(soChatPageRequest).execute()
+                client.newCall(soChatPageRequest).execute().body().close()
             }
         }
 
@@ -128,7 +128,7 @@ class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Co
                         .url(site + "/rooms/favorite/")
                         .post(soRequestBody)
                         .build()
-                client.newCall(soChatPageRequest).execute()
+                client.newCall(soChatPageRequest).execute().body().close()
             }
         }
 

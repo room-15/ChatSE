@@ -91,7 +91,7 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
                 .url(App.SITE_STACK_OVERFLOW + "/chats/join/" + room.num)
                 .post(soRequestBody)
                 .build()
-        client.newCall(soChatPageRequest).execute()
+        client.newCall(soChatPageRequest).execute().body().close()
     }
 
     @Throws(IOException::class, JSONException::class)

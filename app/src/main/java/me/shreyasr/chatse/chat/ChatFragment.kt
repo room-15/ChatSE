@@ -561,7 +561,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 .post(newMessageRequestBody)
                 .build()
 
-        client.newCall(newMessageRequest).execute()
+        client.newCall(newMessageRequest).execute().body().close()
     }
 
     companion object {

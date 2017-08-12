@@ -475,7 +475,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     .build()
 
             //Execute call
-            ClientManager.client.newCall(soChatPageRequest).execute()
+            ClientManager.client.newCall(soChatPageRequest).execute().body().close()
 
             //Do the same for StackExchange
             val seRoomInfo = serviceBinder.loadRoom(ChatRoom(App.SITE_STACK_EXCHANGE, 1))
@@ -488,7 +488,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     .url(App.SITE_STACK_EXCHANGE + "/chats/join/favorite")
                     .post(seRequestBody)
                     .build()
-            ClientManager.client.newCall(seChatPageRequest).execute()
+            ClientManager.client.newCall(seChatPageRequest).execute().body().close()
         }
     }
 }

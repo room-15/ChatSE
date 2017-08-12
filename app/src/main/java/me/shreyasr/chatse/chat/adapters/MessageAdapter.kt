@@ -268,7 +268,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                         .build()
 
                 //Star that message!
-                client.newCall(soChatPageRequest).execute()
+                client.newCall(soChatPageRequest).execute().body().close()
             }
         }
 
@@ -291,7 +291,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                         .url("https://chat.stackoverflow.com/messages/$messageId/delete")
                         .post(soLoginRequestBody)
                         .build()
-                client.newCall(soChatPageRequest).execute()
+                client.newCall(soChatPageRequest).execute().body().close()
             }
         }
 
@@ -363,7 +363,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                         .build()
 
                 //Extermin... I mean, Execute
-                client.newCall(soChatPageRequest).execute()
+                client.newCall(soChatPageRequest).execute().body().close()
             }
         }
     }

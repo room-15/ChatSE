@@ -21,6 +21,5 @@ object ClientManager {
                 .addHeader("User-Agent", App.USER_AGENT)
                 .build()
         chain.proceed(requestWithUserAgent)
-
     }.build()
 }
