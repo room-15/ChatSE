@@ -325,8 +325,6 @@ class LoginActivity : AppCompatActivity() {
      * Sets it to the defaultSharedPreferences as "SEID"
      */
     private fun setSEChatId() {
-        Log.wtf("Happening", "SECHATID")
-
         val sePageRequest = Request.Builder()
                 .url("https://chat.stackexchange.com/")
                 .build()
@@ -347,7 +345,6 @@ class LoginActivity : AppCompatActivity() {
 
         //Split the URL and get's their id which is between two slashes /theirid/their-profile-name
         val res = url.split("/")[2]
-        Log.wtf("ResPONSE", "Res: $res \n HTML: ${sePageDoc.body()}")
         defaultSharedPreferences.edit().putInt("SEID", res.toInt()).apply()
     }
 }
