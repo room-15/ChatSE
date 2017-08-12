@@ -13,7 +13,6 @@ import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.ChatActivity
 import me.shreyasr.chatse.network.ClientManager
-import me.shreyasr.chatse.network.cookie.PersistentCookieStore
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request

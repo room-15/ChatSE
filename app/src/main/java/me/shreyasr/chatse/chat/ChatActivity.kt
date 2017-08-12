@@ -22,6 +22,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import com.franmontiel.persistentcookiejar.PersistentCookieJar
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.koushikdutta.ion.Ion
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.room_nav_header.*
@@ -32,7 +34,6 @@ import me.shreyasr.chatse.chat.service.IncomingEventService
 import me.shreyasr.chatse.chat.service.IncomingEventServiceBinder
 import me.shreyasr.chatse.login.LoginActivity
 import me.shreyasr.chatse.network.ClientManager
-import me.shreyasr.chatse.network.cookie.PersistentCookieStore
 import okhttp3.FormBody
 import okhttp3.Request
 import org.jetbrains.anko.defaultSharedPreferences
@@ -155,7 +156,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         super.onDestroy()
         unbindService(this)
         if (!defaultSharedPreferences.contains(App.PREF_HAS_CREDS)) {
-            PersistentCookieStore(App.instance).removeAll()
+            (ClientManager.client.cookieJar() as PersistentCookieJar).clear()
             startActivity(Intent(applicationContext, LoginActivity::class.java))
         }
     }
