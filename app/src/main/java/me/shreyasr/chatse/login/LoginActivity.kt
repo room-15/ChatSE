@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
@@ -37,7 +36,7 @@ class LoginActivity : AppCompatActivity() {
      */
     lateinit var emailView: EditText
     lateinit var passwordView: EditText
-//    lateinit var progressBar: ProgressBar
+    //    lateinit var progressBar: ProgressBar
     lateinit var loginButton: FloatingActionButton
     lateinit var prefs: SharedPreferences
 
@@ -72,10 +71,9 @@ class LoginActivity : AppCompatActivity() {
         emailView.setText(prefs.getString(App.PREF_EMAIL, ""))
 
         //When the user presses submit inside the passwordView, attempt a login.
-        passwordView.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
+        passwordView.setOnEditorActionListener({ _, id, _ ->
             if (id == R.id.login_submit || id == EditorInfo.IME_NULL) {
                 attemptLogin()
-                return@OnEditorActionListener true
             }
             false
         })
@@ -163,7 +161,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                 } else {
                     runOnUiThread {
-//                        progressBar.visibility = View.GONE
+                        //                        progressBar.visibility = View.GONE
                         loginButton.isEnabled = true
                         Toast.makeText(this@LoginActivity, "Failed to log in, try again!", Toast.LENGTH_LONG).show()
                     }

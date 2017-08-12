@@ -156,10 +156,6 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     override fun onDestroy() {
         super.onDestroy()
         unbindService(this)
-        if (!defaultSharedPreferences.contains(App.PREF_HAS_CREDS)) {
-            PersistentCookieStore(App.instance).removeAll()
-            startActivity(Intent(applicationContext, LoginActivity::class.java))
-        }
     }
 
     /**
@@ -387,6 +383,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
             //Logout of app by clearing all SharedPreferences and loading the LoginActivity
                 R.id.action_logout -> {
                     defaultSharedPreferences.edit().clear().apply()
+                    PersistentCookieStore(App.instance).removeAll()
+                    startActivity(Intent(applicationContext, LoginActivity::class.java))
                     finish()
                 }
             //This is handled by the ChatFragment
