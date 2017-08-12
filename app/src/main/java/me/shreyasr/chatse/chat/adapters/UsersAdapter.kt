@@ -84,7 +84,7 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
                                 val s: SpannableString
 
                                 //Set user message to the body of the AlertDialog and Linkify links
-                                if (!result.get("user_message").isJsonNull) {
+                                if (result.has("user_message")) {
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                         s = SpannableString(Html.fromHtml(result.get("user_message").asString, Html.FROM_HTML_MODE_COMPACT))
                                     } else {

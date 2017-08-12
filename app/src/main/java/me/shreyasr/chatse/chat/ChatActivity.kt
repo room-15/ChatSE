@@ -23,7 +23,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
-import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.koushikdutta.ion.Ion
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.room_nav_header.*
@@ -59,6 +58,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     lateinit var fkey: String
     lateinit var soRoomAdapter: RoomAdapter
     lateinit var seRoomAdapter: RoomAdapter
+    var bound = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,6 +96,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
         val serviceIntent = Intent(this, IncomingEventService::class.java)
         this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
+        bound = true
     }
 
     /**
@@ -154,10 +155,21 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
      */
     override fun onDestroy() {
         super.onDestroy()
-        unbindService(this)
+        if (bound) {
+            bound = false
+            unbindService(this)
+        }
         if (!defaultSharedPreferences.contains(App.PREF_HAS_CREDS)) {
             (ClientManager.client.cookieJar() as PersistentCookieJar).clear()
             startActivity(Intent(applicationContext, LoginActivity::class.java))
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (bound) {
+            bound = false
+            unbindService(this)
         }
     }
 
@@ -167,7 +179,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     override fun onResume() {
         super.onResume()
         val serviceIntent = Intent(this, IncomingEventService::class.java)
-        this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
+        bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
+        bound = true
     }
 
     /**
