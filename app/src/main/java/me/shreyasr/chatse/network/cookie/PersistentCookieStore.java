@@ -45,19 +45,18 @@ import java.util.Set;
 public class PersistentCookieStore implements CookieStore {
     private static final String TAG = PersistentCookieStore.class
             .getSimpleName();
+
     // Persistence
     private static final String SP_COOKIE_STORE = "cookieStore";
     private static final String SP_KEY_DELIMITER = "|"; // Unusual char in URL
     private static final String SP_KEY_DELIMITER_REGEX = "\\"
             + SP_KEY_DELIMITER;
-    Context c;
     private SharedPreferences sharedPreferences;
 
     // In memory
     private Map<URI, Set<HttpCookie>> allCookies;
 
     public PersistentCookieStore(Context context) {
-        c = context;
         sharedPreferences = context.getSharedPreferences(SP_COOKIE_STORE,
                 Context.MODE_PRIVATE);
         loadAllFromPersistence();
@@ -148,7 +147,7 @@ public class PersistentCookieStore implements CookieStore {
 
     @Override
     public synchronized List<HttpCookie> getCookies() {
-        List<HttpCookie> allValidCookies = new ArrayList<>();
+        List<HttpCookie> allValidCookies = new ArrayList<HttpCookie>();
         for (URI storedUri : allCookies.keySet()) {
             allValidCookies.addAll(getValidCookies(storedUri));
         }
@@ -157,7 +156,7 @@ public class PersistentCookieStore implements CookieStore {
     }
 
     private List<HttpCookie> getValidCookies(URI uri) {
-        List<HttpCookie> targetCookies = new ArrayList<>();
+        List<HttpCookie> targetCookies = new ArrayList<HttpCookie>();
         // If the stored URI does not have a path then it must match any URI in
         // the same domain
         for (URI storedUri : allCookies.keySet()) {
@@ -176,12 +175,8 @@ public class PersistentCookieStore implements CookieStore {
             for (Iterator<HttpCookie> it = targetCookies.iterator(); it
                     .hasNext(); ) {
                 HttpCookie currentCookie = it.next();
-                if (currentCookie != null) {
-                    if (currentCookie.hasExpired()) {
-                        cookiesToRemoveFromPersistence.add(currentCookie);
-                        it.remove();
-                    }
-                } else {
+                if (currentCookie.hasExpired()) {
+                    cookiesToRemoveFromPersistence.add(currentCookie);
                     it.remove();
                 }
             }

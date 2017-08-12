@@ -21,16 +21,16 @@ import android.widget.TextView
 import com.koushikdutta.ion.Ion
 import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.ListHolder
-import com.squareup.okhttp.FormEncodingBuilder
-import com.squareup.okhttp.Request
 import kotlinx.android.synthetic.main.list_item_message.view.*
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
+import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.ChatRoom
 import me.shreyasr.chatse.event.EventList
 import me.shreyasr.chatse.event.presenter.message.MessageEvent
-import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
+import okhttp3.FormBody
+import okhttp3.Request
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
@@ -84,7 +84,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
             starIndicator.visibility = View.GONE
             starCount.visibility = View.GONE
 
-            if (room?.site == Client.SITE_STACK_OVERFLOW) {
+            if (room?.site == App.SITE_STACK_OVERFLOW) {
                 if (message.userId == mContext.defaultSharedPreferences.getInt("SOID", -1).toLong()) {
                     itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_stackoverflow_mine))
                 } else {
@@ -114,7 +114,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                     messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.primary_text))
                     //If Android version is 24 and above use the updated version, otherwise use the deprecated version
                     val doc = Jsoup.parseBodyFragment("<span>" + message.content + "</span>")
-                    val parsedHTML = doc.body().unwrap().toString()
+                    val parsedHTML = doc.body()?.unwrap().toString()
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         messageView.text = Html.fromHtml(parsedHTML, Html.FROM_HTML_MODE_LEGACY)
@@ -191,7 +191,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
             val isUserMessage: Boolean
 
             //Set the user ID depending on the site
-            if (room?.site == Client.SITE_STACK_OVERFLOW) {
+            if (room?.site == App.SITE_STACK_OVERFLOW) {
                 curUserId = mContext.defaultSharedPreferences.getInt("SOID", -1)
             } else {
                 curUserId = mContext.defaultSharedPreferences.getInt("SEID", -1)
@@ -255,9 +255,10 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
          */
         fun starMessage(messageId: Int, chatFkey: String?) {
             val client = ClientManager.client
+
             doAsync {
                 //Create request body
-                val soLoginRequestBody = FormEncodingBuilder()
+                val soLoginRequestBody = FormBody.Builder()
                         .add("fkey", chatFkey)
                         .build()
                 //Create request
@@ -278,9 +279,10 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
          */
         fun deleteMessage(messageId: Int, chatFkey: String?) {
             val client = ClientManager.client
+
             doAsync {
                 //Add fkey to body
-                val soLoginRequestBody = FormEncodingBuilder()
+                val soLoginRequestBody = FormBody.Builder()
                         .add("fkey", chatFkey)
                         .build()
 
@@ -346,9 +348,10 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
          */
         fun editMessage(editText: String, messageId: Int, chatFkey: String?) {
             val client = ClientManager.client
+
             doAsync {
                 //Create body with text and fkey
-                val soLoginRequestBody = FormEncodingBuilder()
+                val soLoginRequestBody = FormBody.Builder()
                         .add("text", editText)
                         .add("fkey", chatFkey)
                         .build()

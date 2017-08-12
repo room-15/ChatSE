@@ -32,10 +32,9 @@ import android.widget.Toast
 import com.koushikdutta.ion.Ion
 import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.GridHolder
-import com.squareup.okhttp.FormEncodingBuilder
-import com.squareup.okhttp.Request
 import kotlinx.android.synthetic.main.fragment_chat.view.*
 import kotlinx.android.synthetic.main.picker_footer.view.*
+import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.adapters.MessageAdapter
 import me.shreyasr.chatse.chat.adapters.UploadImageAdapter
@@ -43,13 +42,14 @@ import me.shreyasr.chatse.chat.adapters.UsersAdapter
 import me.shreyasr.chatse.chat.service.IncomingEventListener
 import me.shreyasr.chatse.event.ChatEventGenerator
 import me.shreyasr.chatse.event.EventList
-import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
+import okhttp3.FormBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import org.codehaus.jackson.JsonNode
 import org.codehaus.jackson.map.ObjectMapper
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
-
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -104,13 +104,13 @@ class ChatFragment : Fragment(), IncomingEventListener {
         //Get the current ChatRoom from the arguments
         room = args.getParcelable<ChatRoom>(EXTRA_ROOM)
 
-        if (room.site == Client.SITE_STACK_OVERFLOW) {
+        if (room.site == App.SITE_STACK_OVERFLOW) {
             //Set the multitasking color to orange
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 activity.setTaskDescription(ActivityManager.TaskDescription((activity as AppCompatActivity).supportActionBar?.title.toString(), ActivityManager.TaskDescription().icon, ContextCompat.getColor(activity, R.color.stackoverflow_orange)))
             }
 
-        } else if (room.site == Client.SITE_STACK_EXCHANGE) {
+        } else if (room.site == App.SITE_STACK_EXCHANGE) {
             //Set the multitasking color to blue
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 activity.setTaskDescription(ActivityManager.TaskDescription((activity as AppCompatActivity).supportActionBar?.title.toString(), ActivityManager.TaskDescription().icon, ContextCompat.getColor(activity, R.color.stackexchange_blue)))
@@ -128,12 +128,12 @@ class ChatFragment : Fragment(), IncomingEventListener {
         var contextThemeWrapper = ContextThemeWrapper(activity, R.style.AppTheme_SO)
 
         //Depending on the room, change the theme and status bar color
-        if (room.site == Client.SITE_STACK_OVERFLOW) {
+        if (room.site == App.SITE_STACK_OVERFLOW) {
             //Check version and set status bar color, theme already defaulted to SO
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 activity.window.statusBarColor = ContextCompat.getColor(activity, R.color.primary_dark)
             }
-        } else if (room.site == Client.SITE_STACK_EXCHANGE) {
+        } else if (room.site == App.SITE_STACK_EXCHANGE) {
             //Set theme to SE and color to SE color
             contextThemeWrapper = ContextThemeWrapper(activity, R.style.AppTheme_SE)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -528,8 +528,8 @@ class ChatFragment : Fragment(), IncomingEventListener {
      * Map a message to an object and return a JsonNode
      */
     @Throws(IOException::class)
-    private fun getMessagesObject(client: Client, room: ChatRoom, count: Int): JsonNode {
-        val getMessagesRequestBody = FormEncodingBuilder()
+    private fun getMessagesObject(client: OkHttpClient, room: ChatRoom, count: Int): JsonNode {
+        val getMessagesRequestBody = FormBody.Builder()
                 .add("since", 0.toString())
                 .add("mode", "Messages")
                 .add("msgCount", count.toString())
@@ -541,16 +541,16 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 .build()
 
         val getMessagesResponse = client.newCall(getMessagesRequest).execute()
-        return mapper.readTree(getMessagesResponse.body().byteStream())
+        return mapper.readTree(getMessagesResponse.body()?.byteStream())
     }
 
     /**
      * Create a new message and post it to the chat, creating it!
      */
     @Throws(IOException::class)
-    private fun newMessage(client: Client, room: ChatRoom,
+    private fun newMessage(client: OkHttpClient, room: ChatRoom,
                            fkey: String?, message: String) {
-        val newMessageRequestBody = FormEncodingBuilder()
+        val newMessageRequestBody = FormBody.Builder()
                 .add("text", message)
                 .add("fkey", fkey)
                 .build()

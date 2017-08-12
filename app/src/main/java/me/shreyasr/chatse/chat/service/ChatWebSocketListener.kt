@@ -1,14 +1,12 @@
 package me.shreyasr.chatse.chat.service
 
 import android.util.Log
-import com.squareup.okhttp.Response
-import com.squareup.okhttp.ws.WebSocket
-import com.squareup.okhttp.ws.WebSocketListener
+import okhttp3.Response
+import okhttp3.ResponseBody
+import okhttp3.ws.WebSocketListener
 import okio.Buffer
-import okio.BufferedSource
 import org.codehaus.jackson.JsonNode
 import org.codehaus.jackson.map.ObjectMapper
-
 import java.io.IOException
 
 /**
@@ -17,22 +15,21 @@ import java.io.IOException
 class ChatWebSocketListener(private val site: String, private val listener: ServiceWebsocketListener) : WebSocketListener {
     private val mapper = ObjectMapper()
 
-    override fun onOpen(webSocket: WebSocket, response: Response) {
+    override fun onOpen(webSocket: okhttp3.ws.WebSocket?, response: Response?) {
         Log.i("ChatWebSocketListener", "websocket open: " + site)
         listener.onConnect(site, true)
     }
 
-    override fun onFailure(e: IOException, response: Response?) {
+    override fun onFailure(e: IOException?, response: Response?) {
         listener.onConnect(site, false)
     }
 
     @Throws(IOException::class)
-    override fun onMessage(payload: BufferedSource,
-                           type: WebSocket.PayloadType) {
-        val message = payload.readUtf8()
-        payload.close()
+    override fun onMessage(payload: ResponseBody) {
+//        val message = payload.
+//        payload.close()
         try {
-            val root = mapper.readTree(message)
+            val root = mapper.readTree(payload.string())
             listener.onNewEvents(site, root)
         } catch (e: IOException) {
             Log.e("ChatWebSocketListener", e.message)

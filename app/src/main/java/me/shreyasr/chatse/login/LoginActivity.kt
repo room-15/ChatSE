@@ -10,13 +10,13 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import com.squareup.okhttp.FormEncodingBuilder
-import com.squareup.okhttp.Request
 import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.ChatActivity
-import me.shreyasr.chatse.network.Client
 import me.shreyasr.chatse.network.ClientManager
+import okhttp3.FormBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
@@ -37,7 +37,7 @@ class LoginActivity : AppCompatActivity() {
      */
     lateinit var emailView: EditText
     lateinit var passwordView: EditText
-//    lateinit var progressBar: ProgressBar
+    //    lateinit var progressBar: ProgressBar
     lateinit var loginButton: FloatingActionButton
     lateinit var prefs: SharedPreferences
 
@@ -163,7 +163,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                 } else {
                     runOnUiThread {
-//                        progressBar.visibility = View.GONE
+                        //                        progressBar.visibility = View.GONE
                         loginButton.isEnabled = true
                         Toast.makeText(this@LoginActivity, "Failed to log in, try again!", Toast.LENGTH_LONG).show()
                     }
@@ -182,16 +182,16 @@ class LoginActivity : AppCompatActivity() {
      * @param password = the user's password as a String
      */
     @Throws(IOException::class)
-    private fun loginToSite(client: Client, site: String,
+    private fun loginToSite(client: OkHttpClient, site: String,
                             email: String, password: String): Boolean {
 
         //Connect to /users/login and get the fkey, this key is necessary to login to the site.
         val soFkey = Jsoup.connect(site + "/users/login/")
-                .userAgent(Client.USER_AGENT).get()
+                .userAgent(App.USER_AGENT).get()
                 .select("input[name=fkey]").attr("value")
 
         //The request body is created by adding the email, password, and fkey to the request body
-        val soLoginRequestBody = FormEncodingBuilder()
+        val soLoginRequestBody = FormBody.Builder()
                 .add("email", email)
                 .add("password", password)
                 .add("fkey", soFkey)
@@ -252,7 +252,7 @@ class LoginActivity : AppCompatActivity() {
      * @param client = the OkHttp ClientManager.client
      */
     @Throws(IOException::class)
-    private fun loginToSE(client: Client) {
+    private fun loginToSE(client: OkHttpClient) {
         //Build the request for logging into StackExchange
         val loginPageRequest = Request.Builder()
                 .url("http://stackexchange.com/users/login/")
@@ -269,7 +269,7 @@ class LoginActivity : AppCompatActivity() {
         if (fkey == "") throw IOException("Fatal: No fkey found.")
 
         //Build a request to login to SE
-        val data = FormEncodingBuilder()
+        val data = FormBody.Builder()
                 .add("oauth_version", "")
                 .add("oauth_server", "")
                 .add("openid_identifier", "https://openid.stackexchange.com/")
@@ -294,7 +294,7 @@ class LoginActivity : AppCompatActivity() {
      * @param client = the OkHttp ClientManager.client
      */
     @Throws(IOException::class)
-    private fun seOpenIdLogin(client: Client, email: String, password: String): Boolean {
+    private fun seOpenIdLogin(client: OkHttpClient, email: String, password: String): Boolean {
         val seLoginPageRequest = Request.Builder()
                 .url("https://openid.stackexchange.com/account/login/")
                 .build()
@@ -304,7 +304,7 @@ class LoginActivity : AppCompatActivity() {
         val seLoginFkeyElements = seLoginDoc.select("input[name=fkey]")
         val seFkey = seLoginFkeyElements.attr("value")
 
-        val seLoginRequestBody = FormEncodingBuilder()
+        val seLoginRequestBody = FormBody.Builder()
                 .add("email", email)
                 .add("password", password)
                 .add("fkey", seFkey)
@@ -322,7 +322,7 @@ class LoginActivity : AppCompatActivity() {
      * Gets the user's chat ID for StackExchange which is different from their normal ID
      * Sets it to the defaultSharedPreferences as "SEID"
      */
-    private fun setSEChatId(client: Client) {
+    private fun setSEChatId(client: OkHttpClient) {
         val sePageRequest = Request.Builder()
                 .url("https://chat.stackexchange.com/")
                 .build()

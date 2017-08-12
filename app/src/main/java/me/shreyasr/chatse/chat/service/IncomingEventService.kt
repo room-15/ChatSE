@@ -4,16 +4,16 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
-import com.squareup.okhttp.FormEncodingBuilder
-import com.squareup.okhttp.Request
-import com.squareup.okhttp.ws.WebSocketCall
+import me.shreyasr.chatse.App
 import me.shreyasr.chatse.chat.ChatRoom
-import me.shreyasr.chatse.network.Client
+import okhttp3.FormBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.ws.WebSocketCall
 import org.codehaus.jackson.JsonNode
 import org.json.JSONException
 import org.json.JSONObject
 import org.jsoup.Jsoup
-
 import java.io.IOException
 import java.util.*
 
@@ -58,7 +58,7 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
     }
 
     @Throws(IOException::class)
-    internal fun loadRoom(client: Client, room: ChatRoom): RoomInfo {
+    internal fun loadRoom(client: OkHttpClient, room: ChatRoom): RoomInfo {
         val chatPageRequest = Request.Builder()
                 .url(room.site + "/rooms/" + room.num)
                 .build()
@@ -72,7 +72,7 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
     }
 
     @Throws(IOException::class, JSONException::class)
-    internal fun joinRoom(client: Client, room: ChatRoom, chatFkey: String) {
+    internal fun joinRoom(client: OkHttpClient, room: ChatRoom, chatFkey: String) {
         if (!siteStatuses.containsKey(room.site)) {
             siteStatuses.put(room.site, WebsocketConnectionStatus.DISCONNECTED)
         }
@@ -81,21 +81,21 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
             siteStatuses.put(room.site, WebsocketConnectionStatus.CREATING)
             initWs(client, wsUrl, room.site)
         }
-        val soRequestBody = FormEncodingBuilder()
+        val soRequestBody = FormBody.Builder()
                 .add("fkey", chatFkey)
                 .add("immediate", "true")
                 .add("quiet", "true")
                 .build()
         val soChatPageRequest = Request.Builder()
-                .url(Client.SITE_STACK_OVERFLOW + "/chats/join/" + room.num)
+                .url(App.SITE_STACK_OVERFLOW + "/chats/join/" + room.num)
                 .post(soRequestBody)
                 .build()
         client.newCall(soChatPageRequest).execute()
     }
 
     @Throws(IOException::class, JSONException::class)
-    private fun registerRoom(client: Client, room: ChatRoom, chatFkey: String): String {
-        val wsUrlRequestBody = FormEncodingBuilder()
+    private fun registerRoom(client: OkHttpClient, room: ChatRoom, chatFkey: String): String {
+        val wsUrlRequestBody = FormBody.Builder()
                 .add("roomid", room.num.toString())
                 .add("fkey", chatFkey).build()
         val wsUrlRequest = Request.Builder()
@@ -104,20 +104,22 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
                 .build()
 
         val wsRegisterResponse = client.newCall(wsUrlRequest).execute()
-        val wsUrlJson = JSONObject(wsRegisterResponse.body().string())
+        val body = wsRegisterResponse.body()
+        val wsUrlJson = JSONObject(body.string())
+        body.close()
         return wsUrlJson.getString("url")
     }
 
     @Throws(IOException::class)
-    private fun initWs(client: Client, wsUrl: String, site: String) {
+    private fun initWs(client: OkHttpClient, wsUrl: String, site: String) {
         val wsRequest = Request.Builder()
-                .addHeader("User-Agent", Client.USER_AGENT)
+                .addHeader("User-Agent", App.USER_AGENT)
                 .addHeader("Sec-WebSocket-Extensions", "permessage-deflate")
                 .addHeader("Sec-WebSocket-Extensions", "client_max_window_bits")
                 .addHeader("Origin", site)
                 .url(wsUrl + "?l=0")
                 .build()
-        val wsCall = WebSocketCall.create(client.httpClient, wsRequest)
+        val wsCall = WebSocketCall.create(client, wsRequest)
         wsCall.enqueue(ChatWebSocketListener(site, this))
     }
 
@@ -129,4 +131,3 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
 
     class RoomInfo internal constructor(val name: String, val fkey: String)
 }
-

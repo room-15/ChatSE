@@ -1,8 +1,10 @@
 package me.shreyasr.chatse.network
 
-import com.squareup.okhttp.OkHttpClient
+import com.franmontiel.persistentcookiejar.PersistentCookieJar
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import me.shreyasr.chatse.App
-import me.shreyasr.chatse.network.cookie.PersistentCookieStore
+import okhttp3.OkHttpClient
 
 /**
  * Static manager of our HTTP Client.
@@ -11,5 +13,13 @@ object ClientManager {
     /**
      * The client to use for network requests.
      */
-    val client = Client(OkHttpClient(), PersistentCookieStore(App.instance))
+    val client: OkHttpClient = OkHttpClient.Builder().cookieJar(PersistentCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(App.instance))).addInterceptor { chain ->
+        val originalRequest = chain.request()
+        val requestWithUserAgent = originalRequest.newBuilder()
+                .removeHeader("User-Agent")
+                .addHeader("User-Agent", App.USER_AGENT)
+                .build()
+        chain.proceed(requestWithUserAgent)
+
+    }.build()
 }

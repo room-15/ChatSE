@@ -7,13 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.squareup.okhttp.FormEncodingBuilder
-import com.squareup.okhttp.Request
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.ChatActivity
 import me.shreyasr.chatse.chat.ChatRoom
 import me.shreyasr.chatse.chat.Room
 import me.shreyasr.chatse.network.ClientManager
+import okhttp3.FormBody
+import okhttp3.Request
 import org.jetbrains.anko.doAsync
 
 /**
@@ -97,7 +97,7 @@ class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Co
             doAsync {
                 val client = ClientManager.client
 
-                val soRequestBody = FormEncodingBuilder()
+                val soRequestBody = FormBody.Builder()
                         .add("fkey", fkey)
                         .add("quiet", "true")
                         .build()
@@ -120,7 +120,7 @@ class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Co
             doAsync {
                 val client = ClientManager.client
 
-                val soRequestBody = FormEncodingBuilder()
+                val soRequestBody = FormBody.Builder()
                         .add("fkey", fkey)
                         .add("roomId", room.roomID.toString())
                         .build()

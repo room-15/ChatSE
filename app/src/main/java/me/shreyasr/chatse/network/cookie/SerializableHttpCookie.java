@@ -32,7 +32,6 @@
 
 package me.shreyasr.chatse.network.cookie;
 
-
 import android.util.Log;
 
 import java.io.ByteArrayInputStream;
@@ -44,7 +43,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.net.HttpCookie;
 
-class SerializableHttpCookie implements Serializable {
+public class SerializableHttpCookie implements Serializable {
     private static final String TAG = SerializableHttpCookie.class
             .getSimpleName();
 
@@ -57,10 +56,10 @@ class SerializableHttpCookie implements Serializable {
     // need to access it using reflection
     private Field fieldHttpOnly;
 
-    SerializableHttpCookie() {
+    public SerializableHttpCookie() {
     }
 
-    String encode(HttpCookie cookie) {
+    public String encode(HttpCookie cookie) {
         this.cookie = cookie;
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -75,7 +74,7 @@ class SerializableHttpCookie implements Serializable {
         return byteArrayToHexString(os.toByteArray());
     }
 
-    HttpCookie decode(String encodedCookie) {
+    public HttpCookie decode(String encodedCookie) {
         byte[] bytes = hexStringToByteArray(encodedCookie);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
                 bytes);

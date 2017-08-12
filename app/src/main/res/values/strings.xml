@@ -26,4 +26,5 @@
     <string name="room_info">Room Info</string>
     <string name="default_profile_email">jonskeet@stackexchange.com</string>
     <string name="default_profile_name">Jon Skeet</string>
+    <string name="enter_room">Enter Room ID</string>
 </resources>

@@ -24,7 +24,9 @@ class IncomingEventServiceBinder internal constructor(private val service: Incom
      */
     @Throws(IOException::class)
     fun loadRoom(room: ChatRoom): IncomingEventService.RoomInfo {
-        return service.loadRoom(ClientManager.client, room)
+        val client = ClientManager.client
+
+        return service.loadRoom(client, room)
     }
 
     /**
@@ -36,6 +38,8 @@ class IncomingEventServiceBinder internal constructor(private val service: Incom
      */
     @Throws(IOException::class, JSONException::class)
     fun joinRoom(room: ChatRoom, chatFkey: String) {
-        service.joinRoom(ClientManager.client, room, chatFkey)
+        val client = ClientManager.client
+
+        service.joinRoom(client, room, chatFkey)
     }
 }

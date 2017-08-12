@@ -3,10 +3,10 @@ package me.shreyasr.chatse.event.presenter.message
 import android.content.Context
 import android.util.Log
 import com.koushikdutta.ion.Ion
+import me.shreyasr.chatse.App
 import me.shreyasr.chatse.chat.ChatRoom
 import me.shreyasr.chatse.event.ChatEvent
 import me.shreyasr.chatse.event.presenter.EventPresenter
-import me.shreyasr.chatse.network.Client
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -41,7 +41,7 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                 //If the user is not in the users list get their profile picture
                 val url: String
                 //Determine what URL to use (StackOverflow or StackExchange)
-                if (room?.site == Client.SITE_STACK_OVERFLOW) {
+                if (room?.site == App.SITE_STACK_OVERFLOW) {
                     url = "https://chat.stackoverflow.com/users/thumbs/${event.user_id}"
                 } else {
                     url = "https://chat.stackexchange.com/users/thumbs/${event.user_id}"
