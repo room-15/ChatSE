@@ -173,6 +173,21 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        val serviceIntent = Intent(this, IncomingEventService::class.java)
+        bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
+        bound = true
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (bound) {
+            bound = false
+            unbindService(this)
+        }
+    }
+
     /**
      * On resume rebind the service to listen for incoming events
      */

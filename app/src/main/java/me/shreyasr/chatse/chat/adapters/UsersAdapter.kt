@@ -5,6 +5,7 @@ import android.os.Build
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.text.Html
+import android.text.InputType
 import android.text.SpannableString
 import android.text.util.Linkify
 import android.util.Log
@@ -85,19 +86,24 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
 
                                 //Set user message to the body of the AlertDialog and Linkify links
                                 if (result.has("user_message")) {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                        s = SpannableString(Html.fromHtml(result.get("user_message").asString, Html.FROM_HTML_MODE_COMPACT))
+                                    if (result.get("user_message").asString.isNotEmpty()) {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                            s = SpannableString(Html.fromHtml(result.get("user_message").asString, Html.FROM_HTML_MODE_COMPACT))
+                                        } else {
+                                            @Suppress("DEPRECATION")
+                                            s = SpannableString(Html.fromHtml(result.get("user_message").asString))
+                                        }
+                                        Linkify.addLinks(s, Linkify.ALL)
                                     } else {
-                                        @Suppress("DEPRECATION")
-                                        s = SpannableString(Html.fromHtml(result.get("user_message").asString))
+                                        s = SpannableString("There's no user bio! :(")
                                     }
-                                    Linkify.addLinks(s, Linkify.ALL)
                                 } else {
                                     s = SpannableString("There's no user bio! :(")
                                 }
 
                                 //Set SpannableString to TextView
                                 val tv = TextView(mContext)
+                                tv.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
                                 tv.text = s
 
                                 //Add TextView to Layout and set Layout to AlertDialog view
