@@ -64,6 +64,7 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
                 .build()
         val chatPageResponse = client.newCall(chatPageRequest).execute()
         val chatPage = Jsoup.parse(chatPageResponse.body().string())
+        chatPageResponse.body().close()
 
         val fkey = chatPage.select("input[name=fkey]").attr("value")
         val name = chatPage.select("span[id=roomname]").text()

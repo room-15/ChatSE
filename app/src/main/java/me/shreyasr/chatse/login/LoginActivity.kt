@@ -8,12 +8,12 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.chat.ChatActivity
 import me.shreyasr.chatse.network.ClientManager
+import me.shreyasr.chatse.network.cookie.PersistentCookieStore
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -72,10 +72,9 @@ class LoginActivity : AppCompatActivity() {
         emailView.setText(prefs.getString(App.PREF_EMAIL, ""))
 
         //When the user presses submit inside the passwordView, attempt a login.
-        passwordView.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
+        passwordView.setOnEditorActionListener({ _, id, _ ->
             if (id == R.id.login_submit || id == EditorInfo.IME_NULL) {
                 attemptLogin()
-                return@OnEditorActionListener true
             }
             false
         })
@@ -154,8 +153,8 @@ class LoginActivity : AppCompatActivity() {
                 val client = ClientManager.client
 
                 if (seOpenIdLogin(client, email, password)) {
-                    loginToSite(client, "https://stackoverflow.com", email, password)
                     loginToSE(client)
+                    loginToSite(client, "https://stackoverflow.com", email, password)
                     runOnUiThread {
                         prefs.edit().putBoolean(App.PREF_HAS_CREDS, true).apply()
                         this@LoginActivity.startActivity(Intent(this@LoginActivity, ChatActivity::class.java))
@@ -208,7 +207,7 @@ class LoginActivity : AppCompatActivity() {
 
         //The response document is pared into a Jsoup document
         val responseDoc = Jsoup.parse(soLoginResponse.body().string())
-
+        soLoginResponse.body().close()
         //All script elements are received from the HTML
         val scriptElements = responseDoc.getElementsByTag("script")
 
@@ -262,6 +261,8 @@ class LoginActivity : AppCompatActivity() {
 
         //Parse the response and get the glorious fkey!
         val doc = Jsoup.parse(loginPageResponse.body().string())
+        loginPageResponse.body().close()
+
         val fkeyElements = doc.select("input[name=fkey]")
         val fkey = fkeyElements.attr("value")
 
@@ -280,7 +281,9 @@ class LoginActivity : AppCompatActivity() {
                 .url("https://stackexchange.com/users/authenticate/")
                 .post(data.build())
                 .build()
-        client.newCall(loginRequest).execute()
+        val response = client.newCall(loginRequest).execute()
+        val body = response.body()
+        body.close()
 
         //Get the main StackExchange ID (which is different from the SE user's chat ID and set the chat ID by calling setSEChatId
         val SEID = defaultSharedPreferences.getInt("SEMAINID", -1)
@@ -301,6 +304,8 @@ class LoginActivity : AppCompatActivity() {
         val seLoginPageResponse = client.newCall(seLoginPageRequest).execute()
 
         val seLoginDoc = Jsoup.parse(seLoginPageResponse.body().string())
+        seLoginPageResponse.body().close()
+
         val seLoginFkeyElements = seLoginDoc.select("input[name=fkey]")
         val seFkey = seLoginFkeyElements.attr("value")
 
@@ -315,6 +320,7 @@ class LoginActivity : AppCompatActivity() {
                 .build()
         val response = client.newCall(seLoginRequest).execute()
         val title = Jsoup.parse(response.body().string()).title()
+        response.body().close()
         return !title.contains("error")
     }
 
@@ -329,6 +335,7 @@ class LoginActivity : AppCompatActivity() {
         val sePageResponse = client.newCall(sePageRequest).execute()
 
         val sePageDoc = Jsoup.parse(sePageResponse.body().string())
+        sePageResponse.body().close()
 
         //Get the URL from the topbar (to their profile)
         val element = sePageDoc.getElementsByClass("topbar-menu-links")[0].child(0)

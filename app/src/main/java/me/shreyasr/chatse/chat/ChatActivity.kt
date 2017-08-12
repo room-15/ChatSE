@@ -144,7 +144,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         }
 
         //Load a default room
-        loadChatFragment(ChatRoom(defaultSharedPreferences.getString("lastRoomSite", App.SITE_STACK_EXCHANGE), defaultSharedPreferences.getInt("lastRoomNum", 15)))
+        loadChatFragment(ChatRoom(defaultSharedPreferences.getString("lastRoomSite", App.SITE_STACK_OVERFLOW), defaultSharedPreferences.getInt("lastRoomNum", 15)))
     }
 
     /**
@@ -269,7 +269,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     .url("$site/rooms/thumbs/$roomNum/")
                     .build()
             val response = client.newCall(soChatPageRequest).execute()
-            val jsonData = response.body()?.string()
+            val jsonData = response.body().string()
+            response.body().close()
             val json = JSONObject(jsonData)
 
             //Get description for room

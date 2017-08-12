@@ -114,7 +114,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                     messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.primary_text))
                     //If Android version is 24 and above use the updated version, otherwise use the deprecated version
                     val doc = Jsoup.parseBodyFragment("<span>" + message.content + "</span>")
-                    val parsedHTML = doc.body()?.unwrap().toString()
+                    val parsedHTML = doc.body().unwrap().toString()
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         messageView.text = Html.fromHtml(parsedHTML, Html.FROM_HTML_MODE_LEGACY)

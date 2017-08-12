@@ -541,7 +541,9 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 .build()
 
         val getMessagesResponse = client.newCall(getMessagesRequest).execute()
-        return mapper.readTree(getMessagesResponse.body()?.byteStream())
+        val inputStream = mapper.readTree(getMessagesResponse.body().byteStream())
+        getMessagesResponse.body().close()
+        return inputStream
     }
 
     /**

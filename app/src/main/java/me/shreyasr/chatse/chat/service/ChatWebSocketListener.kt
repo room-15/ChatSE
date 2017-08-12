@@ -30,6 +30,7 @@ class ChatWebSocketListener(private val site: String, private val listener: Serv
 //        payload.close()
         try {
             val root = mapper.readTree(payload.string())
+            payload.close()
             listener.onNewEvents(site, root)
         } catch (e: IOException) {
             Log.e("ChatWebSocketListener", e.message)
