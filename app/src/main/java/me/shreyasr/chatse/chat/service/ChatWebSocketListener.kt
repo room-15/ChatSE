@@ -26,16 +26,13 @@ class ChatWebSocketListener(private val site: String, private val listener: Serv
 
     @Throws(IOException::class)
     override fun onMessage(payload: ResponseBody) {
-//        val message = payload.
-//        payload.close()
         try {
             val root = mapper.readTree(payload.string())
-            payload.close()
             listener.onNewEvents(site, root)
         } catch (e: IOException) {
             Log.e("ChatWebSocketListener", e.message)
         }
-
+        payload.close()
     }
 
     override fun onPong(payload: Buffer) {
