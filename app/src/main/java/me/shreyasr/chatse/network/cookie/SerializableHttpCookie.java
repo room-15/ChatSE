@@ -96,8 +96,12 @@ class SerializableHttpCookie implements Serializable {
     // Workaround httpOnly (getter)
     private boolean getHttpOnly() {
         try {
-            initFieldHttpOnly();
-            return (boolean) fieldHttpOnly.get(cookie);
+            if (fieldHttpOnly != null) {
+                initFieldHttpOnly();
+                return (boolean) fieldHttpOnly.get(cookie);
+            } else {
+                return false;
+            }
         } catch (Exception e) {
             // NoSuchFieldException || IllegalAccessException ||
             // IllegalArgumentException
@@ -107,6 +111,7 @@ class SerializableHttpCookie implements Serializable {
     }
 
     // Workaround httpOnly (setter)
+
     private void setHttpOnly(boolean httpOnly) {
         try {
             initFieldHttpOnly();
@@ -119,8 +124,13 @@ class SerializableHttpCookie implements Serializable {
     }
 
     private void initFieldHttpOnly() throws NoSuchFieldException {
-        fieldHttpOnly = cookie.getClass().getDeclaredField("httpOnly");
-        fieldHttpOnly.setAccessible(true);
+        Class cl = cookie.getClass();
+        try {
+            fieldHttpOnly = cl.getDeclaredField("httpOnly");
+            fieldHttpOnly.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            Log.d("initFieldHttpOnly", e.getMessage());
+        }
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {

@@ -10,6 +10,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import com.squareup.okhttp.FormEncodingBuilder
+import com.squareup.okhttp.OkHttpClient
 import com.squareup.okhttp.Request
 import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
@@ -152,8 +153,8 @@ class LoginActivity : AppCompatActivity() {
                 val client = ClientManager.client
 
                 if (seOpenIdLogin(client, email, password)) {
-                    loginToSite(client, "https://stackoverflow.com", email, password)
                     loginToSE(client)
+                    loginToSite(client, "https://stackoverflow.com", email, password)
                     runOnUiThread {
                         prefs.edit().putBoolean(App.PREF_HAS_CREDS, true).apply()
                         this@LoginActivity.startActivity(Intent(this@LoginActivity, ChatActivity::class.java))
@@ -260,6 +261,8 @@ class LoginActivity : AppCompatActivity() {
 
         //Parse the response and get the glorious fkey!
         val doc = Jsoup.parse(loginPageResponse.body().string())
+        loginPageResponse.body().close()
+
         val fkeyElements = doc.select("input[name=fkey]")
         val fkey = fkeyElements.attr("value")
 
@@ -278,13 +281,12 @@ class LoginActivity : AppCompatActivity() {
                 .url("https://stackexchange.com/users/authenticate/")
                 .post(data.build())
                 .build()
-        client.newCall(loginRequest).execute()
+        val response = client.newCall(loginRequest).execute()
+        val body = response.body()
+        body.close()
 
         //Get the main StackExchange ID (which is different from the SE user's chat ID and set the chat ID by calling setSEChatId
-        val SEID = defaultSharedPreferences.getInt("SEMAINID", -1)
-        if (SEID != -1) {
-            setSEChatId(client)
-        }
+        setSEChatId()
     }
 
     /**
@@ -320,13 +322,14 @@ class LoginActivity : AppCompatActivity() {
      * Gets the user's chat ID for StackExchange which is different from their normal ID
      * Sets it to the defaultSharedPreferences as "SEID"
      */
-    private fun setSEChatId(client: Client) {
+    private fun setSEChatId() {
         val sePageRequest = Request.Builder()
                 .url("https://chat.stackexchange.com/")
                 .build()
-        val sePageResponse = client.newCall(sePageRequest).execute()
+        val sePageResponse = ClientManager.client.newCall(sePageRequest).execute()
 
         val sePageDoc = Jsoup.parse(sePageResponse.body().string())
+        sePageResponse.body().close()
 
         //Get the URL from the topbar (to their profile)
         val element = sePageDoc.getElementsByClass("topbar-menu-links")[0].child(0)
