@@ -40,7 +40,6 @@ import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.json.JSONException
 import org.json.JSONObject
-
 import java.io.IOException
 
 /**
@@ -64,6 +63,29 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.activity_chat)
+
+        //If the user is still logged in then continue, otherwise logout
+        if (defaultSharedPreferences.getBoolean(App.PREF_HAS_CREDS, false)) {
+            //If the user came from a deep link, continue
+            if (intent.action == Intent.ACTION_VIEW) {
+                //Check if it's SO or SE
+                val isSO = intent.data.toString().contains(Client.SITE_STACK_OVERFLOW)
+                //Get room number
+                val roomNum = intent.data.path.split("/")[2].toInt()
+
+                //Figure out the site based on isSO
+                var site = Client.SITE_STACK_OVERFLOW
+                if (!isSO && roomNum != 0) {
+                    site = Client.SITE_STACK_EXCHANGE
+                }
+
+                //Load the site from the deep link
+                loadChatFragment(ChatRoom(site, roomNum))
+            }
+        } else {
+            startActivity(Intent(applicationContext, LoginActivity::class.java))
+            finish()
+        }
 
         //Create adapters for current user's rooms
         soRoomAdapter = RoomAdapter(Client.SITE_STACK_OVERFLOW, soRoomList, this)
@@ -163,8 +185,14 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
      */
     override fun onResume() {
         super.onResume()
-        val serviceIntent = Intent(this, IncomingEventService::class.java)
-        this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
+        //If the user is still logged in then continue, otherwise logout
+        if (!defaultSharedPreferences.getBoolean(App.PREF_HAS_CREDS, false)) {
+            val serviceIntent = Intent(this, IncomingEventService::class.java)
+            this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
+        } else {
+            startActivity(Intent(applicationContext, LoginActivity::class.java))
+            finish()
+        }
     }
 
     /**
