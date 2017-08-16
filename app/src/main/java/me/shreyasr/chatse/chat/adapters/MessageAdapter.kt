@@ -130,6 +130,10 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                             //For images, load the image into the ImageView, making sure it's visible
                             oneboxImage.visibility = View.VISIBLE
 
+                            itemView.setOnClickListener {
+                                mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.onebox_content)))
+                            }
+
                             Ion.with(itemView.context)
                                     .load(message.onebox_content)
                                     .intoImageView(itemView.message_image)
