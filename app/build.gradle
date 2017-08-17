@@ -45,7 +45,6 @@ dependencies {
     implementation 'com.koushikdutta.ion:ion:2.2.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation 'me.saket:better-link-movement-method:1.2'
-    implementation 'com.afollestad.material-dialogs:core:0.9.4.6'
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.9.5'
     testCompile 'com.squareup.okhttp:mockwebserver:2.4.0'
