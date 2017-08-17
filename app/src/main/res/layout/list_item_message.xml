@@ -6,26 +6,33 @@
 
     <ImageView
         android:id="@+id/message_user_picture"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="8dp"
         android:background="@drawable/box"
         android:scaleType="centerCrop"
-        android:layout_margin="8dp"
         app:layout_constraintBottom_toTopOf="@+id/message_user_name"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"/>
+        app:layout_constraintTop_toBottomOf="@+id/message_timestamp"
+        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
         android:id="@+id/message_user_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
         android:ellipsize="end"
         android:maxLines="2"
         android:textColor="@android:color/black"
         android:textSize="12sp"
+        android:gravity="center_horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/message_edit_indicator"
         app:layout_constraintTop_toBottomOf="@+id/message_user_picture" />
@@ -39,7 +46,7 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/message_user_picture"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/message_timestamp"
         app:layout_constraintVertical_bias="0.5"
         app:srcCompat="@drawable/ic_edit_black_18dp" />
 
@@ -61,7 +68,7 @@
     <TextView
         android:id="@+id/message_content"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_margin="8dp"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -69,7 +76,7 @@
         app:layout_constraintLeft_toRightOf="@+id/message_edit_indicator"
         app:layout_constraintRight_toLeftOf="@+id/message_star_count"
         app:layout_constraintTop_toBottomOf="@+id/message_timestamp"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.5" />
 
 
     <TextView
