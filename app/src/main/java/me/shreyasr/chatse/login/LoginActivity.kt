@@ -9,8 +9,8 @@ import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
+import com.afollestad.materialdialogs.MaterialDialog
 import com.squareup.okhttp.FormEncodingBuilder
-import com.squareup.okhttp.OkHttpClient
 import com.squareup.okhttp.Request
 import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
@@ -40,6 +40,17 @@ class LoginActivity : AppCompatActivity() {
     //    lateinit var progressBar: ProgressBar
     lateinit var loginButton: FloatingActionButton
     lateinit var prefs: SharedPreferences
+    // Pls don't hate me for null
+//    var loadingDialog : MaterialDialog? = null
+    val loadingDialog : MaterialDialog by lazy {
+        MaterialDialog.Builder(this)
+                .title("Please, wait")
+                .content("Loging in")
+                .cancelable(false)
+                .canceledOnTouchOutside(false)
+                .progress(true, 0)
+                .show()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,12 +69,8 @@ class LoginActivity : AppCompatActivity() {
         // Set variables to the layout
         emailView = findViewById(R.id.login_email) as EditText
         passwordView = findViewById(R.id.login_password) as EditText
-//        progressBar = findViewById(R.id.login_progress) as ProgressBar
         loginButton = findViewById(R.id.fab_submit) as FloatingActionButton
 
-        //Set the toolbar as the SupportActionBar for the Activity
-//        val toolbar = findViewById(R.id.toolbar) as Toolbar
-//        setSupportActionBar(toolbar)
 
         //If the loginButton is clicked attempt a login.
         loginButton.setOnClickListener { attemptLogin() }
@@ -90,18 +97,31 @@ class LoginActivity : AppCompatActivity() {
      * @param LoginAsyncTask is called
      */
     fun attemptLogin() {
-        loginButton.isEnabled = false
+        loginButton.isClickable = false
 
         // Reset errors.
         emailView.error = null
         passwordView.error = null
 
         if (!validateInputs()) {
-            loginButton.isEnabled = true
+            loginButton.isClickable = true
             return
         }
 
-//        progressBar.visibility = View.VISIBLE
+        if (!loadingDialog.isShowing)
+            loadingDialog.show()
+
+//        if (!(loadingDialog?.isShowing ?: true)) {
+//            loadingDialog?.show()
+//        }
+//        else {
+//            loadingDialog = MaterialDialog.Builder(this)
+//                    .title("Please, wait")
+//                    .content("Loging in")
+//                    .cancelable(false)
+//                    .canceledOnTouchOutside(false)
+//                    .show()
+//        }
 
         loginToSites(emailView.text.toString(), passwordView.text.toString())
     }
@@ -163,7 +183,8 @@ class LoginActivity : AppCompatActivity() {
                 } else {
                     runOnUiThread {
                         //                        progressBar.visibility = View.GONE
-                        loginButton.isEnabled = true
+                        loadingDialog.dismiss()
+                        loginButton.isClickable = true
                         Toast.makeText(this@LoginActivity, "Failed to log in, try again!", Toast.LENGTH_LONG).show()
                     }
                 }

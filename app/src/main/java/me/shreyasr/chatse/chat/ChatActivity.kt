@@ -64,7 +64,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.activity_chat)
 
-        //If the user is still logged in then continue, otherwise logout
+/*        //If the user is still logged in then continue, otherwise logout
         if (defaultSharedPreferences.getBoolean(App.PREF_HAS_CREDS, false)) {
             //If the user came from a deep link, continue
             if (intent.action == Intent.ACTION_VIEW) {
@@ -85,7 +85,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         } else {
             startActivity(Intent(applicationContext, LoginActivity::class.java))
             finish()
-        }
+        } */
 
         //Create adapters for current user's rooms
         soRoomAdapter = RoomAdapter(Client.SITE_STACK_OVERFLOW, soRoomList, this)
@@ -185,14 +185,16 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
      */
     override fun onResume() {
         super.onResume()
-        //If the user is still logged in then continue, otherwise logout
-        if (!defaultSharedPreferences.getBoolean(App.PREF_HAS_CREDS, false)) {
-            val serviceIntent = Intent(this, IncomingEventService::class.java)
-            this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
-        } else {
-            startActivity(Intent(applicationContext, LoginActivity::class.java))
-            finish()
-        }
+        val serviceIntent = Intent(this, IncomingEventService::class.java)
+        this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
+//        //If the user is still logged in then continue, otherwise logout
+//        if (!defaultSharedPreferences.getBoolean(App.PREF_HAS_CREDS, false)) {
+//            val serviceIntent = Intent(this, IncomingEventService::class.java)
+//            this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
+//        } else {
+//            startActivity(Intent(applicationContext, LoginActivity::class.java))
+//            finish()
+//        }
     }
 
     /**
