@@ -85,9 +85,10 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
             starIndicator.visibility = View.INVISIBLE
             starCount.visibility = View.INVISIBLE
 
-            //Load the profile pictures! Create a request to get the url for the piccture
+            //Load the profile pictures! Create a request to get the url for the picture
             Ion.with(mContext)
                     .load("${room?.site}/users/thumbs/${message.userId}")
+                    .noCache()
                     .asJsonObject()
                     .setCallback { e, result ->
                         if (e != null) {
