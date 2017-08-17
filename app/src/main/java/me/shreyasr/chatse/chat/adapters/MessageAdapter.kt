@@ -121,7 +121,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                 }
             }
             //If the message is starred, show the indicator and set the count text to the star count
-            if (message.message_starred) {
+            if (message.message_stars > 0) {
                 starIndicator.visibility = View.VISIBLE
                 starCount.visibility = View.VISIBLE
                 starCount.text = message.message_stars.toString()

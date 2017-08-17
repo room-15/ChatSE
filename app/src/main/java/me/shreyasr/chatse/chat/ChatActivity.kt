@@ -192,14 +192,6 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         super.onResume()
         val serviceIntent = Intent(this, IncomingEventService::class.java)
         this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
-//        //If the user is still logged in then continue, otherwise logout
-//        if (!defaultSharedPreferences.getBoolean(App.PREF_HAS_CREDS, false)) {
-//            val serviceIntent = Intent(this, IncomingEventService::class.java)
-//            this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
-//        } else {
-//            startActivity(Intent(applicationContext, LoginActivity::class.java))
-//            finish()
-//        }
     }
 
     /**
