@@ -1,15 +1,16 @@
 package me.shreyasr.chatse.login
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
-import com.afollestad.materialdialogs.MaterialDialog
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import me.shreyasr.chatse.App
@@ -37,20 +38,9 @@ class LoginActivity : AppCompatActivity() {
      */
     lateinit var emailView: EditText
     lateinit var passwordView: EditText
-    //    lateinit var progressBar: ProgressBar
     lateinit var loginButton: FloatingActionButton
     lateinit var prefs: SharedPreferences
-    // Pls don't hate me for null
-//    var loadingDialog : MaterialDialog? = null
-    val loadingDialog : MaterialDialog by lazy {
-        MaterialDialog.Builder(this)
-                .title("Please, wait")
-                .content("Loging in")
-                .cancelable(false)
-                .canceledOnTouchOutside(false)
-                .progress(true, 0)
-                .show()
-    }
+    lateinit var dialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +55,14 @@ class LoginActivity : AppCompatActivity() {
 
         //If the user has not logged in already, display the chat login layout
         setContentView(R.layout.activity_login_beautiful)
+
+        dialog = ProgressDialog(this)
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
+        dialog.setMessage("Attempting to log in")
+        dialog.isIndeterminate = true
+        dialog.setTitle("Loading")
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
 
         // Set variables to the layout
         emailView = findViewById(R.id.login_email) as EditText
@@ -108,20 +106,7 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        if (!loadingDialog.isShowing)
-            loadingDialog.show()
-
-//        if (!(loadingDialog?.isShowing ?: true)) {
-//            loadingDialog?.show()
-//        }
-//        else {
-//            loadingDialog = MaterialDialog.Builder(this)
-//                    .title("Please, wait")
-//                    .content("Loging in")
-//                    .cancelable(false)
-//                    .canceledOnTouchOutside(false)
-//                    .show()
-//        }
+        dialog.show()
 
         loginToSites(emailView.text.toString(), passwordView.text.toString())
     }
@@ -182,8 +167,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                 } else {
                     runOnUiThread {
-                        //                        progressBar.visibility = View.GONE
-                        loadingDialog.dismiss()
+                        dialog.dismiss()
                         loginButton.isClickable = true
                         Toast.makeText(this@LoginActivity, "Failed to log in, try again!", Toast.LENGTH_LONG).show()
                     }
