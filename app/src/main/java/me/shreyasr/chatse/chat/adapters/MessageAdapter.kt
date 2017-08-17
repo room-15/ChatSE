@@ -85,6 +85,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
             starIndicator.visibility = View.INVISIBLE
             starCount.visibility = View.INVISIBLE
 
+            //Load the profile pictures! Create a request to get the url for the piccture
             Ion.with(mContext)
                     .load("${room?.site}/users/thumbs/${message.userId}")
                     .asJsonObject()
@@ -92,11 +93,15 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                         if (e != null) {
                             Log.e("MessageAdapter", e.message.toString())
                         } else {
+                            //Get the email_hash attribute which contains either a link to Imgur or a hash for Gravatar
                             val hash = result.get("email_hash").asString.replace("!", "")
                             var imageLink = hash
+                            //If Gravatar, create link
                             if (!hash.contains(".")) {
                                 imageLink = "https://www.gravatar.com/avatar/$hash"
                             }
+
+                            //Load it into the ImageView!
                             Ion.with(userPicture)
                                     .load(imageLink)
                         }
