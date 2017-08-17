@@ -46,7 +46,7 @@
             android:enabled="true"
             android:exported="false" />
 
-        <activity android:name=".about.MainActivity"></activity>
+        <activity android:name=".about.AboutActivity"></activity>
     </application>
 
 </manifest>
