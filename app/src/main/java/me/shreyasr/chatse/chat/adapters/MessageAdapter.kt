@@ -80,9 +80,9 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
 
         fun bindMessage(message: MessageEvent) {
             //Hide elements in case not used
-            oneboxImage.visibility = View.GONE
-            starIndicator.visibility = View.GONE
-            starCount.visibility = View.GONE
+            oneboxImage.visibility = View.INVISIBLE
+            starIndicator.visibility = View.INVISIBLE
+            starCount.visibility = View.INVISIBLE
 
             if (room?.site == Client.SITE_STACK_OVERFLOW) {
                 if (message.userId == mContext.defaultSharedPreferences.getInt("SOID", -1).toLong()) {
