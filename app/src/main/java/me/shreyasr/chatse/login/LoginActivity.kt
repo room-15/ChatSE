@@ -80,7 +80,7 @@ class LoginActivity : AppCompatActivity() {
 
         //When the user presses submit inside the passwordView, attempt a login.
         passwordView.setOnEditorActionListener({ _, id, _ ->
-            if (id == R.id.login_submit || id == EditorInfo.IME_NULL) {
+            if (id == R.id.fab_submit || id == EditorInfo.IME_NULL) {
                 attemptLogin()
             }
             false

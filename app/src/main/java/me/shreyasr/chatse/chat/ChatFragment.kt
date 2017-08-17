@@ -24,7 +24,6 @@ import android.text.util.Linkify
 import android.util.Base64
 import android.util.Log
 import android.view.*
-import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -49,7 +48,6 @@ import org.codehaus.jackson.JsonNode
 import org.codehaus.jackson.map.ObjectMapper
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
-
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -216,17 +214,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 handleNewEvents(messages.get("events"))
             }
         }
-
-        //On input send. Create message and set text to nothing ("")
-        input.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEND) {
-                val content = input.text.toString()
-                input.setText("")
-                onSubmit(content)
-                return@OnEditorActionListener true
-            }
-            false
-        })
 
         //Get handle new events
         doAsync {
