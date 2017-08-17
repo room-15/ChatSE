@@ -77,12 +77,35 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
         val starIndicator = itemView.findViewById(R.id.message_star_indicator) as ImageView
         val starCount = itemView.findViewById(R.id.message_star_count) as TextView
         val oneboxImage = itemView.findViewById(R.id.message_image) as ImageView
+        val userPicture = itemView.findViewById(R.id.message_user_picture) as ImageView
 
         fun bindMessage(message: MessageEvent) {
             //Hide elements in case not used
             oneboxImage.visibility = View.INVISIBLE
             starIndicator.visibility = View.INVISIBLE
             starCount.visibility = View.INVISIBLE
+
+            //Load the profile pictures! Create a request to get the url for the piccture
+            Ion.with(mContext)
+                    .load("${room?.site}/users/thumbs/${message.userId}")
+                    .asJsonObject()
+                    .setCallback { e, result ->
+                        if (e != null) {
+                            Log.e("MessageAdapter", e.message.toString())
+                        } else {
+                            //Get the email_hash attribute which contains either a link to Imgur or a hash for Gravatar
+                            val hash = result.get("email_hash").asString.replace("!", "")
+                            var imageLink = hash
+                            //If Gravatar, create link
+                            if (!hash.contains(".")) {
+                                imageLink = "https://www.gravatar.com/avatar/$hash"
+                            }
+
+                            //Load it into the ImageView!
+                            Ion.with(userPicture)
+                                    .load(imageLink)
+                        }
+                    }
 
             if (room?.site == Client.SITE_STACK_OVERFLOW) {
                 if (message.userId == mContext.defaultSharedPreferences.getInt("SOID", -1).toLong()) {
