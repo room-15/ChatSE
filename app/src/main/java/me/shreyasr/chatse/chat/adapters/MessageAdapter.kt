@@ -2,8 +2,14 @@ package me.shreyasr.chatse.chat.adapters
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
+import android.support.constraint.ConstraintLayout
+import android.support.constraint.ConstraintSet
+import android.support.transition.AutoTransition
+import android.support.transition.Transition
+import android.support.transition.TransitionManager
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
@@ -69,6 +75,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
      * ViewHolder that handles setting all content in itemView
      */
     class MessageViewHolder(val mContext: Context, itemView: View, val chatFkey: String?, val room: ChatRoom?) : RecyclerView.ViewHolder(itemView) {
+        val rootLayout = itemView.findViewById(R.id.message_root) as ConstraintLayout
         val timestampFormat = SimpleDateFormat("hh:mm aa", Locale.getDefault())
         val messageView = itemView.findViewById(R.id.message_content) as TextView
         val userNameView = itemView.findViewById(R.id.message_user_name) as TextView
@@ -78,17 +85,23 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
         val starCount = itemView.findViewById(R.id.message_star_count) as TextView
         val oneboxImage = itemView.findViewById(R.id.message_image) as ImageView
         val userPicture = itemView.findViewById(R.id.message_user_picture) as ImageView
+        val placeholderDrawable = ContextCompat.getDrawable(mContext, R.drawable.box) as Drawable
+        var isFullSize : Boolean = false
+        var origWidth = 0
+        var origHeight = 0
 
         fun bindMessage(message: MessageEvent) {
             //Hide elements in case not used
-            oneboxImage.visibility = View.INVISIBLE
+            oneboxImage.visibility = View.GONE
             starIndicator.visibility = View.INVISIBLE
             starCount.visibility = View.INVISIBLE
+
+            if (userPicture.drawable != placeholderDrawable)
+                userPicture.setImageResource(R.drawable.box)
 
             //Load the profile pictures! Create a request to get the url for the picture
             Ion.with(mContext)
                     .load("${room?.site}/users/thumbs/${message.userId}")
-                    .noCache()
                     .asJsonObject()
                     .setCallback { e, result ->
                         if (e != null) {
@@ -154,13 +167,118 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                             //For images, load the image into the ImageView, making sure it's visible
                             oneboxImage.visibility = View.VISIBLE
 
-                            itemView.setOnClickListener {
-                                mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.onebox_content)))
+                            if (!isFullSize) {
+                                val layoutParams : ViewGroup.LayoutParams = oneboxImage.layoutParams
+                                origWidth = layoutParams.width
+                                origHeight = layoutParams.height
                             }
 
                             Ion.with(itemView.context)
                                     .load(message.onebox_content)
-                                    .intoImageView(itemView.message_image)
+                                    .noCache()
+                                    .intoImageView(oneboxImage)
+
+
+                            val resizeUpTransitionListener = object : Transition.TransitionListener {
+                                override fun onTransitionEnd(transition: Transition) { }
+
+                                override fun onTransitionResume(transition: Transition) { }
+
+                                override fun onTransitionPause(transition: Transition) { }
+
+                                override fun onTransitionCancel(transition: Transition) { }
+
+                                override fun onTransitionStart(transition: Transition) {
+                                    Ion.with(itemView.context)
+                                            .load(message.onebox_content)
+                                            .intoImageView(oneboxImage)
+                                }
+                            }
+
+                            val transitionListener = object : Transition.TransitionListener {
+                                override fun onTransitionEnd(transition: Transition) {
+                                    Ion.with(itemView.context)
+                                            .load(message.onebox_content)
+                                            .intoImageView(oneboxImage)
+                                }
+
+                                override fun onTransitionResume(transition: Transition) { }
+
+                                override fun onTransitionPause(transition: Transition) { }
+
+                                override fun onTransitionCancel(transition: Transition) { }
+
+                                override fun onTransitionStart(transition: Transition) {
+//                                    Ion.with(itemView.context)
+//                                            .load(message.onebox_content)
+//                                            .intoImageView(oneboxImage)
+                                }
+                            }
+
+                            oneboxImage.setOnClickListener {
+                                Log.d("oneBoxImage", "ImageClicked")
+                                Log.d("oneBoxImage", "isFullsize? $isFullSize")
+                                Log.d("oneBoxImage", "origWidth: $origWidth origHeight: $origHeight")
+
+                                val trans : Transition = AutoTransition()
+
+                                if (!isFullSize) {
+                                    val cSet : ConstraintSet = ConstraintSet()
+                                    cSet.clone(rootLayout)
+
+                                    cSet.constrainWidth(R.id.message_image, ConstraintSet.MATCH_CONSTRAINT)
+                                    cSet.constrainHeight(R.id.message_image, ConstraintSet.WRAP_CONTENT)
+
+                                    cSet.connect(R.id.message_image, ConstraintSet.LEFT, R.id.message_root, ConstraintSet.LEFT)
+                                    cSet.connect(R.id.message_image, ConstraintSet.START, R.id.message_root, ConstraintSet.START)
+                                    cSet.connect(R.id.message_image, ConstraintSet.RIGHT, R.id.message_root, ConstraintSet.RIGHT)
+                                    cSet.connect(R.id.message_image, ConstraintSet.END, R.id.message_root, ConstraintSet.END)
+
+                                    trans.addListener(transitionListener)
+
+                                    TransitionManager.beginDelayedTransition(rootLayout, trans)
+                                    cSet.applyTo(rootLayout)
+
+//                                    val layoutParams : ViewGroup.LayoutParams = oneboxImage.layoutParams
+//                                    layoutParams.width = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
+//                                    layoutParams.height = ConstraintLayout.LayoutParams.WRAP_CONTENT
+//                                    Log.d("oneBoxImage", "width: ${layoutParams.width} height: ${layoutParams.height}")
+//                                    oneboxImage.scaleType = ImageView.ScaleType.FIT_XY
+//                                    oneboxImage.layoutParams = layoutParams
+                                }
+                                else {
+//                                    val layoutParams : ViewGroup.LayoutParams = oneboxImage.layoutParams
+//                                    layoutParams.width = origWidth
+//                                    layoutParams.height = origHeight
+//                                    Log.d("oneBoxImage", "width: ${layoutParams.width} height: ${layoutParams.height}")
+//                                    oneboxImage.scaleType = ImageView.ScaleType.FIT_CENTER
+//                                    oneboxImage.layoutParams = layoutParams
+
+
+                                    val cSet : ConstraintSet = ConstraintSet()
+                                    cSet.clone(rootLayout)
+
+                                    cSet.constrainWidth(R.id.message_image, origWidth)
+                                    cSet.constrainHeight(R.id.message_image, origHeight)
+
+
+                                    cSet.connect(R.id.message_image, ConstraintSet.LEFT, R.id.message_edit_indicator, ConstraintSet.RIGHT)
+                                    cSet.connect(R.id.message_image, ConstraintSet.START, R.id.message_edit_indicator, ConstraintSet.END)
+                                    cSet.connect(R.id.message_image, ConstraintSet.RIGHT, R.id.guideline_80, ConstraintSet.LEFT)
+                                    cSet.connect(R.id.message_image, ConstraintSet.END, R.id.guideline_80, ConstraintSet.START)
+
+                                    trans.addListener(transitionListener)
+
+                                    TransitionManager.beginDelayedTransition(rootLayout, trans)
+                                    cSet.applyTo(rootLayout)
+                                }
+
+                                isFullSize = !isFullSize
+                            }
+
+//                            itemView.setOnClickListener {
+//                                mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.onebox_content)))
+//                            }
 
                             //Set the text to nothing just in case
                             messageView.text = ""
