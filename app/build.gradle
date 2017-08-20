@@ -1,5 +1,12 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
 apply plugin: 'kotlin-android'
+
+repositories {
+    maven {
+        url 'https://maven.fabric.io/public'
+    }
+}
 
 android {
     compileSdkVersion 25
@@ -30,6 +37,10 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    // Crashlytics Kit
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
+        transitive = true
+    }
     implementation 'com.android.support:design:25.4.0'
     implementation 'com.android.support:appcompat-v7:25.4.0'
     implementation 'com.android.support:recyclerview-v7:25.4.0'

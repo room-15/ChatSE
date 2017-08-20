@@ -3,6 +3,8 @@ package me.shreyasr.chatse
 import android.app.Application
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import com.crashlytics.android.Crashlytics
+import io.fabric.sdk.android.Fabric
 
 /**
  * Application class that manages certain constants for us.
@@ -11,6 +13,7 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        Fabric.with(this, Crashlytics())
         instance = this
     }
 
