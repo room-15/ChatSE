@@ -2,6 +2,11 @@ apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'kotlin-android'
 
+def FABRIC_API_KEY = '"' + fabricApiKey + '"'
+def MANIFEST_FABRIC_API_KEY = fabricApiKey
+
+def STRING = "String"
+
 repositories {
     maven {
         url 'https://maven.fabric.io/public'
@@ -19,10 +24,16 @@ android {
         versionName "1.0"
 
         vectorDrawables.useSupportLibrary = true
+
+        buildConfigField STRING, "fabricApiKey", FABRIC_API_KEY
+
+            manifestPlaceholders = [
+                    "fabricApiKey" : MANIFEST_FABRIC_API_KEY
+            ]
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

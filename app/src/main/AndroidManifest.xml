@@ -41,12 +41,16 @@
             <!-- </intent-filter> -->
         </activity>
 
+        <activity android:name=".about.AboutActivity"/>
+
         <service
             android:name=".chat.service.IncomingEventService"
             android:enabled="true"
             android:exported="false" />
 
-        <activity android:name=".about.AboutActivity"></activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="${fabricApiKey}" />
     </application>
 
 </manifest>
