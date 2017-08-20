@@ -113,11 +113,13 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                             //If Gravatar, create link
                             if (!hash.contains(".")) {
                                 imageLink = "https://www.gravatar.com/avatar/$hash"
+                            } else if (!hash.contains("http")){
+                                imageLink = room?.site + hash
                             }
 
                             //Load it into the ImageView!
-                            Ion.with(userPicture)
-                                    .load(imageLink)
+                                Ion.with(userPicture)
+                                        .load(imageLink)
                         }
                     }
 

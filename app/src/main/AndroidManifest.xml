@@ -14,33 +14,39 @@
         <activity android:name=".login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".chat.ChatActivity"
             android:label="@string/app_name">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.VIEW" />-->
 
-                <!--<category android:name="android.intent.category.DEFAULT" />-->
-                <!--<category android:name="android.intent.category.BROWSABLE" />-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.VIEW" /> -->
 
-                <!--<data-->
-                    <!--android:host="chat.stackoverflow.com"-->
-                    <!--android:pathPrefix="/rooms/"-->
-                    <!--android:scheme="https" />-->
-                <!--<data-->
-                    <!--android:host="chat.stackexchange.com"-->
-                    <!--android:pathPrefix="/rooms/"-->
-                    <!--android:scheme="https" />-->
-            <!--</intent-filter>-->
+
+            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+            <!-- <category android:name="android.intent.category.BROWSABLE" /> -->
+
+
+            <!-- <data -->
+            <!-- android:host="chat.stackoverflow.com" -->
+            <!-- android:pathPrefix="/rooms/" -->
+            <!-- android:scheme="https" /> -->
+            <!-- <data -->
+            <!-- android:host="chat.stackexchange.com" -->
+            <!-- android:pathPrefix="/rooms/" -->
+            <!-- android:scheme="https" /> -->
+            <!-- </intent-filter> -->
         </activity>
 
         <service
             android:name=".chat.service.IncomingEventService"
             android:enabled="true"
             android:exported="false" />
+
+        <activity android:name=".about.AboutActivity"></activity>
     </application>
 
 </manifest>

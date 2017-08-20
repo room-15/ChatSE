@@ -59,6 +59,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     lateinit var fkey: String
     lateinit var soRoomAdapter: RoomAdapter
     lateinit var seRoomAdapter: RoomAdapter
+    var isBound = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -119,6 +120,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
         val serviceIntent = Intent(this, IncomingEventService::class.java)
         this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
+        isBound = true
     }
 
     /**
@@ -177,7 +179,10 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
      */
     override fun onDestroy() {
         super.onDestroy()
-        unbindService(this)
+        if (isBound) {
+            unbindService(this)
+            isBound = false
+        }
         if (!defaultSharedPreferences.getBoolean(App.PREF_HAS_CREDS, false)) {
             PersistentCookieStore(App.instance).removeAll()
             startActivity(Intent(applicationContext, LoginActivity::class.java))
@@ -190,8 +195,11 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
      */
     override fun onResume() {
         super.onResume()
-        val serviceIntent = Intent(this, IncomingEventService::class.java)
-        this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
+        if (!isBound) {
+            val serviceIntent = Intent(this, IncomingEventService::class.java)
+            this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
+            isBound = true
+        }
     }
 
     /**

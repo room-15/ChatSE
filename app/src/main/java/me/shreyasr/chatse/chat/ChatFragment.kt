@@ -425,7 +425,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
                     events.addEvent(it, this.activity, room)
                 }
 
-
         //Update adapters so we know to check for new events
         activity.runOnUiThread {
             messageAdapter.update()
