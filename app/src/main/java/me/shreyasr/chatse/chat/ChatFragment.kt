@@ -201,7 +201,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
         usersAdapter = UsersAdapter(activity, events)
         messageList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, true)
         messageList.adapter = messageAdapter
-        messageList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))
+//        messageList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))
         userList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         userList.adapter = usersAdapter
         userList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))

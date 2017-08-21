@@ -77,7 +77,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
      * ViewHolder that handles setting all content in itemView
      */
     class MessageViewHolder(val mContext: Context, itemView: View, val chatFkey: String?, val room: ChatRoom?) : RecyclerView.ViewHolder(itemView) {
-        val rootLayout = itemView.findViewById<ConstraintLayout>(R.id.message_root)
+        val rootLayout = itemView.findViewById<ConstraintLayout>(R.id.message_root_container)
         val timestampFormat = SimpleDateFormat("hh:mm aa", Locale.getDefault())
         val messageView = itemView.findViewById<TextView>(R.id.message_content)
         val userNameView = itemView.findViewById<TextView>(R.id.message_user_name)
@@ -138,15 +138,15 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
 
             if (room?.site == Client.SITE_STACK_OVERFLOW) {
                 if (message.userId == mContext.defaultSharedPreferences.getInt("SOID", -1).toLong()) {
-                    itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_stackoverflow_mine))
+                    rootLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_stackoverflow_mine))
                 } else {
-                    itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_other))
+                    rootLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_other))
                 }
             } else {
                 if (message.userId == mContext.defaultSharedPreferences.getInt("SEID", -1).toLong()) {
-                    itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_stackexchange_mine))
+                    rootLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_stackexchange_mine))
                 } else {
-                    itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_other))
+                    rootLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_other))
                 }
             }
             //If the message is starred, show the indicator and set the count text to the star count
@@ -193,23 +193,6 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                                     .noCache()
                                     .intoImageView(oneboxImage)
 
-
-                            val resizeUpTransitionListener = object : Transition.TransitionListener {
-                                override fun onTransitionEnd(transition: Transition) {}
-
-                                override fun onTransitionResume(transition: Transition) {}
-
-                                override fun onTransitionPause(transition: Transition) {}
-
-                                override fun onTransitionCancel(transition: Transition) {}
-
-                                override fun onTransitionStart(transition: Transition) {
-                                    Ion.with(itemView.context)
-                                            .load(message.onebox_content)
-                                            .intoImageView(oneboxImage)
-                                }
-                            }
-
                             val transitionListener = object : Transition.TransitionListener {
                                 override fun onTransitionEnd(transition: Transition) {
                                     Ion.with(itemView.context)
@@ -223,31 +206,24 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
 
                                 override fun onTransitionCancel(transition: Transition) {}
 
-                                override fun onTransitionStart(transition: Transition) {
-//                                    Ion.with(itemView.context)
-//                                            .load(message.onebox_content)
-//                                            .intoImageView(oneboxImage)
-                                }
+                                override fun onTransitionStart(transition: Transition) {}
                             }
 
                             oneboxImage.setOnClickListener {
-                                Log.d("oneBoxImage", "ImageClicked")
-                                Log.d("oneBoxImage", "isFullsize? $isFullSize")
-                                Log.d("oneBoxImage", "origWidth: $origWidth origHeight: $origHeight")
-
                                 val trans: Transition = AutoTransition()
 
                                 if (!isFullSize) {
-                                    val cSet: ConstraintSet = ConstraintSet()
+                                    val cSet = ConstraintSet()
                                     cSet.clone(rootLayout)
 
+                                    // Grow as much as it can.
                                     cSet.constrainWidth(R.id.message_image, ConstraintSet.MATCH_CONSTRAINT)
                                     cSet.constrainHeight(R.id.message_image, ConstraintSet.WRAP_CONTENT)
 
-                                    cSet.connect(R.id.message_image, ConstraintSet.LEFT, R.id.message_root, ConstraintSet.LEFT)
-                                    cSet.connect(R.id.message_image, ConstraintSet.START, R.id.message_root, ConstraintSet.START)
-                                    cSet.connect(R.id.message_image, ConstraintSet.RIGHT, R.id.message_root, ConstraintSet.RIGHT)
-                                    cSet.connect(R.id.message_image, ConstraintSet.END, R.id.message_root, ConstraintSet.END)
+                                    cSet.connect(R.id.message_image, ConstraintSet.LEFT, R.id.message_root_container, ConstraintSet.LEFT)
+                                    cSet.connect(R.id.message_image, ConstraintSet.START, R.id.message_root_container, ConstraintSet.START)
+                                    cSet.connect(R.id.message_image, ConstraintSet.RIGHT, R.id.message_root_container, ConstraintSet.RIGHT)
+                                    cSet.connect(R.id.message_image, ConstraintSet.END, R.id.message_root_container, ConstraintSet.END)
 
                                     trans.addListener(transitionListener)
 
@@ -255,12 +231,12 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                                     cSet.applyTo(rootLayout)
 
                                 } else {
-                                    val cSet: ConstraintSet = ConstraintSet()
+                                    val cSet = ConstraintSet()
                                     cSet.clone(rootLayout)
 
+                                    // Revert it back to its original size.
                                     cSet.constrainWidth(R.id.message_image, origWidth)
                                     cSet.constrainHeight(R.id.message_image, origHeight)
-
 
                                     cSet.connect(R.id.message_image, ConstraintSet.LEFT, R.id.message_edit_indicator, ConstraintSet.RIGHT)
                                     cSet.connect(R.id.message_image, ConstraintSet.START, R.id.message_edit_indicator, ConstraintSet.END)
