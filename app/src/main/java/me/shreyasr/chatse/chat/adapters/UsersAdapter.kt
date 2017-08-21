@@ -49,8 +49,8 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
     override fun getItemCount() = users.size
 
     class UsersViewHolder(val mContext: Context, itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val userPicture = itemView.findViewById(R.id.user_icon) as ImageView
-        val userName = itemView.findViewById(R.id.user_name) as TextView
+        val userPicture = itemView.findViewById<ImageView>(R.id.user_icon)
+        val userName = itemView.findViewById<TextView>(R.id.user_name)
 
         fun bindMessage(user: MessageEvent) {
             //Set the username to the TextView

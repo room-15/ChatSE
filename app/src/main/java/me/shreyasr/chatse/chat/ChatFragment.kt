@@ -192,10 +192,10 @@ class ChatFragment : Fragment(), IncomingEventListener {
         }
 
         //Set all variables from layout
-        input = view.findViewById(R.id.chat_input_text) as EditText
-        messageList = view.findViewById(R.id.chat_message_list) as RecyclerView
-        userList = activity.findViewById(R.id.room_users) as RecyclerView
-        loadMessagesLayout = view.findViewById(R.id.load_messages_layout) as SwipeRefreshLayout
+        input = view.findViewById<EditText>(R.id.chat_input_text)
+        messageList = view.findViewById<RecyclerView>(R.id.chat_message_list)
+        userList = activity.findViewById<RecyclerView>(R.id.room_users)
+        loadMessagesLayout = view.findViewById<SwipeRefreshLayout>(R.id.load_messages_layout)
 
         messageAdapter = MessageAdapter(activity, events, chatFkey, room)
         usersAdapter = UsersAdapter(activity, events)

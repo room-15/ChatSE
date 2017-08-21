@@ -34,7 +34,7 @@ class ModifyMessageAdapter(val dialogMessages: MutableList<String>, context: Con
             view = layoutInflater.inflate(android.R.layout.simple_list_item_1, parent, false)
 
             viewHolder = ViewHolder()
-            viewHolder.textView = view.findViewById(android.R.id.text1) as TextView
+            viewHolder.textView = view.findViewById<TextView>(android.R.id.text1)
             view.tag = viewHolder
         } else {
             viewHolder = view.tag as ViewHolder
