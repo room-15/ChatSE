@@ -65,15 +65,15 @@ class LoginActivity : AppCompatActivity() {
         dialog.setCanceledOnTouchOutside(false)
 
         // Set variables to the layout
-        emailView = findViewById(R.id.login_email) as EditText
-        passwordView = findViewById(R.id.login_password) as EditText
-        loginButton = findViewById(R.id.fab_submit) as FloatingActionButton
+        emailView = findViewById(R.id.login_email)
+        passwordView = findViewById(R.id.login_password)
+        loginButton = findViewById(R.id.fab_submit)
 
 
         //If the loginButton is clicked attempt a login.
         loginButton.setOnClickListener { attemptLogin() }
 
-        //Set the emailView teext to the email saved in the preferences.
+        //Set the emailView text to the email saved in the preferences.
         emailView.setText(prefs.getString(App.PREF_EMAIL, ""))
 
         //When the user presses submit inside the passwordView, attempt a login.
