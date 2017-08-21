@@ -23,7 +23,7 @@
 
     <color name="message_stackoverflow_mine">#fbf2d9</color>
     <color name="message_stackexchange_mine">#d0eaf3</color>
-    <color name="message_other">#f6f6f6</color>
+    <color name="message_other">#f5f6f5</color>
 
     <color name="deleted">#BBBBBB</color>
 </resources>
