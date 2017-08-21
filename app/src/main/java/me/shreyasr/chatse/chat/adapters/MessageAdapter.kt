@@ -3,7 +3,6 @@ package me.shreyasr.chatse.chat.adapters
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -27,7 +26,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.koushikdutta.async.future.FutureCallback
 import com.koushikdutta.ion.Ion
 import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.ListHolder
@@ -256,21 +254,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                                     TransitionManager.beginDelayedTransition(rootLayout, trans)
                                     cSet.applyTo(rootLayout)
 
-//                                    val layoutParams : ViewGroup.LayoutParams = oneboxImage.layoutParams
-//                                    layoutParams.width = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
-//                                    layoutParams.height = ConstraintLayout.LayoutParams.WRAP_CONTENT
-//                                    Log.d("oneBoxImage", "width: ${layoutParams.width} height: ${layoutParams.height}")
-//                                    oneboxImage.scaleType = ImageView.ScaleType.FIT_XY
-//                                    oneboxImage.layoutParams = layoutParams
                                 } else {
-//                                    val layoutParams : ViewGroup.LayoutParams = oneboxImage.layoutParams
-//                                    layoutParams.width = origWidth
-//                                    layoutParams.height = origHeight
-//                                    Log.d("oneBoxImage", "width: ${layoutParams.width} height: ${layoutParams.height}")
-//                                    oneboxImage.scaleType = ImageView.ScaleType.FIT_CENTER
-//                                    oneboxImage.layoutParams = layoutParams
-
-
                                     val cSet: ConstraintSet = ConstraintSet()
                                     cSet.clone(rootLayout)
 
@@ -530,7 +514,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
             val swatchesTemp = Palette.from(bitmap).generate().getSwatches()
             val swatches = ArrayList<Palette.Swatch>(swatchesTemp)
             Collections.sort(swatches) { swatch1, swatch2 -> swatch2.population - swatch1.population }
-            return if (swatches.size > 0) swatches[0].rgb else mContext.resources.getColor(R.color.primary)
+            return if (swatches.size > 0) swatches[0].rgb else ContextCompat.getColor(mContext,(R.color.primary))
         }
     }
 }
