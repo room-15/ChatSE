@@ -38,3 +38,5 @@ local.properties
 # Custom
 /app/src/main/res/values/secrets.xml
 /app/app-release.apk
+gradle.properties
+gradle.properties

@@ -2,6 +2,8 @@ package me.shreyasr.chatse.chat.adapters
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -12,6 +14,7 @@ import android.support.transition.Transition
 import android.support.transition.TransitionManager
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
+import android.support.v7.graphics.Palette
 import android.support.v7.widget.RecyclerView
 import android.text.Html
 import android.text.util.Linkify
@@ -24,6 +27,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.koushikdutta.async.future.FutureCallback
 import com.koushikdutta.ion.Ion
 import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.ListHolder
@@ -85,6 +89,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
         val starCount = itemView.findViewById<TextView>(R.id.message_star_count)
         val oneboxImage = itemView.findViewById<ImageView>(R.id.message_image)
         val userPicture = itemView.findViewById<ImageView>(R.id.message_user_picture)
+        val userBarBottom = itemView.findViewById<ImageView>(R.id.message_user_color)
         val placeholderDrawable = ContextCompat.getDrawable(mContext, R.drawable.box) as Drawable
         var isFullSize: Boolean = false
         var origWidth = 0
@@ -118,8 +123,18 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                             }
 
                             //Load it into the ImageView!
-                            Ion.with(userPicture)
+                            Ion.with(mContext)
                                     .load(imageLink)
+                                    .asBitmap()
+                                    .setCallback{e,result ->
+                                        if(e != null || result == null){
+                                            Log.e("profilePic",e.toString())
+                                        }else{
+                                            Log.i("profilePic",result.toString())
+                                            userPicture.setImageBitmap(result)
+                                            userBarBottom.setBackgroundColor(getDominantColor(result))
+                                        }
+                                    }
                         }
                     }
 
@@ -509,6 +524,13 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                 //Extermin... I mean, Execute
                 client.newCall(soChatPageRequest).execute()
             }
+        }
+
+        fun getDominantColor(bitmap : Bitmap): Int {
+            val swatchesTemp = Palette.from(bitmap).generate().getSwatches()
+            val swatches = ArrayList<Palette.Swatch>(swatchesTemp)
+            Collections.sort(swatches) { swatch1, swatch2 -> swatch2.population - swatch1.population }
+            return if (swatches.size > 0) swatches[0].rgb else mContext.resources.getColor(R.color.primary)
         }
     }
 }
