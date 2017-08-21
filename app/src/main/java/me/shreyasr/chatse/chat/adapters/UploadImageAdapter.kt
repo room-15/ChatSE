@@ -37,8 +37,8 @@ class UploadImageAdapter(context: Context) : BaseAdapter() {
             view = layoutInflater.inflate(R.layout.simple_grid_item, parent, false)
 
             viewHolder = ViewHolder()
-            viewHolder.textView = view.findViewById(R.id.text_view) as TextView
-            viewHolder.imageView = view.findViewById(R.id.image_view) as ImageView
+            viewHolder.textView = view.findViewById<TextView>(R.id.text_view)
+            viewHolder.imageView = view.findViewById<ImageView>(R.id.image_view)
             view.tag = viewHolder
         } else {
             viewHolder = view.tag as ViewHolder

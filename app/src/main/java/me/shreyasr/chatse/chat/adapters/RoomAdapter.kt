@@ -41,7 +41,7 @@ class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Co
 
     //Set the room to the RecyclerView
     class ListRowHolder(val mContext: Context, itemView: View, val site: String) : RecyclerView.ViewHolder(itemView) {
-        val name = itemView.findViewById(R.id.room_name) as TextView
+        val name = itemView.findViewById<TextView>(R.id.room_name)
 
         fun bindMessage(room: Room) {
 
