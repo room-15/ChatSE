@@ -1,13 +1,21 @@
 package me.shreyasr.chatse.chat.service
 
+import android.app.ActivityManager
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import android.support.v4.app.NotificationCompat
 import android.util.Log
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.squareup.okhttp.ws.WebSocketCall
+import me.shreyasr.chatse.R
+import me.shreyasr.chatse.chat.ChatActivity
 import me.shreyasr.chatse.chat.ChatRoom
+import me.shreyasr.chatse.login.LoginActivity
 import me.shreyasr.chatse.network.Client
 import org.codehaus.jackson.JsonNode
 import org.json.JSONException
@@ -38,7 +46,25 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
         listeners.add(MessageListenerHolder(room, listener))
     }
 
+    private fun isAppInForeground(context: Context): Boolean {
+        val appProcessInfo = ActivityManager.RunningAppProcessInfo()
+        ActivityManager.getMyMemoryState(appProcessInfo)
+        if (appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND ||
+                appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
+            return true
+        } else if (appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_TOP_SLEEPING ||
+                appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_BACKGROUND) {
+            return false
+        }
+
+        val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val foregroundTaskInfo = am.getRunningTasks(1)[0]
+        val foregroundTaskPackageName = foregroundTaskInfo.topActivity.packageName
+        return foregroundTaskPackageName.toLowerCase() == context.packageName.toLowerCase()
+    }
+
     override fun onNewEvents(site: String, root: JsonNode) {
+
         for (holder in listeners) {
             if (holder.room.site != site) continue
             if (!root.has("r" + holder.room.num)) {
@@ -49,6 +75,25 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
             val roomNode = root.get("r" + holder.room.num)
             if (roomNode.has("e")) {
                 holder.listener.handleNewEvents(roomNode.get("e"))
+                if(!isAppInForeground(this)){
+                    val mBuilder = NotificationCompat.Builder(this)
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setContentTitle("New messages in room " + holder.room.num)
+                            .setAutoCancel(true)
+                    val mNotificationId = 1
+                    val resultIntent = Intent(this, ChatActivity::class.java)
+                    resultIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    val resultPendingIntent = PendingIntent.getActivity(
+                            this,
+                            0,
+                            resultIntent,
+                            PendingIntent.FLAG_CANCEL_CURRENT
+                    )
+                    mBuilder.setContentIntent(resultPendingIntent)
+                    val mNotifyMgr = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+                    mNotifyMgr.notify(mNotificationId, mBuilder.build())
+                }
+
             }
         }
     }
