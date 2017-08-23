@@ -82,6 +82,16 @@ class ChatEvent {
                 message_onebox = true
                 onebox_type = "image"
                 onebox_content = url
+            }  else if(obType.contains("ob-tweet")){
+                message_onebox = true
+                onebox_type = "tweet"
+                val status = elements[2]
+                val writtenBy = elements[4]
+                onebox_content = ""
+                onebox_content += "<p>" + status.childNode(0).toString() + "</p>"
+                onebox_content += "<p>"+writtenBy.toString()+"</p>"
+                shouldSetContent = false
+                this.contents = onebox_content
             } else {
                 message_onebox = false
                 onebox_type = ""
