@@ -3,6 +3,7 @@ package me.shreyasr.chatse.chat.adapters
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -98,6 +99,7 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
             oneboxImage.visibility = View.GONE
             starIndicator.visibility = View.INVISIBLE
             starCount.visibility = View.INVISIBLE
+            messageView.setBackgroundResource(0)
 
             if (userPicture.drawable != placeholderDrawable)
                 userPicture.setImageResource(R.drawable.box)
@@ -270,6 +272,21 @@ class MessageAdapter(val mContext: Context, val events: EventList, val chatFkey:
                                     .load(message.onebox_content)
                                     .intoImageView(itemView.message_image)
                             messageView.text = message.content
+                        }
+                        //for twitter tweets, display the profile pic, profile name, and render the text. might need some css
+                        "tweet" -> {
+                            messageView.background = ContextCompat.getDrawable(itemView.context,R.drawable.background_twitter)
+                            messageView.setPadding(15,15,15,15)
+                            messageView.setTextColor(ContextCompat.getColor(itemView.context,R.color.white))
+                            messageView.setLinkTextColor(ContextCompat.getColor(itemView.context,R.color.accent_twitter))
+                            Log.d("Onebox", "Type: ${message.onebox_type}")
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                messageView.text = Html.fromHtml(message.content, Html.FROM_HTML_MODE_LEGACY)
+                            } else {
+                                @Suppress("DEPRECATION")
+                                messageView.text = Html.fromHtml(message.content)
+                            }
+
                         }
                     //Other oneboxed items just display the HTML until we implement them all
                         else -> {
