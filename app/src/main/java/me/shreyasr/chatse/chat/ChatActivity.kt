@@ -103,7 +103,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         seRoomAdapter.notifyDataSetChanged()
 
         //Set toolbar as SupportActionBar
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         //Color the toolbar for StackOverflow as a default
