@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import me.shreyasr.chatse.R
 import me.shreyasr.chatse.about.pokos.DevPoko
 
@@ -17,6 +18,7 @@ import me.shreyasr.chatse.about.pokos.DevPoko
 class AboutDevCardAdapter(mContext : Context, val data: ArrayList<DevPoko>) : RecyclerView.Adapter<AboutDevCardAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
+        val headerPic : ImageView = itemView.findViewById(R.id.about_card_dev_header_image)
         val picture: ImageView = itemView.findViewById(R.id.about_card_profile_picture)
         val name: TextView = itemView.findViewById(R.id.about_card_dev_name)
         val job: TextView = itemView.findViewById(R.id.about_card_dev_job)
@@ -27,11 +29,14 @@ class AboutDevCardAdapter(mContext : Context, val data: ArrayList<DevPoko>) : Re
                 GridLayoutManager(itemView.context,3,GridLayoutManager.VERTICAL, false)
 
         fun bind(item : DevPoko) {
-//            Glide.with(itemView.context)
-//                    .load(item.imageRes)
-//                    .into(picture)
+            Glide.with(itemView.context)
+                    .load(R.drawable.material_bg2)
+                    .into(headerPic)
 
-            picture.setImageResource(item.imageRes)
+            Glide.with(itemView.context)
+                    .load(item.imageRes)
+                    .into(picture)
+
             name.text = item.name
             job.text = item.job
             aboutMe.text = item.aboutMe

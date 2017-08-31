@@ -186,7 +186,7 @@ class AboutActivity : AppCompatActivity() {
         )
 
         val anoobianPoko: DevPoko = DevPoko(
-                "Tristan Wiley",
+                "Shreyas",
                 "Full stack developer",
                 "I love Kotlin <3 Android development",
                 R.drawable.dev_anoobian,

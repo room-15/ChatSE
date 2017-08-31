@@ -111,8 +111,8 @@
 
     <me.shreyasr.chatse.views.CircleImageView
         android:id="@+id/about_card_profile_picture"
-        android:layout_width="92dp"
-        android:layout_height="92dp"
+        android:layout_width="112dp"
+        android:layout_height="112dp"
         app:layout_anchor="@id/about_card_content"
         app:layout_anchorGravity="top|center_horizontal"
         android:elevation="4dp"/>
