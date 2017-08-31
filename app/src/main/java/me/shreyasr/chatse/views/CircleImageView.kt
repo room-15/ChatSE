@@ -32,7 +32,7 @@ class CircleImageView : AppCompatImageView {
 
     private val mCornerRadii : FloatArray = floatArrayOf(DEFAULT_RADIUS, DEFAULT_RADIUS, DEFAULT_RADIUS, DEFAULT_RADIUS)
     private var mBackgroundDrawable: Drawable? = null
-    private var mBorderColor : ColorStateList? = ColorStateList.valueOf(Color.BLACK)
+    private var mBorderColor : ColorStateList? = ColorStateList.valueOf(Color.WHITE)
     private var mBorderWidth : Float = DEFAULT_BORDER_WIDTH
     private var mColorFilter: ColorFilter? = null
     private var mColorMod = false

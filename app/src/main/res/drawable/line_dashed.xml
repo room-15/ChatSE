@@ -1,0 +1,12 @@
+<!-- Taken from: https://stackoverflow.com/questions/39667195/android-how-to-add-a-dashed-dotted-separator-line-for-recyclerview-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="line" >
+
+    <stroke
+        android:color="@color/divider"
+        android:dashGap="12dp"
+        android:dashWidth="12dp"
+        android:width="1dp"
+        android:height="2dp"/>
+
+</shape>
