@@ -37,4 +37,5 @@
     <string name="about_app_header_bug_report">Report a bug</string>
     <string name="about_app_header_changelog">Changelog</string>
     <string name="about_app_header_donate">Donate</string>
+    <string name="our_developers">Our developers</string>
 </resources>
