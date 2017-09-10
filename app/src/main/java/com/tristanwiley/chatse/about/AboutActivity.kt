@@ -13,7 +13,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import com.tristanwiley.chatse.BuildConfig
 import com.tristanwiley.chatse.R
 
@@ -71,21 +70,31 @@ class AboutActivity : AppCompatActivity() {
         headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
                 R.drawable.ic_star_black,
                 getString(R.string.buy_coffee),
-                View.OnClickListener { Toast.makeText(this, "Rated!", Toast.LENGTH_LONG).show() }
-        ))
+                View.OnClickListener {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.tristanwiley.chatse")))
+                }))
 
         // Play Store
         headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
                 R.drawable.ic_google_play,
                 getString(R.string.about_app_header_play_store),
-                View.OnClickListener { /* TODO */ }
+                View.OnClickListener {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.tristanwiley.chatse")))
+                }
         ))
 
         // Share app
         headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
                 R.drawable.ic_share_black_24dp,
                 getString(R.string.share_app),
-                View.OnClickListener { /* TODO */ }
+                View.OnClickListener {
+                    val sendIntent = Intent()
+                    sendIntent.action = Intent.ACTION_SEND
+                    sendIntent.putExtra(Intent.EXTRA_TEXT,
+                            "Check out StackExchange's chat app! https://play.google.com/store/apps/details?id=com.tristanwiley.chatse")
+                    sendIntent.type = "text/plain"
+                    startActivity(sendIntent)
+                }
         ))
 
         // Changelog
