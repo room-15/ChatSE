@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/light_gray"
     android:fitsSystemWindows="true"
-    tools:context="me.shreyasr.chatse.about.AboutActivity">
+    tools:context="com.tristanwiley.chatse.about.AboutActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/about_appbar_layout"

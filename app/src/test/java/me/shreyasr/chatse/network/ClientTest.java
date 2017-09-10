@@ -1,4 +1,4 @@
-package me.shreyasr.chatse.network;
+package com.tristanwiley.chatse.network;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,8 +12,8 @@ import junit.framework.TestCase;
 
 import java.net.CookieStore;
 
-import me.shreyasr.chatse.TestUtils;
-import me.shreyasr.chatse.network.cookie.PersistentCookieStore;
+import com.tristanwiley.chatse.TestUtils;
+import com.tristanwiley.chatse.network.cookie.PersistentCookieStore;
 
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyString;

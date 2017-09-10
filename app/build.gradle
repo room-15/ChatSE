@@ -17,7 +17,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion "26.0.1"
     defaultConfig {
-        applicationId "me.shreyasr.chatse"
+        applicationId 'com.tristanwiley.chatse'
         minSdkVersion 16
         targetSdkVersion 26
         versionCode 1

@@ -1,4 +1,4 @@
-package me.shreyasr.chatse;
+package com.tristanwiley.chatse;
 
 import android.content.SharedPreferences;
 

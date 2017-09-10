@@ -7,10 +7,10 @@
   "client": [
     {
       "client_info": {
-        "client_id": "android:me.shreyasr.chatse",
+        "client_id": "android:com.tristanwiley.chatse",
         "client_type": 1,
         "android_client_info": {
-          "package_name": "me.shreyasr.chatse"
+          "package_name": "com.tristanwiley.chatse"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "591450971993-anluos2lt1km7gjsvt8frm7nga9rok92.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "me.shreyasr.chatse",
+            "package_name": "com.tristanwiley.chatse",
             "certificate_hash": "b9a151a8f001a4f9be4fa057d49f1ce204082752"
           }
         }
