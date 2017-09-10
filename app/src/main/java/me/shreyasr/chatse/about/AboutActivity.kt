@@ -1,5 +1,7 @@
 package me.shreyasr.chatse.about
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CollapsingToolbarLayout
@@ -21,9 +23,9 @@ import me.shreyasr.chatse.about.pokos.DevPoko
 class AboutActivity : AppCompatActivity() {
 
     lateinit var tvHeaderAppAbout: TextView
-    lateinit var tvHeaderVersion : TextView
-    lateinit var rvHeader : RecyclerView
-    lateinit var rvDevs : RecyclerView
+    lateinit var tvHeaderVersion: TextView
+    lateinit var rvHeader: RecyclerView
+    lateinit var rvDevs: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +47,7 @@ class AboutActivity : AppCompatActivity() {
                     collapsingToolbarLayout.title = "About ChatSE"
                     isShow = true
                 } else if (isShow) {
-                    collapsingToolbarLayout.title = " "//carefull there should a space between double quote otherwise it wont work
+                    collapsingToolbarLayout.title = " "
                     isShow = false
                 }
             }
@@ -72,49 +74,49 @@ class AboutActivity : AppCompatActivity() {
                 R.drawable.ic_star_black,
                 getString(R.string.about_app_header_share),
                 View.OnClickListener { Toast.makeText(this, "Rated!", Toast.LENGTH_LONG).show() }
-            )
+        )
         )
         // Play Store
         headerArray.add(AboutIconPoko(
                 R.drawable.ic_google_play,
                 getString(R.string.about_app_header_play_store),
                 View.OnClickListener { /* TODO */ }
-            )
+        )
         )
         // Share app
         headerArray.add(AboutIconPoko(
                 R.drawable.ic_share_black_24dp,
                 getString(R.string.about_app_header_share),
                 View.OnClickListener { /* TODO */ }
-            )
+        )
         )
         // Changelog
         headerArray.add(AboutIconPoko(
                 R.drawable.ic_log_black_24dp,
                 getString(R.string.about_app_header_changelog),
                 View.OnClickListener { /* TODO */ }
-            )
+        )
         )
         // Contact us
         headerArray.add(AboutIconPoko(
                 R.drawable.ic_feedback_black_24dp,
                 getString(R.string.about_app_header_contact_us),
                 View.OnClickListener { /* TODO */ }
-            )
+        )
         )
         // Report bug
         headerArray.add(AboutIconPoko(
                 R.drawable.ic_bug_report_black_24dp,
                 getString(R.string.about_app_header_bug_report),
                 View.OnClickListener { /* TODO */ }
-            )
+        )
         )
         // Donate
         headerArray.add(AboutIconPoko(
                 R.drawable.ic_favorite_black_24dp,
                 getString(R.string.about_app_header_share),
                 View.OnClickListener { /* TODO */ }
-            )
+        )
         )
 
         rvHeader.adapter = AboutIconAdapter(this, headerArray)
@@ -123,90 +125,48 @@ class AboutActivity : AppCompatActivity() {
         rvDevs = findViewById(R.id.rv_about_devs)
         rvDevs.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
-        val maukerArray = ArrayList<AboutIconPoko>()
-
-        // Twitter
-        maukerArray.add(AboutIconPoko(
-                R.drawable.ic_twitter_circle,
-                "Twitter",
-                View.OnClickListener { Toast.makeText(this, "Clicked!", Toast.LENGTH_LONG).show() }
-            )
-        )
-
-        // Instagram
-        maukerArray.add(AboutIconPoko(
-                R.drawable.ic_instagram,
-                "Instagram",
-                View.OnClickListener { Toast.makeText(this, "Clicked!", Toast.LENGTH_LONG).show() }
-            )
-        )
-
-        // Github
-        maukerArray.add(AboutIconPoko(
-                R.drawable.ic_github_circle,
-                "Github",
-                View.OnClickListener { Toast.makeText(this, "Clicked!", Toast.LENGTH_LONG).show() }
-            )
-        )
-
-        // Website
-        maukerArray.add(AboutIconPoko(
-                R.drawable.ic_web_black_24dp,
-                "Website",
-                View.OnClickListener { Toast.makeText(this, "Clicked!", Toast.LENGTH_LONG).show() }
-            )
-        )
-
-        // Email
-        maukerArray.add(AboutIconPoko(
-                R.drawable.ic_email_black_24dp,
-                "Email",
-                View.OnClickListener { Toast.makeText(this, "Clicked!", Toast.LENGTH_LONG).show() }
-            )
-        )
-
         val devList: ArrayList<DevPoko> = ArrayList()
 
-        val maukerPoko: DevPoko = DevPoko(
+        val tristanPoko = DevPoko(
+                "Tristan Wiley",
+                "Full stack developer",
+                "A lover of Android development and code of all stacks. Currently pursuing a Computer Science degree at The University at Buffalo.",
+                R.drawable.dev_tristan,
+                generateAboutIconArray("https://github.com/TristanWiley", "http://tristanwiley.com/", "https://stackoverflow.com/users/1064310/tristan-wiley", "tristan@tristanwiley.com", "https://twitter.com/lesirhype")
+        )
+
+        val maukerPoko = DevPoko(
                 "Mauricio Pessoa",
                 "Software Engineer",
                 "Computer Science Master's Student on UFMA and a tech lover. Sometimes I also grab my Nikon and go out for some pictures.\n" +
                         "\n" +
                         "I'm mostly an Android developer, but I also have other unhealthy obsessions.",
                 R.drawable.dev_mauker,
-                maukerArray
+                generateAboutIconArray("https://github.com/mauker1", "http://tristanwiley.com/", "https://stackoverflow.com/users/4070469/mauker", "", "https://twitter.com/mauker")
         )
 
-        val tristanPoko: DevPoko = DevPoko(
-                "Tristan Wiley",
-                "Full stack developer",
-                "I love Kotlin <3 Android development",
-                R.drawable.dev_tristan,
-                maukerArray
-        )
-
-        val anoobianPoko: DevPoko = DevPoko(
+        val anoobianPoko = DevPoko(
                 "Shreyas",
                 "Full stack developer",
-                "Developer of the base application, got too busy.",
+                "Developer of the base application, got too busy with life <3.",
                 R.drawable.dev_anoobian,
-                maukerArray
+                generateAboutIconArray("https://github.com/AnubianN00b", "", "", "", "")
         )
 
-        val adamPoko: DevPoko = DevPoko(
+        val adamPoko = DevPoko(
                 "Adam McNeilly",
                 "Full stack Android developer",
                 "Android developer at HelloWorld, and author of @androidessence. Also an organizer for @GrizzHacks.",
                 R.drawable.dev_adam,
-                maukerArray
+                generateAboutIconArray("https://github.com/AdamMc331", "http://adammcneilly.com/", "https://stackoverflow.com/users/3131147/adammc331", "amcneilly331@gmail.com", "https://twitter.com/adammc331")
         )
 
-        val ericPoko: DevPoko = DevPoko(
+        val ericPoko = DevPoko(
                 "Eric Cugota",
                 "Android developer",
                 "...",
                 R.drawable.dev_eric,
-                maukerArray
+                generateAboutIconArray("https://github.com/tryadelion", "http://cugotaeric.wixsite.com/", "https://stackoverflow.com/users/4763177/cpteric", "", "https://twitter.com/lesirhype")
         )
 
 
@@ -218,5 +178,64 @@ class AboutActivity : AppCompatActivity() {
         devList.add(ericPoko)
 
         rvDevs.adapter = AboutDevCardAdapter(this, devList)
+    }
+
+    /**
+     * Function to create clickable icons in the About cards
+     */
+    fun generateAboutIconArray(githubURL: String, websiteURL: String, stackoverflowURL: String, emailAddress: String, twitterURL: String): ArrayList<AboutIconPoko> {
+        val iconArray = ArrayList<AboutIconPoko>()
+
+        if (!githubURL.isBlank()) {
+            // Github
+            iconArray.add(AboutIconPoko(
+                    R.drawable.ic_github_circle,
+                    "Github",
+                    View.OnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(githubURL))) }
+            ))
+        }
+
+        if (!websiteURL.isBlank()) {
+            // Website
+            iconArray.add(AboutIconPoko(
+                    R.drawable.ic_web_black_24dp,
+                    "Website",
+                    View.OnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(websiteURL))) }
+            ))
+        }
+
+        if (!stackoverflowURL.isBlank()) {
+            // Website
+            iconArray.add(AboutIconPoko(
+                    R.drawable.ic_web_black_24dp,
+                    "StackOverflow",
+                    View.OnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(stackoverflowURL))) }
+            ))
+        }
+
+        if (!emailAddress.isBlank()) {
+            // Email
+            iconArray.add(AboutIconPoko(
+                    R.drawable.ic_email_black_24dp,
+                    "Email",
+                    View.OnClickListener {
+                        val emailIntent = Intent(android.content.Intent.ACTION_SEND)
+                        emailIntent.type = "plain/text"
+                        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf(emailAddress))
+                        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "ChatSE")
+                        startActivity(Intent.createChooser(emailIntent, "Send mail..."))
+                    }
+            ))
+        }
+
+        if (!twitterURL.isBlank()) {
+            // Twitter
+            iconArray.add(AboutIconPoko(
+                    R.drawable.ic_twitter_circle,
+                    "Twitter",
+                    View.OnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(twitterURL))) }
+            ))
+        }
+        return iconArray
     }
 }

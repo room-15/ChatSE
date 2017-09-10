@@ -29,6 +29,7 @@ import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.room_nav_header.*
 import me.shreyasr.chatse.App
 import me.shreyasr.chatse.R
+import me.shreyasr.chatse.about.AboutActivity
 import me.shreyasr.chatse.chat.adapters.RoomAdapter
 import me.shreyasr.chatse.chat.service.IncomingEventService
 import me.shreyasr.chatse.chat.service.IncomingEventServiceBinder
@@ -414,6 +415,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
                     //Show the dialog
                     builder.show()
+                }
+                R.id.action_about -> {
+                    startActivity(Intent(this, AboutActivity::class.java))
                 }
             //Logout of app by clearing all SharedPreferences and loading the LoginActivity
                 R.id.action_logout -> {

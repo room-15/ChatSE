@@ -27,8 +27,9 @@
     <string name="default_profile_email">jonskeet@stackexchange.com</string>
     <string name="default_profile_name">Jon Skeet</string>
 
+    <string name="about">About</string>
     <string name="about_version">%1$s - Version %2$s</string>
-    <string name="about_app">This app was made with S2 by bla bla bla</string>
+    <string name="about_app">This app was made with love by the StackExchange community &lt;3</string>
 
     <string name="about_app_header_share">Share this app</string>
     <string name="about_app_header_play_store">Check Chat.SE on Play Store</string>
@@ -36,14 +37,4 @@
     <string name="about_app_header_bug_report">Report a bug</string>
     <string name="about_app_header_changelog">Changelog</string>
     <string name="about_app_header_donate">Donate</string>
-
-    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla mollis consequat diam sit amet mattis. Quisque a est pulvinar, volutpat mauris congue, sagittis arcu. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Mauris laoreet quis sem vitae rhoncus. Aenean quis sem id velit consectetur consequat. Nam tempor vestibulum pretium. Quisque neque quam, pulvinar non risus dignissim, ullamcorper auctor neque. Nunc sagittis nunc a eros congue lacinia. Vivamus laoreet, sapien non euismod ullamcorper, odio quam interdum magna, eget pellentesque est eros ac lectus.
-
-    Sed vitae metus sed ligula tempus congue. Cras nec arcu nulla. Morbi luctus elit eu arcu ultricies lacinia. Sed sodales tempor velit sit amet sodales. Aenean vestibulum ut massa at ultricies. Quisque at dui feugiat, commodo risus vel, luctus urna. Quisque eget nisl ex. Fusce dignissim leo a velit porta dapibus. Quisque facilisis pharetra est, et ullamcorper velit consectetur ut. Proin aliquet velit eget magna suscipit bibendum. Maecenas nec scelerisque massa. Mauris pretium, enim ac placerat aliquet, mauris sapien feugiat mauris, quis mollis nulla risus sit amet nunc. Suspendisse aliquet mauris in nisi tincidunt, vel ornare mi malesuada.
-
-    Curabitur dictum ipsum quis lacus euismod dapibus. Integer porttitor sagittis maximus. Ut imperdiet interdum nisl. Cras et turpis non tortor cursus volutpat euismod ac sem. Vestibulum commodo cursus ex, vitae cursus felis interdum eu. Vivamus finibus nisl ut pharetra ullamcorper. Sed fermentum vel sapien sed elementum.
-
-    Cras consectetur erat tellus, non iaculis ex facilisis quis. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Mauris luctus odio sit amet justo laoreet pretium. Sed vel vulputate velit. Cras euismod enim in dolor dictum, ac lacinia risus cursus. Phasellus nec justo vel nisl dictum ornare. Morbi nec convallis urna. Proin sed metus at erat molestie aliquam. Proin vestibulum gravida orci, ut tincidunt nibh sodales sit amet. Aliquam placerat sapien mauris, non faucibus turpis finibus sed.
-
-    Curabitur lobortis tellus nec ante congue hendrerit. In congue eget mauris vulputate dictum. Integer aliquam risus ut massa eleifend lobortis. Aenean hendrerit erat non dolor dapibus, et sollicitudin est pretium. Donec magna ante, gravida ut metus sed, mattis elementum quam. Cras in arcu neque. Quisque dignissim lectus ac nunc feugiat laoreet. Vivamus accumsan accumsan mauris eget viverra. Cras vel lobortis felis. Praesent egestas nunc neque, non elementum arcu auctor id. Praesent velit massa, vestibulum in efficitur quis, aliquam condimentum nulla. Vestibulum condimentum est vel justo semper eleifend. Maecenas rhoncus gravida ligula vel mattis. Aliquam feugiat tortor et porta dictum.</string>
 </resources>
