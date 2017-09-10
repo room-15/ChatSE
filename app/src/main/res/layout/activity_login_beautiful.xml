@@ -6,7 +6,7 @@
     android:id="@+id/activity_login_rl_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="me.shreyasr.chatse.login.LoginActivity">
+    tools:context="com.tristanwiley.chatse.login.LoginActivity">
 
     <ImageView
         android:id="@+id/activity_login_iv_background"
