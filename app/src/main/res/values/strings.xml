@@ -31,11 +31,12 @@
     <string name="about_version">%1$s - Version %2$s</string>
     <string name="about_app">This app was made with love by the StackExchange community &lt;3</string>
 
-    <string name="about_app_header_share">Share this app</string>
+    <string name="buy_coffee">Buy me a coffee</string>
     <string name="about_app_header_play_store">Check Chat.SE on Play Store</string>
     <string name="about_app_header_contact_us">Contact us</string>
     <string name="about_app_header_bug_report">Report a bug</string>
     <string name="about_app_header_changelog">Changelog</string>
     <string name="about_app_header_donate">Donate</string>
     <string name="our_developers">Our developers</string>
+    <string name="share_app">Share App</string>
 </resources>

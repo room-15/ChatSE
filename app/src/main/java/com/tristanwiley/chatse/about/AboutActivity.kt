@@ -5,10 +5,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CollapsingToolbarLayout
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
@@ -68,52 +70,59 @@ class AboutActivity : AppCompatActivity() {
         // Rate app
         headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
                 R.drawable.ic_star_black,
-                getString(R.string.about_app_header_share),
+                getString(R.string.buy_coffee),
                 View.OnClickListener { Toast.makeText(this, "Rated!", Toast.LENGTH_LONG).show() }
-        )
-        )
+        ))
+
         // Play Store
         headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
                 R.drawable.ic_google_play,
                 getString(R.string.about_app_header_play_store),
                 View.OnClickListener { /* TODO */ }
-        )
-        )
+        ))
+
         // Share app
         headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
                 R.drawable.ic_share_black_24dp,
-                getString(R.string.about_app_header_share),
+                getString(R.string.share_app),
                 View.OnClickListener { /* TODO */ }
-        )
-        )
+        ))
+
         // Changelog
         headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
                 R.drawable.ic_log_black_24dp,
                 getString(R.string.about_app_header_changelog),
-                View.OnClickListener { /* TODO */ }
-        )
-        )
+                View.OnClickListener {
+                    AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme_SO))
+                            .setTitle(getString(R.string.about_app_header_changelog))
+                            .setView(R.layout.fragment_changelog)
+                            .setPositiveButton("Close",
+                                    { dialog, _ -> dialog.dismiss() }
+                            )
+                            .create()
+                            .show()
+                }
+        ))
+
         // Contact us
         headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
                 R.drawable.ic_feedback_black_24dp,
                 getString(R.string.about_app_header_contact_us),
-                View.OnClickListener { /* TODO */ }
-        )
-        )
-        // Report bug
-        headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
-                R.drawable.ic_bug_report_black_24dp,
-                getString(R.string.about_app_header_bug_report),
-                View.OnClickListener { /* TODO */ }
-        )
-        )
+                View.OnClickListener {
+                    val emailIntent = Intent(android.content.Intent.ACTION_SEND)
+                    emailIntent.type = "plain/text"
+                    emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf("tristan@tristanwiley.com"))
+                    emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "ChatSE")
+                    startActivity(Intent.createChooser(emailIntent, "Send mail..."))
+                }
+        ))
+
         // Donate
         headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
                 R.drawable.ic_favorite_black_24dp,
-                getString(R.string.about_app_header_share),
-                View.OnClickListener { /* TODO */ }
-        )
-        )
+                getString(R.string.buy_coffee),
+                View.OnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://ko-fi.com/A44341P5"))) }
+        ))
 
         rvHeader.adapter = com.tristanwiley.chatse.about.adapters.AboutIconAdapter(this, headerArray)
 
