@@ -138,7 +138,7 @@ class AboutActivity : AppCompatActivity() {
                         "\n" +
                         "I'm mostly an Android developer, but I also have other unhealthy obsessions.",
                 R.drawable.dev_mauker,
-                generateAboutIconArray("https://github.com/mauker1", "http://tristanwiley.com/", "https://stackoverflow.com/users/4070469/mauker", "", "https://twitter.com/mauker")
+                generateAboutIconArray("https://github.com/mauker1", "", "https://stackoverflow.com/users/4070469/mauker", "mauricio.ufma@gmail.com", "https://twitter.com/mauker")
         )
 
         val anoobianPoko = com.tristanwiley.chatse.about.pokos.DevPoko(
