@@ -33,10 +33,10 @@ import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.GridHolder
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
-import kotlinx.android.synthetic.main.fragment_chat.view.*
-import kotlinx.android.synthetic.main.picker_footer.view.*
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.network.ClientManager
+import kotlinx.android.synthetic.main.fragment_chat.view.*
+import kotlinx.android.synthetic.main.picker_footer.view.*
 import org.codehaus.jackson.JsonNode
 import org.codehaus.jackson.map.ObjectMapper
 import org.jetbrains.anko.doAsync
@@ -93,7 +93,7 @@ class ChatFragment : Fragment(), com.tristanwiley.chatse.chat.service.IncomingEv
         chatFkey = args.getString(com.tristanwiley.chatse.chat.ChatFragment.Companion.EXTRA_FKEY)
 
         //Get the current ChatRoom from the arguments
-        room = args.getParcelable<com.tristanwiley.chatse.chat.ChatRoom>(com.tristanwiley.chatse.chat.ChatFragment.Companion.EXTRA_ROOM)
+        room = args.getParcelable(com.tristanwiley.chatse.chat.ChatFragment.Companion.EXTRA_ROOM)
 
         if (room.site == com.tristanwiley.chatse.network.Client.SITE_STACK_OVERFLOW) {
             //Set the multitasking color to orange
@@ -185,10 +185,10 @@ class ChatFragment : Fragment(), com.tristanwiley.chatse.chat.service.IncomingEv
         }
 
         //Set all variables from layout
-        input = view.findViewById<EditText>(R.id.chat_input_text)
-        messageList = view.findViewById<RecyclerView>(R.id.chat_message_list)
-        userList = activity.findViewById<RecyclerView>(R.id.room_users)
-        loadMessagesLayout = view.findViewById<SwipeRefreshLayout>(R.id.load_messages_layout)
+        input = view.findViewById(R.id.chat_input_text)
+        messageList = view.findViewById(R.id.chat_message_list)
+        userList = activity.findViewById(R.id.room_users)
+        loadMessagesLayout = view.findViewById(R.id.load_messages_layout)
 
         messageAdapter = com.tristanwiley.chatse.chat.adapters.MessageAdapter(activity, events, chatFkey, room)
         usersAdapter = com.tristanwiley.chatse.chat.adapters.UsersAdapter(activity, events)
@@ -328,6 +328,13 @@ class ChatFragment : Fragment(), com.tristanwiley.chatse.chat.service.IncomingEv
                             }
                         }
                 return true
+            }
+            R.id.room_stars -> {
+                //Load intent for showing stars
+                val intent = Intent(activity, StarsActivity::class.java)
+                intent.putExtra("roomID", room.num)
+                intent.putExtra("roomSite", room.site)
+                startActivity(intent)
             }
         }
         return false

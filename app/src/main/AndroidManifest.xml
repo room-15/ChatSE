@@ -6,12 +6,12 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
-        android:name="com.tristanwiley.chatse.App"
+        android:name=".App"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
-        <activity android:name="com.tristanwiley.chatse.login.LoginActivity">
+        <activity android:name=".login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.tristanwiley.chatse.chat.ChatActivity"
+            android:name=".chat.ChatActivity"
             android:label="@string/app_name">
 
             <!-- <intent-filter> -->
@@ -40,17 +40,18 @@
             <!-- android:scheme="https" /> -->
             <!-- </intent-filter> -->
         </activity>
-
-        <activity android:name="com.tristanwiley.chatse.about.AboutActivity"/>
+        <activity android:name=".about.AboutActivity" />
 
         <service
-            android:name="com.tristanwiley.chatse.chat.service.IncomingEventService"
+            android:name=".chat.service.IncomingEventService"
             android:enabled="true"
             android:exported="false" />
 
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="${fabricApiKey}" />
+
+        <activity android:name=".chat.StarsActivity"></activity>
     </application>
 
 </manifest>

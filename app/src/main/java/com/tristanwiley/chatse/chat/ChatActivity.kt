@@ -418,6 +418,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                 }
             //This is handled by the ChatFragment
                 R.id.room_information -> return false
+                R.id.room_stars -> return false
             }
         }
         return super.onOptionsItemSelected(item)

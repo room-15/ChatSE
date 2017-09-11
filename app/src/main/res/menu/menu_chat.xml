@@ -15,6 +15,12 @@
         android:title="@string/room_info"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/room_stars"
+        android:icon="@drawable/ic_star_white"
+        android:orderInCategory="0"
+        android:title="@string/stars"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_about"
         android:orderInCategory="50"
         android:title="@string/about"

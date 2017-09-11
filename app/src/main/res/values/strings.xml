@@ -24,6 +24,7 @@
     <string name="star_message">Star Message</string>
     <string name="edit_message">Edit Message</string>
     <string name="room_info">Room Info</string>
+    <string name="stars">Stars</string>
     <string name="default_profile_email">jonskeet@stackexchange.com</string>
     <string name="default_profile_name">Jon Skeet</string>
 
