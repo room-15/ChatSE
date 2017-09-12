@@ -18,10 +18,10 @@ class ChatEventGenerator {
      * @param json: is a JSONNode that is take in and mapped to a ChatEvent
      * @return a ChatEvent
      */
-    fun createEvent(json: JsonNode): com.tristanwiley.chatse.event.ChatEvent? {
-        var c: com.tristanwiley.chatse.event.ChatEvent? = null
+    fun createEvent(json: JsonNode): ChatEvent? {
+        var c: ChatEvent? = null
         try {
-            c = mapper.readValue<com.tristanwiley.chatse.event.ChatEvent>(json, com.tristanwiley.chatse.event.ChatEvent::class.java)
+            c = mapper.readValue<ChatEvent>(json, ChatEvent::class.java)
         } catch (e: IOException) {
             Log.e("ChatEventGenerator", "Failed to map json", e)
         }

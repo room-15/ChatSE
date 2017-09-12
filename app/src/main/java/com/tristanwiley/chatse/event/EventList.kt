@@ -1,6 +1,8 @@
 package com.tristanwiley.chatse.event
 
 import android.content.Context
+import com.tristanwiley.chatse.event.presenter.UnfilteredEventPresenter
+import com.tristanwiley.chatse.event.presenter.message.MessageEventPresenter
 
 /**
  * Maintains a list of events for a specific room.
@@ -8,9 +10,9 @@ import android.content.Context
 class EventList(private val roomNum: Int) {
 
     //List of unfilteredEvents
-    var unfilteredPresenter = com.tristanwiley.chatse.event.presenter.UnfilteredEventPresenter()
+    var unfilteredPresenter = UnfilteredEventPresenter()
     //List of events used for messages
-    var messagePresenter = com.tristanwiley.chatse.event.presenter.message.MessageEventPresenter()
+    var messagePresenter = MessageEventPresenter()
 
     //Array of the unfiltered and filtered events
     private val presenters = arrayOf(unfilteredPresenter, messagePresenter)

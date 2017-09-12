@@ -58,6 +58,8 @@ class ChatEvent {
     var isForUsersList = false
     var email_hash = ""
 
+    var star_timestamp = ""
+
     fun setContent(content: String) {
         val doc = Jsoup.parse(content, "http://chat.stackexchange.com/")
         val elements = doc.select("div")
@@ -66,36 +68,39 @@ class ChatEvent {
         if (elements.size != 0) {
             val obType = elements[0].className()
 
-            if (obType.contains("ob-message")) {
-                println("This is a quote")
-            } else if (obType.contains("ob-youtube")) {
-                shouldSetContent = false
-                message_onebox = true
-                onebox_type = "youtube"
-                this.contents = elements[0].child(0).getElementsByClass("ob-youtube-title").text()
-                onebox_content = elements.select("img").attr("src")
-                onebox_extra = elements[0].child(0).attr("href")
-            } else if (obType.contains("ob-wikipedia")) {
-                println("This is Wikipedia")
-            } else if (obType.contains("ob-image")) {
-                val url = elements.select("img").first().absUrl("src")
-                message_onebox = true
-                onebox_type = "image"
-                onebox_content = url
-            }  else if(obType.contains("ob-tweet")){
-                message_onebox = true
-                onebox_type = "tweet"
-                val status = elements[2]
-                val writtenBy = elements[4]
-                onebox_content = ""
-                onebox_content += "<p>" + status.childNode(0).toString() + "</p>"
-                onebox_content += "<p>"+writtenBy.toString()+"</p>"
-                shouldSetContent = false
-                this.contents = onebox_content
-            } else {
-                message_onebox = false
-                onebox_type = ""
-                onebox_content = ""
+            when {
+                obType.contains("ob-message") -> println("This is a quote")
+                obType.contains("ob-youtube") -> {
+                    shouldSetContent = false
+                    message_onebox = true
+                    onebox_type = "youtube"
+                    this.contents = elements[0].child(0).getElementsByClass("ob-youtube-title").text()
+                    onebox_content = elements.select("img").attr("src")
+                    onebox_extra = elements[0].child(0).attr("href")
+                }
+                obType.contains("ob-wikipedia") -> println("This is Wikipedia")
+                obType.contains("ob-image") -> {
+                    val url = elements.select("img").first().absUrl("src")
+                    message_onebox = true
+                    onebox_type = "image"
+                    onebox_content = url
+                }
+                obType.contains("ob-tweet") -> {
+                    message_onebox = true
+                    onebox_type = "tweet"
+                    val status = elements[2]
+                    val writtenBy = elements[4]
+                    onebox_content = ""
+                    onebox_content += "<p>" + status.childNode(0).toString() + "</p>"
+                    onebox_content += "<p>" + writtenBy.toString() + "</p>"
+                    shouldSetContent = false
+                    this.contents = onebox_content
+                }
+                else -> {
+                    message_onebox = false
+                    onebox_type = ""
+                    onebox_content = ""
+                }
             }
         }
         if (shouldSetContent) {

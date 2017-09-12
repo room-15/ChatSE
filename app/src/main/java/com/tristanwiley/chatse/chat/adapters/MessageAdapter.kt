@@ -31,10 +31,10 @@ import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.ListHolder
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
-import kotlinx.android.synthetic.main.list_item_message.view.*
-import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.network.ClientManager
+import kotlinx.android.synthetic.main.list_item_message.view.*
+import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
@@ -121,11 +121,11 @@ class MessageAdapter(val mContext: Context, val events: com.tristanwiley.chatse.
                             Ion.with(mContext)
                                     .load(imageLink)
                                     .asBitmap()
-                                    .setCallback{e,result ->
-                                        if(e != null || result == null){
-                                            Log.e("profilePic",e.toString())
-                                        }else{
-                                            Log.i("profilePic",result.toString())
+                                    .setCallback { e, result ->
+                                        if (e != null || result == null) {
+                                            Log.e("profilePic", e.toString())
+                                        } else {
+                                            Log.i("profilePic", result.toString())
                                             userPicture.setImageBitmap(result)
                                             userBarBottom.setBackgroundColor(getDominantColor(result))
                                         }
@@ -268,12 +268,12 @@ class MessageAdapter(val mContext: Context, val events: com.tristanwiley.chatse.
                                     .intoImageView(itemView.message_image)
                             messageView.text = message.content
                         }
-                        //for twitter tweets, display the profile pic, profile name, and render the text. might need some css
+                    //for twitter tweets, display the profile pic, profile name, and render the text. might need some css
                         "tweet" -> {
-                            messageView.background = ContextCompat.getDrawable(itemView.context,R.drawable.background_twitter)
-                            messageView.setPadding(15,15,15,15)
-                            messageView.setTextColor(ContextCompat.getColor(itemView.context,R.color.white))
-                            messageView.setLinkTextColor(ContextCompat.getColor(itemView.context,R.color.accent_twitter))
+                            messageView.background = ContextCompat.getDrawable(itemView.context, R.drawable.background_twitter)
+                            messageView.setPadding(15, 15, 15, 15)
+                            messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
+                            messageView.setLinkTextColor(ContextCompat.getColor(itemView.context, R.color.accent_twitter))
                             Log.d("Onebox", "Type: ${message.onebox_type}")
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 messageView.text = Html.fromHtml(message.content, Html.FROM_HTML_MODE_LEGACY)
@@ -498,11 +498,11 @@ class MessageAdapter(val mContext: Context, val events: com.tristanwiley.chatse.
             }
         }
 
-        fun getDominantColor(bitmap : Bitmap): Int {
+        fun getDominantColor(bitmap: Bitmap): Int {
             val swatchesTemp = Palette.from(bitmap).generate().getSwatches()
             val swatches = ArrayList<Palette.Swatch>(swatchesTemp)
             Collections.sort(swatches) { swatch1, swatch2 -> swatch2.population - swatch1.population }
-            return if (swatches.size > 0) swatches[0].rgb else ContextCompat.getColor(mContext,(R.color.primary))
+            return if (swatches.size > 0) swatches[0].rgb else ContextCompat.getColor(mContext, (R.color.primary))
         }
     }
 }

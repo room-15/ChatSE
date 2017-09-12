@@ -1,6 +1,8 @@
 package com.tristanwiley.chatse.event.presenter.message
 
-class MessageEvent(baseEvent: com.tristanwiley.chatse.event.ChatEvent) : Comparable<com.tristanwiley.chatse.event.presenter.message.MessageEvent> {
+import com.tristanwiley.chatse.event.ChatEvent
+
+class MessageEvent(baseEvent: ChatEvent) : Comparable<com.tristanwiley.chatse.event.presenter.message.MessageEvent> {
     var content: String?
     val timestamp: Long
     val id: Long
@@ -19,7 +21,8 @@ class MessageEvent(baseEvent: com.tristanwiley.chatse.event.ChatEvent) : Compara
     var message_starred: Boolean
     var isForUsersList: Boolean
     var email_hash: String
-    internal var previous: com.tristanwiley.chatse.event.presenter.message.MessageEvent? = null
+    var star_timestamp: String
+    internal var previous: MessageEvent? = null
 
     init {
         this.content = baseEvent.contents
@@ -40,6 +43,7 @@ class MessageEvent(baseEvent: com.tristanwiley.chatse.event.ChatEvent) : Compara
         this.onebox_extra = baseEvent.onebox_extra
         this.isForUsersList = baseEvent.isForUsersList
         this.email_hash = baseEvent.email_hash
+        this.star_timestamp = baseEvent.star_timestamp
     }
 
     val isDeleted: Boolean

@@ -35,6 +35,7 @@ import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.network.ClientManager
+import com.tristanwiley.chatse.stars.StarsActivity
 import kotlinx.android.synthetic.main.fragment_chat.view.*
 import kotlinx.android.synthetic.main.picker_footer.view.*
 import org.codehaus.jackson.JsonNode
@@ -334,6 +335,7 @@ class ChatFragment : Fragment(), com.tristanwiley.chatse.chat.service.IncomingEv
                 val intent = Intent(activity, StarsActivity::class.java)
                 intent.putExtra("roomID", room.num)
                 intent.putExtra("roomSite", room.site)
+                intent.putExtra("room", room)
                 startActivity(intent)
             }
         }

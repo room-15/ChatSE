@@ -9,5 +9,5 @@ data class DevPoko(
         val job: String,
         val aboutMe: String,
         val imageRes: Int,
-        val icons : ArrayList<com.tristanwiley.chatse.about.pokos.AboutIconPoko>
+        val icons: ArrayList<com.tristanwiley.chatse.about.pokos.AboutIconPoko>
 )

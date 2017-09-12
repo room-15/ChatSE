@@ -51,7 +51,7 @@
             android:name="io.fabric.ApiKey"
             android:value="${fabricApiKey}" />
 
-        <activity android:name=".chat.StarsActivity"></activity>
+        <activity android:name=".stars.StarsActivity"></activity>
     </application>
 
 </manifest>

@@ -23,17 +23,17 @@ import com.tristanwiley.chatse.R
  */
 class CircleImageView : AppCompatImageView {
     companion object {
-        val LOG_TAG : String = CircleImageView::class.java.simpleName
+        val LOG_TAG: String = CircleImageView::class.java.simpleName
 
         val DEFAULT_RADIUS = 1f
         val DEFAULT_BORDER_WIDTH = 1f
         val DEFAULT_TILE_MODE: Shader.TileMode = Shader.TileMode.CLAMP
     }
 
-    private val mCornerRadii : FloatArray = floatArrayOf(DEFAULT_RADIUS, DEFAULT_RADIUS, DEFAULT_RADIUS, DEFAULT_RADIUS)
+    private val mCornerRadii: FloatArray = floatArrayOf(DEFAULT_RADIUS, DEFAULT_RADIUS, DEFAULT_RADIUS, DEFAULT_RADIUS)
     private var mBackgroundDrawable: Drawable? = null
-    private var mBorderColor : ColorStateList? = ColorStateList.valueOf(Color.WHITE)
-    private var mBorderWidth : Float = DEFAULT_BORDER_WIDTH
+    private var mBorderColor: ColorStateList? = ColorStateList.valueOf(Color.WHITE)
+    private var mBorderWidth: Float = DEFAULT_BORDER_WIDTH
     private var mColorFilter: ColorFilter? = null
     private var mColorMod = false
     private var mDrawable: Drawable? = null
@@ -54,7 +54,7 @@ class CircleImageView : AppCompatImageView {
         init()
     }
 
-    constructor(context: Context, attrs: AttributeSet) : super(context,attrs) {
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
         init()
     }
 
@@ -164,7 +164,7 @@ class CircleImageView : AppCompatImageView {
     private fun resolveResource(): Drawable? {
         if (mResource != 0) {
             try {
-                return RoundedDrawable.fromDrawable(ContextCompat.getDrawable(context,mResource))
+                return RoundedDrawable.fromDrawable(ContextCompat.getDrawable(context, mResource))
             } catch (e: Exception) {
                 mResource = 0
             }
@@ -176,7 +176,7 @@ class CircleImageView : AppCompatImageView {
     private fun resolveBackgroundResource(): Drawable? {
         if (mBackgroundResource != 0) {
             try {
-                return RoundedDrawable.fromDrawable(ContextCompat.getDrawable(context,mBackgroundResource))
+                return RoundedDrawable.fromDrawable(ContextCompat.getDrawable(context, mBackgroundResource))
             } catch (e: Exception) {
                 Log.w(LOG_TAG, "Unable to find resource: " + mBackgroundResource, e)
                 // Don't try again.
@@ -204,7 +204,7 @@ class CircleImageView : AppCompatImageView {
         updateDrawableAttrs()
         updateBackgroundDrawableAttrs(false)
 
-        if(mBorderWidth > 0)
+        if (mBorderWidth > 0)
             invalidate()
     }
 
@@ -232,7 +232,7 @@ class CircleImageView : AppCompatImageView {
                 val tr = mCornerRadii[Corner.TOP_RIGHT.ordinal]
                 val br = mCornerRadii[Corner.BOTTOM_RIGHT.ordinal]
                 val bl = mCornerRadii[Corner.BOTTOM_LEFT.ordinal]
-                drawable.setCornerRadius(tl,tr,br,bl)
+                drawable.setCornerRadius(tl, tr, br, bl)
             }
 
 
@@ -261,7 +261,7 @@ class CircleImageView : AppCompatImageView {
         }
     }
 
-    fun setOval(isOval : Boolean) {
+    fun setOval(isOval: Boolean) {
         if (isOval == mIsOval) return
 
         mIsOval = isOval
@@ -270,7 +270,7 @@ class CircleImageView : AppCompatImageView {
         invalidate()
     }
 
-    fun mutateBackground(mutate : Boolean) {
+    fun mutateBackground(mutate: Boolean) {
         if (mutate == mMutateBackground) return
 
         mMutateBackground = mutate

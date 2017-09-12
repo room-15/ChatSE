@@ -71,7 +71,7 @@ class IncomingEventService : Service(), com.tristanwiley.chatse.chat.service.Cha
             val roomNode = root.get("r" + holder.room.num)
             if (roomNode.has("e")) {
                 holder.listener.handleNewEvents(roomNode.get("e"))
-                if(!isAppInForeground(this)){
+                if (!isAppInForeground(this)) {
                     val mBuilder = NotificationCompat.Builder(this)
                             .setSmallIcon(R.mipmap.ic_launcher)
                             .setContentTitle("New messages in room " + holder.room.num)

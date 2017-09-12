@@ -26,8 +26,8 @@ class RoundedDrawable(bitmap: Bitmap) : Drawable() {
     private var mShaderMatrix = Matrix()
     private var mSquareCornersRect = RectF()
 
-    private var mTileModeX : Shader.TileMode? = Shader.TileMode.CLAMP
-    private var mTileModeY : Shader.TileMode? = Shader.TileMode.CLAMP
+    private var mTileModeX: Shader.TileMode? = Shader.TileMode.CLAMP
+    private var mTileModeY: Shader.TileMode? = Shader.TileMode.CLAMP
     private var mRebuildShader = true
 
     // [ topLeft, topRight, bottomLeft, bottomRight ]
@@ -289,7 +289,7 @@ class RoundedDrawable(bitmap: Bitmap) : Drawable() {
     }
 
     fun setScaleType(scaleType: ScaleType?): RoundedDrawable {
-        val type : ScaleType = scaleType ?: ScaleType.FIT_CENTER
+        val type: ScaleType = scaleType ?: ScaleType.FIT_CENTER
 
         if (mScaleType != scaleType) {
             mScaleType = type
@@ -447,7 +447,7 @@ class RoundedDrawable(bitmap: Bitmap) : Drawable() {
     override fun isStateful(): Boolean = mBorderColor.isStateful
 
     override fun onStateChange(state: IntArray?): Boolean {
-        val newColor : Int = mBorderColor.getColorForState(state, 0)
+        val newColor: Int = mBorderColor.getColorForState(state, 0)
         if (mBorderPaint.color != newColor) {
             mBorderPaint.color = newColor
             return true
@@ -480,8 +480,7 @@ class RoundedDrawable(bitmap: Bitmap) : Drawable() {
             } else {
                 canvas.drawOval(mDrawableRect, mBitmapPaint);
             }
-        }
-        else {
+        } else {
             if (any(mCornersRounded)) {
                 val radius: Float = mCornerRadius
                 if (mBorderWidth > 0) {
