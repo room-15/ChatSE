@@ -82,19 +82,39 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
             if (userPicture.drawable != placeholderDrawable)
                 userPicture.setImageResource(R.drawable.box)
 
-//            //Load it into the ImageView!
-//            Ion.with(mContext)
-//                    .load(imageLink)
-//                    .asBitmap()
-//                    .setCallback { e, result ->
-//                        if (e != null || result == null) {
-//                            Log.e("profilePic", e.toString())
-//                        } else {
-//                            Log.i("profilePic", result.toString())
-//                            userPicture.setImageBitmap(result)
-//                            userBarBottom.setBackgroundColor(getDominantColor(result))
-//                        }
-//                    }
+            //Load the profile pictures! Create a request to get the url for the picture
+            Ion.with(mContext)
+                    .load("${room?.site}/users/thumbs/${message.user_id}")
+                    .asJsonObject()
+                    .setCallback { e, result ->
+                        if (e != null) {
+                            Log.e("MessageAdapter", e.message.toString())
+                        } else {
+                            //Get the email_hash attribute which contains either a link to Imgur or a hash for Gravatar
+                            val hash = result.get("email_hash").asString.replace("!", "")
+                            var imageLink = hash
+                            //If Gravatar, create link
+                            if (!hash.contains(".")) {
+                                imageLink = "https://www.gravatar.com/avatar/$hash"
+                            } else if (!hash.contains("http")) {
+                                imageLink = room.site + hash
+                            }
+
+                            //Load it into the ImageView!
+                            Ion.with(mContext)
+                                    .load(imageLink)
+                                    .asBitmap()
+                                    .setCallback { e, result ->
+                                        if (e != null || result == null) {
+                                            Log.e("profilePic", e.toString())
+                                        } else {
+                                            Log.i("profilePic", result.toString())
+                                            userPicture.setImageBitmap(result)
+                                            userBarBottom.setBackgroundColor(getDominantColor(result))
+                                        }
+                                    }
+                        }
+                    }
 
 
             if (room.site == com.tristanwiley.chatse.network.Client.SITE_STACK_OVERFLOW) {
@@ -117,7 +137,7 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                 starCount.visibility = View.VISIBLE
                 starCount.text = message.message_stars.toString()
             }
-            
+
             //If it's just a plain message, then set the text from HTML
             if (!message.message_onebox) {
                 messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.primary_text))
