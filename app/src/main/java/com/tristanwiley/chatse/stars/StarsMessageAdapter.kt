@@ -84,7 +84,7 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
 
             //Load the profile pictures! Create a request to get the url for the picture
             Ion.with(mContext)
-                    .load("${room?.site}/users/thumbs/${message.user_id}")
+                    .load("${room.site}/users/thumbs/${message.user_id}")
                     .asJsonObject()
                     .setCallback { e, result ->
                         if (e != null) {
@@ -104,13 +104,13 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                             Ion.with(mContext)
                                     .load(imageLink)
                                     .asBitmap()
-                                    .setCallback { e, result ->
-                                        if (e != null || result == null) {
+                                    .setCallback { error, imageResult ->
+                                        if (error != null || imageResult == null) {
                                             Log.e("profilePic", e.toString())
                                         } else {
                                             Log.i("profilePic", result.toString())
-                                            userPicture.setImageBitmap(result)
-                                            userBarBottom.setBackgroundColor(getDominantColor(result))
+                                            userPicture.setImageBitmap(imageResult)
+                                            userBarBottom.setBackgroundColor(getDominantColor(imageResult))
                                         }
                                     }
                         }
