@@ -1,26 +1,44 @@
 package com.tristanwiley.chatse.stars
 
+import android.graphics.drawable.ColorDrawable
+
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.Toolbar
+import android.view.MenuItem
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.chat.ChatRoom
 import com.tristanwiley.chatse.event.ChatEvent
+import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import kotlinx.android.synthetic.main.activity_stars.*
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
 
 class StarsActivity : AppCompatActivity() {
-    val eventList = arrayListOf<ChatEvent>()
+    private val eventList = arrayListOf<ChatEvent>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stars)
-
         val room = intent.getParcelableExtra<ChatRoom>("room")
+        val roomName = intent.getStringExtra("roomName")
 
+        //Set toolbar as SupportActionBar
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        //Color the toolbar for StackOverflow as a default
+        supportActionBar?.setBackgroundDrawable(ColorDrawable(ContextCompat.getColor(applicationContext, R.color.stackoverflow_orange)))
+        if (room.site == Client.SITE_STACK_EXCHANGE) {
+            supportActionBar?.setBackgroundDrawable(ColorDrawable(ContextCompat.getColor(applicationContext, R.color.stackexchange_blue)))
+        }
+
+        supportActionBar?.title = "Stars - $roomName"
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         doAsync {
             val client = ClientManager.client
@@ -52,7 +70,7 @@ class StarsActivity : AppCompatActivity() {
             }
 
             runOnUiThread {
-                val messageAdapter = StarsMessageAdapter(applicationContext, getEventsListfromStarPage(room), room)
+                val messageAdapter = StarsMessageAdapter(applicationContext, eventList, room)
                 starsRecyclerView.layoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, true)
                 starsRecyclerView.adapter = messageAdapter
             }
@@ -61,8 +79,10 @@ class StarsActivity : AppCompatActivity() {
 
     }
 
-    private fun getEventsListfromStarPage(room: ChatRoom): ArrayList<ChatEvent> {
-
-        return eventList
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item?.itemId == android.R.id.home) {
+            finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

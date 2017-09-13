@@ -34,6 +34,10 @@ import com.orhanobut.dialogplus.GridHolder
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.chat.adapters.MessageAdapter
+import com.tristanwiley.chatse.chat.adapters.UploadImageAdapter
+import com.tristanwiley.chatse.chat.adapters.UsersAdapter
+import com.tristanwiley.chatse.chat.service.IncomingEventListener
 import com.tristanwiley.chatse.network.ClientManager
 import com.tristanwiley.chatse.stars.StarsActivity
 import kotlinx.android.synthetic.main.fragment_chat.view.*
@@ -64,7 +68,7 @@ import java.io.IOException
  * @param chatEventGenerator: Generator that generates ChatEvent objects
  * @param dialog: Used for DialogPlus displaying the image uploading dialog.
  */
-class ChatFragment : Fragment(), com.tristanwiley.chatse.chat.service.IncomingEventListener {
+class ChatFragment : Fragment(), IncomingEventListener {
 
     private lateinit var input: EditText
     private lateinit var messageList: RecyclerView
@@ -72,10 +76,11 @@ class ChatFragment : Fragment(), com.tristanwiley.chatse.chat.service.IncomingEv
     private lateinit var events: com.tristanwiley.chatse.event.EventList
     private lateinit var loadMessagesLayout: SwipeRefreshLayout
     lateinit var chatFkey: String
-    lateinit var room: com.tristanwiley.chatse.chat.ChatRoom
+    lateinit var room: ChatRoom
+    lateinit var roomName: String
     private val client = ClientManager.client
-    private lateinit var messageAdapter: com.tristanwiley.chatse.chat.adapters.MessageAdapter
-    private lateinit var usersAdapter: com.tristanwiley.chatse.chat.adapters.UsersAdapter
+    private lateinit var messageAdapter: MessageAdapter
+    private lateinit var usersAdapter: UsersAdapter
     private val mapper = ObjectMapper()
     private val chatEventGenerator = com.tristanwiley.chatse.event.ChatEventGenerator()
     lateinit var dialog: DialogPlus
@@ -91,10 +96,13 @@ class ChatFragment : Fragment(), com.tristanwiley.chatse.chat.service.IncomingEv
         val args = arguments
 
         //Get the fkey from the arguments
-        chatFkey = args.getString(com.tristanwiley.chatse.chat.ChatFragment.Companion.EXTRA_FKEY)
+        chatFkey = args.getString(ChatFragment.Companion.EXTRA_FKEY)
 
         //Get the current ChatRoom from the arguments
-        room = args.getParcelable(com.tristanwiley.chatse.chat.ChatFragment.Companion.EXTRA_ROOM)
+        room = args.getParcelable(ChatFragment.Companion.EXTRA_ROOM)
+
+        //Get the roomName from the arguments
+        roomName = args.getString(ChatFragment.Companion.EXTRA_NAME)
 
         if (room.site == com.tristanwiley.chatse.network.Client.SITE_STACK_OVERFLOW) {
             //Set the multitasking color to orange
@@ -150,7 +158,7 @@ class ChatFragment : Fragment(), com.tristanwiley.chatse.chat.service.IncomingEv
             dialog = DialogPlus.newDialog(activity)
                     .setContentHolder(GridHolder(2))
                     .setGravity(Gravity.CENTER)
-                    .setAdapter(com.tristanwiley.chatse.chat.adapters.UploadImageAdapter(activity))
+                    .setAdapter(UploadImageAdapter(activity))
                     .setOnItemClickListener { _, _, _, position ->
                         when (position) {
                             0 -> {
@@ -191,14 +199,14 @@ class ChatFragment : Fragment(), com.tristanwiley.chatse.chat.service.IncomingEv
         userList = activity.findViewById(R.id.room_users)
         loadMessagesLayout = view.findViewById(R.id.load_messages_layout)
 
-        messageAdapter = com.tristanwiley.chatse.chat.adapters.MessageAdapter(activity, events, chatFkey, room)
-        usersAdapter = com.tristanwiley.chatse.chat.adapters.UsersAdapter(activity, events)
+        messageAdapter = MessageAdapter(activity, events, chatFkey, room)
+        usersAdapter = UsersAdapter(activity, events)
         messageList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, true)
         messageList.adapter = messageAdapter
 //        messageList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))
         userList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         userList.adapter = usersAdapter
-        userList.addItemDecoration(com.tristanwiley.chatse.chat.CoreDividerItemDecoration(activity, com.tristanwiley.chatse.chat.CoreDividerItemDecoration.Companion.VERTICAL_LIST))
+        userList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.Companion.VERTICAL_LIST))
 
         //When you reach the top and swipe to load more, add 25 to the current loaded amount and load more
         loadMessagesLayout.setOnRefreshListener {
@@ -273,7 +281,7 @@ class ChatFragment : Fragment(), com.tristanwiley.chatse.chat.service.IncomingEv
                                 l.addView(roomText)
 
                                 //Create a FlowLayout (instead of LinearLayout so we can display multiple tags)
-                                val tagsLayout = com.tristanwiley.chatse.chat.FlowLayout(context)
+                                val tagsLayout = FlowLayout(context)
 
                                 //For each tag create a TextView
                                 val tags = Jsoup.parse(result.get("tags").asString).getElementsByClass("tag")
@@ -333,9 +341,8 @@ class ChatFragment : Fragment(), com.tristanwiley.chatse.chat.service.IncomingEv
             R.id.room_stars -> {
                 //Load intent for showing stars
                 val intent = Intent(activity, StarsActivity::class.java)
-                intent.putExtra("roomID", room.num)
-                intent.putExtra("roomSite", room.site)
                 intent.putExtra("room", room)
+                intent.putExtra("roomName", roomName)
                 startActivity(intent)
             }
         }
@@ -431,7 +438,7 @@ class ChatFragment : Fragment(), com.tristanwiley.chatse.chat.service.IncomingEv
         activity.runOnUiThread {
             messageAdapter.update()
             usersAdapter.update()
-            (activity as com.tristanwiley.chatse.chat.ChatActivity).addRoomsToDrawer(chatFkey)
+            (activity as ChatActivity).addRoomsToDrawer(chatFkey)
             loadMessagesLayout.isRefreshing = false
         }
     }
@@ -516,7 +523,7 @@ class ChatFragment : Fragment(), com.tristanwiley.chatse.chat.service.IncomingEv
      * Map a message to an object and return a JsonNode
      */
     @Throws(IOException::class)
-    private fun getMessagesObject(client: com.tristanwiley.chatse.network.Client, room: com.tristanwiley.chatse.chat.ChatRoom, count: Int): JsonNode {
+    private fun getMessagesObject(client: com.tristanwiley.chatse.network.Client, room: ChatRoom, count: Int): JsonNode {
         val getMessagesRequestBody = FormEncodingBuilder()
                 .add("since", 0.toString())
                 .add("mode", "Messages")
@@ -536,7 +543,7 @@ class ChatFragment : Fragment(), com.tristanwiley.chatse.chat.service.IncomingEv
      * Create a new message and post it to the chat, creating it!
      */
     @Throws(IOException::class)
-    private fun newMessage(client: com.tristanwiley.chatse.network.Client, room: com.tristanwiley.chatse.chat.ChatRoom,
+    private fun newMessage(client: com.tristanwiley.chatse.network.Client, room: ChatRoom,
                            fkey: String?, message: String) {
         val newMessageRequestBody = FormEncodingBuilder()
                 .add("text", message)
@@ -556,13 +563,13 @@ class ChatFragment : Fragment(), com.tristanwiley.chatse.chat.service.IncomingEv
         private val EXTRA_NAME = "name"
         private val EXTRA_FKEY = "fkey"
 
-        fun createInstance(room: com.tristanwiley.chatse.chat.ChatRoom, name: String, fkey: String): com.tristanwiley.chatse.chat.ChatFragment {
+        fun createInstance(room: ChatRoom, name: String, fkey: String): ChatFragment {
             val b = Bundle(3)
-            b.putParcelable(com.tristanwiley.chatse.chat.ChatFragment.Companion.EXTRA_ROOM, room)
-            b.putString(com.tristanwiley.chatse.chat.ChatFragment.Companion.EXTRA_NAME, name)
-            b.putString(com.tristanwiley.chatse.chat.ChatFragment.Companion.EXTRA_FKEY, fkey)
+            b.putParcelable(ChatFragment.Companion.EXTRA_ROOM, room)
+            b.putString(ChatFragment.Companion.EXTRA_NAME, name)
+            b.putString(ChatFragment.Companion.EXTRA_FKEY, fkey)
 
-            val fragment = com.tristanwiley.chatse.chat.ChatFragment()
+            val fragment = ChatFragment()
             fragment.arguments = b
             return fragment
         }
