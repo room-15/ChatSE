@@ -256,7 +256,7 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                             @Suppress("DEPRECATION")
                             messageView.text = Html.fromHtml(message.onebox_content)
                         }
-
+                        BetterLinkMovementMethod.linkify(Linkify.ALL, messageView)
                     }
                 //Other oneboxed items just display the HTML until we implement them all
                     else -> {

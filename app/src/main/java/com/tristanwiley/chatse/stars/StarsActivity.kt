@@ -75,8 +75,9 @@ class StarsActivity : AppCompatActivity() {
                         }
                         "youtube" -> event.onebox_content = it.getElementsByClass("ob-youtube")[0].attr("href")
                         "tweet" -> {
-                            var contents = it.getElementsByClass("ob-tweet-info")[0].children().last().attr("href")
-                            contents += ""
+                            var contents = "<p>" + it.getElementsByClass("ob-status-text")[0].html() + "</p>"
+                            contents += "<p>" + it.getElementsByClass("ob-tweet-info")[0].html() + "</p>"
+                            event.onebox_content = contents
                         }
                     }
 
