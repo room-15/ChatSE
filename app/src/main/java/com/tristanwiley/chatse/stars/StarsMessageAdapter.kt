@@ -26,11 +26,11 @@ import com.koushikdutta.ion.Ion
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.chat.ChatRoom
 import com.tristanwiley.chatse.event.ChatEvent
+import com.tristanwiley.chatse.network.Client
 import kotlinx.android.synthetic.main.list_item_message.view.*
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jsoup.Jsoup
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -113,7 +113,7 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                         }
                     }
 
-            if (room.site == com.tristanwiley.chatse.network.Client.SITE_STACK_OVERFLOW) {
+            if (room.site == Client.SITE_STACK_OVERFLOW) {
                 if (message.user_id == mContext.defaultSharedPreferences.getInt("SOID", -1)) {
                     rootLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_stackoverflow_mine))
                 } else {

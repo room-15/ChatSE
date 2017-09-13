@@ -32,7 +32,10 @@ import com.orhanobut.dialogplus.ListHolder
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.chat.ChatRoom
+import com.tristanwiley.chatse.event.EventList
 import com.tristanwiley.chatse.event.presenter.message.MessageEvent
+import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import kotlinx.android.synthetic.main.list_item_message.view.*
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
@@ -46,7 +49,7 @@ import kotlin.collections.ArrayList
 /**
  * The beautiful adapter that handles all new messages in the chat
  */
-class MessageAdapter(val mContext: Context, val events: com.tristanwiley.chatse.event.EventList, val chatFkey: String?, val room: com.tristanwiley.chatse.chat.ChatRoom?, var messages: ArrayList<com.tristanwiley.chatse.event.presenter.message.MessageEvent> = ArrayList()) : RecyclerView.Adapter<com.tristanwiley.chatse.chat.adapters.MessageAdapter.MessageViewHolder>() {
+class MessageAdapter(private val mContext: Context, private val events: EventList, val chatFkey: String?, val room: ChatRoom?, var messages: ArrayList<com.tristanwiley.chatse.event.presenter.message.MessageEvent> = ArrayList()) : RecyclerView.Adapter<com.tristanwiley.chatse.chat.adapters.MessageAdapter.MessageViewHolder>() {
 
     override fun onBindViewHolder(viewHolder: com.tristanwiley.chatse.chat.adapters.MessageAdapter.MessageViewHolder?, pos: Int) {
         val message = messages[pos]
@@ -73,19 +76,19 @@ class MessageAdapter(val mContext: Context, val events: com.tristanwiley.chatse.
     /**
      * ViewHolder that handles setting all content in itemView
      */
-    class MessageViewHolder(val mContext: Context, itemView: View, val chatFkey: String?, val room: com.tristanwiley.chatse.chat.ChatRoom?) : RecyclerView.ViewHolder(itemView) {
-        val rootLayout = itemView.findViewById<ConstraintLayout>(R.id.message_root_container)
-        val timestampFormat = SimpleDateFormat("hh:mm aa", Locale.getDefault())
-        val messageView = itemView.findViewById<TextView>(R.id.message_content)
-        val userNameView = itemView.findViewById<TextView>(R.id.message_user_name)
-        val messageTimestamp = itemView.findViewById<TextView>(R.id.message_timestamp)
-        val editIndicator = itemView.findViewById<ImageView>(R.id.message_edit_indicator)
-        val starIndicator = itemView.findViewById<ImageView>(R.id.message_star_indicator)
-        val starCount = itemView.findViewById<TextView>(R.id.message_star_count)
-        val oneboxImage = itemView.findViewById<ImageView>(R.id.message_image)
-        val userPicture = itemView.findViewById<ImageView>(R.id.message_user_picture)
-        val userBarBottom = itemView.findViewById<ImageView>(R.id.message_user_color)
-        val placeholderDrawable = ContextCompat.getDrawable(mContext, R.drawable.box) as Drawable
+    class MessageViewHolder(private val mContext: Context, itemView: View, private val chatFkey: String?, val room: ChatRoom?) : RecyclerView.ViewHolder(itemView) {
+        private val rootLayout = itemView.findViewById<ConstraintLayout>(R.id.message_root_container)
+        private val timestampFormat = SimpleDateFormat("hh:mm aa", Locale.getDefault())
+        private val messageView = itemView.findViewById<TextView>(R.id.message_content)
+        private val userNameView = itemView.findViewById<TextView>(R.id.message_user_name)
+        private val messageTimestamp = itemView.findViewById<TextView>(R.id.message_timestamp)
+        private val editIndicator = itemView.findViewById<ImageView>(R.id.message_edit_indicator)
+        private val starIndicator = itemView.findViewById<ImageView>(R.id.message_star_indicator)
+        private val starCount = itemView.findViewById<TextView>(R.id.message_star_count)
+        private val oneboxImage = itemView.findViewById<ImageView>(R.id.message_image)
+        private val userPicture = itemView.findViewById<ImageView>(R.id.message_user_picture)
+        private val userBarBottom = itemView.findViewById<ImageView>(R.id.message_user_color)
+        private val placeholderDrawable = ContextCompat.getDrawable(mContext, R.drawable.box) as Drawable
         var isFullSize: Boolean = false
         var origWidth = 0
         var origHeight = 0
@@ -134,7 +137,7 @@ class MessageAdapter(val mContext: Context, val events: com.tristanwiley.chatse.
                         }
                     }
 
-            if (room?.site == com.tristanwiley.chatse.network.Client.SITE_STACK_OVERFLOW) {
+            if (room?.site == Client.SITE_STACK_OVERFLOW) {
                 if (message.userId == mContext.defaultSharedPreferences.getInt("SOID", -1).toLong()) {
                     rootLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_stackoverflow_mine))
                 } else {
@@ -326,7 +329,7 @@ class MessageAdapter(val mContext: Context, val events: com.tristanwiley.chatse.
             val isUserMessage: Boolean
 
             //Set the user ID depending on the site
-            if (room?.site == com.tristanwiley.chatse.network.Client.SITE_STACK_OVERFLOW) {
+            if (room?.site == Client.SITE_STACK_OVERFLOW) {
                 curUserId = mContext.defaultSharedPreferences.getInt("SOID", -1)
             } else {
                 curUserId = mContext.defaultSharedPreferences.getInt("SEID", -1)

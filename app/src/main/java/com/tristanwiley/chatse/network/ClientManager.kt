@@ -9,5 +9,5 @@ object ClientManager {
     /**
      * The client to use for network requests.
      */
-    val client = com.tristanwiley.chatse.network.Client(OkHttpClient(), com.tristanwiley.chatse.network.cookie.PersistentCookieStore(com.tristanwiley.chatse.App.instance))
+    val client = Client(OkHttpClient(), com.tristanwiley.chatse.network.cookie.PersistentCookieStore(com.tristanwiley.chatse.App.instance))
 }

@@ -10,6 +10,7 @@ import android.widget.TextView
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.chat.ChatRoom
 import com.tristanwiley.chatse.network.ClientManager
 import org.jetbrains.anko.doAsync
 
@@ -48,7 +49,7 @@ class RoomAdapter(val site: String, val list: MutableList<com.tristanwiley.chats
             //OnClick, load the chat fragment
             itemView.setOnClickListener {
                 val roomNum = room.roomID.toInt()
-                (mContext as com.tristanwiley.chatse.chat.ChatActivity).loadChatFragment(com.tristanwiley.chatse.chat.ChatRoom(site, roomNum))
+                (mContext as com.tristanwiley.chatse.chat.ChatActivity).loadChatFragment(ChatRoom(site, roomNum))
             }
 
             /*

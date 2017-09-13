@@ -1,6 +1,7 @@
 package com.tristanwiley.chatse.chat.service
 
 import android.os.Binder
+import com.tristanwiley.chatse.chat.ChatRoom
 import com.tristanwiley.chatse.network.ClientManager
 import org.json.JSONException
 import java.io.IOException
@@ -10,7 +11,7 @@ import java.io.IOException
  */
 class IncomingEventServiceBinder internal constructor(private val service: com.tristanwiley.chatse.chat.service.IncomingEventService) : Binder() {
 
-    fun registerListener(room: com.tristanwiley.chatse.chat.ChatRoom, listener: com.tristanwiley.chatse.chat.service.IncomingEventListener) {
+    fun registerListener(room: ChatRoom, listener: com.tristanwiley.chatse.chat.service.IncomingEventListener) {
         service.registerListener(room, listener)
     }
 
@@ -22,7 +23,7 @@ class IncomingEventServiceBinder internal constructor(private val service: com.t
      * @throws IOException If the page fails to load.
      */
     @Throws(IOException::class)
-    fun loadRoom(room: com.tristanwiley.chatse.chat.ChatRoom): com.tristanwiley.chatse.chat.service.IncomingEventService.RoomInfo {
+    fun loadRoom(room: ChatRoom): com.tristanwiley.chatse.chat.service.IncomingEventService.RoomInfo {
         return service.loadRoom(ClientManager.client, room)
     }
 
@@ -34,7 +35,7 @@ class IncomingEventServiceBinder internal constructor(private val service: com.t
      * @throws JSONException If the registration requests fails to parse the websocket url
      */
     @Throws(IOException::class, JSONException::class)
-    fun joinRoom(room: com.tristanwiley.chatse.chat.ChatRoom, chatFkey: String) {
+    fun joinRoom(room: ChatRoom, chatFkey: String) {
         service.joinRoom(ClientManager.client, room, chatFkey)
     }
 }

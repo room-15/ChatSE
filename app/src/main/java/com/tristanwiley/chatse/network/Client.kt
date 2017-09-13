@@ -22,7 +22,7 @@ class Client internal constructor(val httpClient: OkHttpClient, private val cook
             val originalRequest = chain.request()
             val requestWithUserAgent = originalRequest.newBuilder()
                     .removeHeader("User-Agent")
-                    .addHeader("User-Agent", com.tristanwiley.chatse.network.Client.Companion.USER_AGENT)
+                    .addHeader("User-Agent", Client.Companion.USER_AGENT)
                     .build()
             chain.proceed(requestWithUserAgent)
         })

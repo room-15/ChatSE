@@ -13,6 +13,7 @@ import android.widget.Toast
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
@@ -182,12 +183,12 @@ class LoginActivity : AppCompatActivity() {
      * @param password = the user's password as a String
      */
     @Throws(IOException::class)
-    private fun loginToSite(client: com.tristanwiley.chatse.network.Client, site: String,
+    private fun loginToSite(client: Client, site: String,
                             email: String, password: String): Boolean {
 
         //Connect to /users/login and get the fkey, this key is necessary to login to the site.
         val soFkey = Jsoup.connect(site + "/users/login/")
-                .userAgent(com.tristanwiley.chatse.network.Client.USER_AGENT).get()
+                .userAgent(Client.USER_AGENT).get()
                 .select("input[name=fkey]").attr("value")
 
         //The request body is created by adding the email, password, and fkey to the request body
@@ -252,7 +253,7 @@ class LoginActivity : AppCompatActivity() {
      * @param client = the OkHttp ClientManager.client
      */
     @Throws(IOException::class)
-    private fun loginToSE(client: com.tristanwiley.chatse.network.Client) {
+    private fun loginToSE(client: Client) {
         //Build the request for logging into StackExchange
         val loginPageRequest = Request.Builder()
                 .url("http://stackexchange.com/users/login/")
@@ -295,7 +296,7 @@ class LoginActivity : AppCompatActivity() {
      * @param client = the OkHttp ClientManager.client
      */
     @Throws(IOException::class)
-    private fun seOpenIdLogin(client: com.tristanwiley.chatse.network.Client, email: String, password: String): Boolean {
+    private fun seOpenIdLogin(client: Client, email: String, password: String): Boolean {
         val seLoginPageRequest = Request.Builder()
                 .url("https://openid.stackexchange.com/account/login/")
                 .build()

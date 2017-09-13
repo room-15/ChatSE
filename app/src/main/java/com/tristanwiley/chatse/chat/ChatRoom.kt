@@ -25,12 +25,12 @@ class ChatRoom(val site: String, val num: Int) : Parcelable {
 
     companion object {
         @JvmField
-        val CREATOR: Parcelable.Creator<com.tristanwiley.chatse.chat.ChatRoom> = object : Parcelable.Creator<com.tristanwiley.chatse.chat.ChatRoom> {
-            override fun createFromParcel(`in`: Parcel): com.tristanwiley.chatse.chat.ChatRoom {
-                return com.tristanwiley.chatse.chat.ChatRoom(`in`)
+        val CREATOR: Parcelable.Creator<ChatRoom> = object : Parcelable.Creator<ChatRoom> {
+            override fun createFromParcel(`in`: Parcel): ChatRoom {
+                return ChatRoom(`in`)
             }
 
-            override fun newArray(size: Int): Array<com.tristanwiley.chatse.chat.ChatRoom?> {
+            override fun newArray(size: Int): Array<ChatRoom?> {
                 return arrayOfNulls(size)
             }
         }

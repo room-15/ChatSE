@@ -3,6 +3,10 @@ package com.tristanwiley.chatse.event.presenter.message
 import android.content.Context
 import android.util.Log
 import com.koushikdutta.ion.Ion
+import com.tristanwiley.chatse.chat.ChatRoom
+import com.tristanwiley.chatse.event.ChatEvent
+import com.tristanwiley.chatse.event.presenter.EventPresenter
+import com.tristanwiley.chatse.network.Client
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -17,18 +21,18 @@ import kotlin.collections.ArrayList
  *
  * Get these by calling .getEventsList() and .getUsersList()
  */
-class MessageEventPresenter : com.tristanwiley.chatse.event.presenter.EventPresenter<com.tristanwiley.chatse.event.presenter.message.MessageEvent> {
+class MessageEventPresenter : EventPresenter<MessageEvent> {
 
-    internal var messages = TreeSet<com.tristanwiley.chatse.event.presenter.message.MessageEvent>()
-    internal var users = hashMapOf<Long, com.tristanwiley.chatse.event.presenter.message.MessageEvent>()
+    internal var messages = TreeSet<MessageEvent>()
+    internal var users = hashMapOf<Long, MessageEvent>()
 
-    override fun addEvent(event: com.tristanwiley.chatse.event.ChatEvent, roomNum: Int, context: Context, room: com.tristanwiley.chatse.chat.ChatRoom?) {
+    override fun addEvent(event: ChatEvent, roomNum: Int, context: Context, room: ChatRoom?) {
         //If the event type is not for leaving but definitely exists then continue so we can add the user to the UsersList
-        if (event.event_type != com.tristanwiley.chatse.event.ChatEvent.EVENT_TYPE_LEAVE && event.user_id != 0) {
+        if (event.event_type != ChatEvent.EVENT_TYPE_LEAVE && event.user_id != 0) {
             //If the user is already in the room, move them to the top
             if (users.containsKey(event.user_id.toLong())) {
                 //Create a new MessageEvent and say it's for the users list
-                val newEvent = com.tristanwiley.chatse.event.presenter.message.MessageEvent(event)
+                val newEvent = MessageEvent(event)
                 newEvent.isForUsersList = true
 
                 //Put in the users list
@@ -37,7 +41,7 @@ class MessageEventPresenter : com.tristanwiley.chatse.event.presenter.EventPrese
                 //If the user is not in the users list get their profile picture
                 val url: String
                 //Determine what URL to use (StackOverflow or StackExchange)
-                if (room?.site == com.tristanwiley.chatse.network.Client.SITE_STACK_OVERFLOW) {
+                if (room?.site == Client.SITE_STACK_OVERFLOW) {
                     url = "https://chat.stackoverflow.com/users/thumbs/${event.user_id}"
                 } else {
                     url = "https://chat.stackexchange.com/users/thumbs/${event.user_id}"
@@ -59,7 +63,7 @@ class MessageEventPresenter : com.tristanwiley.chatse.event.presenter.EventPrese
                                 //Ensure the user is in the room
                                 if (r != null) {
                                     //Get the profile picture for the user and add it to the user in the users list
-                                    val newEvent = com.tristanwiley.chatse.event.presenter.message.MessageEvent(event)
+                                    val newEvent = MessageEvent(event)
                                     newEvent.isForUsersList = true
                                     val image_url = result.get("email_hash").asString.replace("!", "")
                                     if (image_url.contains(".")) {
@@ -79,10 +83,10 @@ class MessageEventPresenter : com.tristanwiley.chatse.event.presenter.EventPrese
             //Kotlin version of the switch statement, determine what to do with the event
             when (event.event_type) {
             //If the event is a message, add it to the messages
-                com.tristanwiley.chatse.event.ChatEvent.EVENT_TYPE_MESSAGE -> messages.add(com.tristanwiley.chatse.event.presenter.message.MessageEvent(event))
+                ChatEvent.EVENT_TYPE_MESSAGE -> messages.add(MessageEvent(event))
             //If the event is an edit, or a delete, then add that new event in place of the old.
-                com.tristanwiley.chatse.event.ChatEvent.EVENT_TYPE_EDIT, com.tristanwiley.chatse.event.ChatEvent.EVENT_TYPE_DELETE -> {
-                    val newMessage = com.tristanwiley.chatse.event.presenter.message.MessageEvent(event)
+                ChatEvent.EVENT_TYPE_EDIT, ChatEvent.EVENT_TYPE_DELETE -> {
+                    val newMessage = MessageEvent(event)
                     val originalMessage = messages.floor(newMessage)
                     if (originalMessage != newMessage) {
                         Log.w("MessageEventPresenter", "Attempting to edit nonexistent message")
@@ -93,8 +97,8 @@ class MessageEventPresenter : com.tristanwiley.chatse.event.presenter.EventPrese
                     messages.add(newMessage)
                 }
             //If the event is a starred message, modify the original message with the stars to add it to the event
-                com.tristanwiley.chatse.event.ChatEvent.EVENT_TYPE_STAR -> {
-                    val newMessage = com.tristanwiley.chatse.event.presenter.message.MessageEvent(event)
+                ChatEvent.EVENT_TYPE_STAR -> {
+                    val newMessage = MessageEvent(event)
                     val originalMessage = messages.floor(newMessage)
                     if (originalMessage != null) {
                         newMessage.userId = originalMessage.userId
@@ -110,12 +114,12 @@ class MessageEventPresenter : com.tristanwiley.chatse.event.presenter.EventPrese
     }
 
     //Used from adapter to get all the messages
-    override fun getEventsList(): List<com.tristanwiley.chatse.event.presenter.message.MessageEvent> {
+    override fun getEventsList(): List<MessageEvent> {
         return Collections.unmodifiableList(ArrayList(messages))
     }
 
     //Used from adapter to get all the users in a room
-    override fun getUsersList(): List<com.tristanwiley.chatse.event.presenter.message.MessageEvent> {
+    override fun getUsersList(): List<MessageEvent> {
         return Collections.unmodifiableList(ArrayList(users.values).sortedByDescending { it.timestamp })
     }
 }

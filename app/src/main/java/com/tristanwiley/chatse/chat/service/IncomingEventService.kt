@@ -13,6 +13,8 @@ import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.squareup.okhttp.ws.WebSocketCall
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.chat.ChatRoom
+import com.tristanwiley.chatse.network.Client
 import org.codehaus.jackson.JsonNode
 import org.json.JSONException
 import org.json.JSONObject
@@ -37,7 +39,7 @@ class IncomingEventService : Service(), com.tristanwiley.chatse.chat.service.Cha
         Log.d("IncomingEventService", "onDestroy")
     }
 
-    fun registerListener(room: com.tristanwiley.chatse.chat.ChatRoom, listener: com.tristanwiley.chatse.chat.service.IncomingEventListener) {
+    fun registerListener(room: ChatRoom, listener: com.tristanwiley.chatse.chat.service.IncomingEventListener) {
         listeners.clear()
         listeners.add(com.tristanwiley.chatse.chat.service.IncomingEventService.MessageListenerHolder(room, listener))
     }
@@ -99,7 +101,7 @@ class IncomingEventService : Service(), com.tristanwiley.chatse.chat.service.Cha
     }
 
     @Throws(IOException::class)
-    internal fun loadRoom(client: com.tristanwiley.chatse.network.Client, room: com.tristanwiley.chatse.chat.ChatRoom): com.tristanwiley.chatse.chat.service.IncomingEventService.RoomInfo {
+    internal fun loadRoom(client: Client, room: ChatRoom): com.tristanwiley.chatse.chat.service.IncomingEventService.RoomInfo {
         val chatPageRequest = Request.Builder()
                 .url(room.site + "/rooms/" + room.num)
                 .build()
@@ -113,7 +115,7 @@ class IncomingEventService : Service(), com.tristanwiley.chatse.chat.service.Cha
     }
 
     @Throws(IOException::class, JSONException::class)
-    internal fun joinRoom(client: com.tristanwiley.chatse.network.Client, room: com.tristanwiley.chatse.chat.ChatRoom, chatFkey: String) {
+    internal fun joinRoom(client: Client, room: ChatRoom, chatFkey: String) {
         if (!siteStatuses.containsKey(room.site)) {
             siteStatuses.put(room.site, com.tristanwiley.chatse.chat.service.IncomingEventService.WebsocketConnectionStatus.DISCONNECTED)
         }
@@ -128,14 +130,14 @@ class IncomingEventService : Service(), com.tristanwiley.chatse.chat.service.Cha
                 .add("quiet", "true")
                 .build()
         val soChatPageRequest = Request.Builder()
-                .url(com.tristanwiley.chatse.network.Client.SITE_STACK_OVERFLOW + "/chats/join/" + room.num)
+                .url(Client.SITE_STACK_OVERFLOW + "/chats/join/" + room.num)
                 .post(soRequestBody)
                 .build()
         client.newCall(soChatPageRequest).execute()
     }
 
     @Throws(IOException::class, JSONException::class)
-    private fun registerRoom(client: com.tristanwiley.chatse.network.Client, room: com.tristanwiley.chatse.chat.ChatRoom, chatFkey: String): String {
+    private fun registerRoom(client: Client, room: ChatRoom, chatFkey: String): String {
         val wsUrlRequestBody = FormEncodingBuilder()
                 .add("roomid", room.num.toString())
                 .add("fkey", chatFkey).build()
@@ -150,9 +152,9 @@ class IncomingEventService : Service(), com.tristanwiley.chatse.chat.service.Cha
     }
 
     @Throws(IOException::class)
-    private fun initWs(client: com.tristanwiley.chatse.network.Client, wsUrl: String, site: String) {
+    private fun initWs(client: Client, wsUrl: String, site: String) {
         val wsRequest = Request.Builder()
-                .addHeader("User-Agent", com.tristanwiley.chatse.network.Client.USER_AGENT)
+                .addHeader("User-Agent", Client.USER_AGENT)
                 .addHeader("Sec-WebSocket-Extensions", "permessage-deflate")
                 .addHeader("Sec-WebSocket-Extensions", "client_max_window_bits")
                 .addHeader("Origin", site)
@@ -166,7 +168,7 @@ class IncomingEventService : Service(), com.tristanwiley.chatse.chat.service.Cha
         ESTABLISHED, CREATING, DISCONNECTED
     }
 
-    class MessageListenerHolder(val room: com.tristanwiley.chatse.chat.ChatRoom, val listener: com.tristanwiley.chatse.chat.service.IncomingEventListener)
+    class MessageListenerHolder(val room: ChatRoom, val listener: com.tristanwiley.chatse.chat.service.IncomingEventListener)
 
     class RoomInfo internal constructor(val name: String, val fkey: String)
 }

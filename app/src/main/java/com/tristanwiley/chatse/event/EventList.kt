@@ -1,6 +1,7 @@
 package com.tristanwiley.chatse.event
 
 import android.content.Context
+import com.tristanwiley.chatse.chat.ChatRoom
 import com.tristanwiley.chatse.event.presenter.UnfilteredEventPresenter
 import com.tristanwiley.chatse.event.presenter.message.MessageEventPresenter
 
@@ -17,7 +18,7 @@ class EventList(private val roomNum: Int) {
     //Array of the unfiltered and filtered events
     private val presenters = arrayOf(unfilteredPresenter, messagePresenter)
 
-    fun addEvent(event: com.tristanwiley.chatse.event.ChatEvent, context: Context, room: com.tristanwiley.chatse.chat.ChatRoom?) {
+    fun addEvent(event: ChatEvent, context: Context, room: ChatRoom?) {
         presenters.forEach { it.addEvent(event, roomNum, context, room) }
     }
 }

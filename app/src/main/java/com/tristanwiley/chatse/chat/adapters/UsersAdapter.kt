@@ -16,6 +16,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.koushikdutta.ion.Ion
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.event.EventList
 
 
 /**
@@ -24,7 +25,7 @@ import com.tristanwiley.chatse.R
  * @param events: All the events to get the users from
  */
 
-class UsersAdapter(val mContext: Context, val events: com.tristanwiley.chatse.event.EventList, var users: ArrayList<com.tristanwiley.chatse.event.presenter.message.MessageEvent> = ArrayList()) : RecyclerView.Adapter<com.tristanwiley.chatse.chat.adapters.UsersAdapter.UsersViewHolder>() {
+class UsersAdapter(val mContext: Context, val events: EventList, var users: ArrayList<com.tristanwiley.chatse.event.presenter.message.MessageEvent> = ArrayList()) : RecyclerView.Adapter<com.tristanwiley.chatse.chat.adapters.UsersAdapter.UsersViewHolder>() {
 
     override fun onBindViewHolder(viewHolder: com.tristanwiley.chatse.chat.adapters.UsersAdapter.UsersViewHolder?, pos: Int) {
         val user = users[pos]

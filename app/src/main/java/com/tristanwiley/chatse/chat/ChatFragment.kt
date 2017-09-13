@@ -38,6 +38,9 @@ import com.tristanwiley.chatse.chat.adapters.MessageAdapter
 import com.tristanwiley.chatse.chat.adapters.UploadImageAdapter
 import com.tristanwiley.chatse.chat.adapters.UsersAdapter
 import com.tristanwiley.chatse.chat.service.IncomingEventListener
+import com.tristanwiley.chatse.event.ChatEventGenerator
+import com.tristanwiley.chatse.event.EventList
+import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import com.tristanwiley.chatse.stars.StarsActivity
 import kotlinx.android.synthetic.main.fragment_chat.view.*
@@ -73,7 +76,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
     private lateinit var input: EditText
     private lateinit var messageList: RecyclerView
     private lateinit var userList: RecyclerView
-    private lateinit var events: com.tristanwiley.chatse.event.EventList
+    private lateinit var events: EventList
     private lateinit var loadMessagesLayout: SwipeRefreshLayout
     lateinit var chatFkey: String
     lateinit var room: ChatRoom
@@ -82,7 +85,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
     private lateinit var messageAdapter: MessageAdapter
     private lateinit var usersAdapter: UsersAdapter
     private val mapper = ObjectMapper()
-    private val chatEventGenerator = com.tristanwiley.chatse.event.ChatEventGenerator()
+    private val chatEventGenerator = ChatEventGenerator()
     lateinit var dialog: DialogPlus
     var currentLoadCount = 50
 
@@ -104,20 +107,20 @@ class ChatFragment : Fragment(), IncomingEventListener {
         //Get the roomName from the arguments
         roomName = args.getString(ChatFragment.Companion.EXTRA_NAME)
 
-        if (room.site == com.tristanwiley.chatse.network.Client.SITE_STACK_OVERFLOW) {
+        if (room.site == Client.SITE_STACK_OVERFLOW) {
             //Set the multitasking color to orange
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 activity.setTaskDescription(ActivityManager.TaskDescription((activity as AppCompatActivity).supportActionBar?.title.toString(), ActivityManager.TaskDescription().icon, ContextCompat.getColor(activity, R.color.stackoverflow_orange)))
             }
 
-        } else if (room.site == com.tristanwiley.chatse.network.Client.SITE_STACK_EXCHANGE) {
+        } else if (room.site == Client.SITE_STACK_EXCHANGE) {
             //Set the multitasking color to blue
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 activity.setTaskDescription(ActivityManager.TaskDescription((activity as AppCompatActivity).supportActionBar?.title.toString(), ActivityManager.TaskDescription().icon, ContextCompat.getColor(activity, R.color.stackexchange_blue)))
             }
         }
         //Set the EventList by the room number
-        events = com.tristanwiley.chatse.event.EventList(room.num)
+        events = EventList(room.num)
     }
 
     //When the fragment view is created
@@ -128,12 +131,12 @@ class ChatFragment : Fragment(), IncomingEventListener {
         var contextThemeWrapper = ContextThemeWrapper(activity, R.style.AppTheme_SO)
 
         //Depending on the room, change the theme and status bar color
-        if (room.site == com.tristanwiley.chatse.network.Client.SITE_STACK_OVERFLOW) {
+        if (room.site == Client.SITE_STACK_OVERFLOW) {
             //Check version and set status bar color, theme already defaulted to SO
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 activity.window.statusBarColor = ContextCompat.getColor(activity, R.color.primary_dark)
             }
-        } else if (room.site == com.tristanwiley.chatse.network.Client.SITE_STACK_EXCHANGE) {
+        } else if (room.site == Client.SITE_STACK_EXCHANGE) {
             //Set theme to SE and color to SE color
             contextThemeWrapper = ContextThemeWrapper(activity, R.style.AppTheme_SE)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -523,7 +526,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
      * Map a message to an object and return a JsonNode
      */
     @Throws(IOException::class)
-    private fun getMessagesObject(client: com.tristanwiley.chatse.network.Client, room: ChatRoom, count: Int): JsonNode {
+    private fun getMessagesObject(client: Client, room: ChatRoom, count: Int): JsonNode {
         val getMessagesRequestBody = FormEncodingBuilder()
                 .add("since", 0.toString())
                 .add("mode", "Messages")
@@ -543,7 +546,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
      * Create a new message and post it to the chat, creating it!
      */
     @Throws(IOException::class)
-    private fun newMessage(client: com.tristanwiley.chatse.network.Client, room: ChatRoom,
+    private fun newMessage(client: Client, room: ChatRoom,
                            fkey: String?, message: String) {
         val newMessageRequestBody = FormEncodingBuilder()
                 .add("text", message)
