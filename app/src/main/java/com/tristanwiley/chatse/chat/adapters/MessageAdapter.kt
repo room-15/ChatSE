@@ -32,6 +32,7 @@ import com.orhanobut.dialogplus.ListHolder
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.event.presenter.message.MessageEvent
 import com.tristanwiley.chatse.network.ClientManager
 import kotlinx.android.synthetic.main.list_item_message.view.*
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
@@ -89,7 +90,7 @@ class MessageAdapter(val mContext: Context, val events: com.tristanwiley.chatse.
         var origWidth = 0
         var origHeight = 0
 
-        fun bindMessage(message: com.tristanwiley.chatse.event.presenter.message.MessageEvent) {
+        fun bindMessage(message: MessageEvent) {
             //Hide elements in case not used
             oneboxImage.visibility = View.GONE
             starIndicator.visibility = View.INVISIBLE

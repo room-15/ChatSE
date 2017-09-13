@@ -64,6 +64,19 @@ class StarsActivity : AppCompatActivity() {
                 if (event.contents.contains("onebox")) {
                     event.message_onebox = true
                     event.onebox_type = it.getElementsByClass("content")[0].child(0).classNames().toList()[1].removePrefix("ob-")
+                    when (event.onebox_type) {
+                        "image" -> {
+//                            event.onebox_content = it.getElementsByClass("user-image")[0].attr("src").removePrefix("//")
+                            var url = it.getElementsByClass("user-image")[0].attr("src").removePrefix("//")
+                            if (!url.contains("http")) {
+                                url = "https://$url"
+                            }
+                            event.onebox_content = url
+                        }
+                        "youtube" -> event.onebox_content = it.getElementsByClass("ob-youtube")[0].attr("href")
+                        "tweet" -> event.onebox_content = it.getElementsByClass("ob-tweet-info")[0].children().last().attr("href")
+                    }
+
                 }
                 event.star_timestamp = it.getElementsByClass("timestamp")[0].text()
                 eventList.add(event)

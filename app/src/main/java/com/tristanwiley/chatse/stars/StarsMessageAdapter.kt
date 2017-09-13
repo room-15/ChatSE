@@ -57,11 +57,9 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
      */
     class MessageViewHolder(private val mContext: Context, itemView: View, val room: ChatRoom) : RecyclerView.ViewHolder(itemView) {
         private val rootLayout = itemView.findViewById<ConstraintLayout>(R.id.message_root_container)
-        private val timestampFormat = SimpleDateFormat("hh:mm aa", Locale.getDefault())
         private val messageView = itemView.findViewById<TextView>(R.id.message_content)
         private val userNameView = itemView.findViewById<TextView>(R.id.message_user_name)
         private val messageTimestamp = itemView.findViewById<TextView>(R.id.message_timestamp)
-        private val editIndicator = itemView.findViewById<ImageView>(R.id.message_edit_indicator)
         private val starIndicator = itemView.findViewById<ImageView>(R.id.message_star_indicator)
         private val starCount = itemView.findViewById<TextView>(R.id.message_star_count)
         private val oneboxImage = itemView.findViewById<ImageView>(R.id.message_image)
@@ -108,14 +106,12 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                                         if (error != null || imageResult == null) {
                                             Log.e("profilePic", e.toString())
                                         } else {
-                                            Log.i("profilePic", result.toString())
                                             userPicture.setImageBitmap(imageResult)
                                             userBarBottom.setBackgroundColor(getDominantColor(imageResult))
                                         }
                                     }
                         }
                     }
-
 
             if (room.site == com.tristanwiley.chatse.network.Client.SITE_STACK_OVERFLOW) {
                 if (message.user_id == mContext.defaultSharedPreferences.getInt("SOID", -1)) {
@@ -153,6 +149,7 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                 }
                 BetterLinkMovementMethod.linkify(Linkify.ALL, messageView)
             } else {
+                Log.wtf("ONEBOX_CONTENT", message.onebox_content)
                 //if it's a onebox, then display it specially
                 when (message.onebox_type) {
                     "image" -> {
@@ -215,8 +212,6 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                                 cSet.constrainWidth(R.id.message_image, origWidth)
                                 cSet.constrainHeight(R.id.message_image, origHeight)
 
-                                cSet.connect(R.id.message_image, ConstraintSet.LEFT, R.id.message_edit_indicator, ConstraintSet.RIGHT)
-                                cSet.connect(R.id.message_image, ConstraintSet.START, R.id.message_edit_indicator, ConstraintSet.END)
                                 cSet.connect(R.id.message_image, ConstraintSet.RIGHT, R.id.guideline_80, ConstraintSet.LEFT)
                                 cSet.connect(R.id.message_image, ConstraintSet.END, R.id.guideline_80, ConstraintSet.START)
 
@@ -256,10 +251,10 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                         messageView.setLinkTextColor(ContextCompat.getColor(itemView.context, R.color.accent_twitter))
                         Log.d("Onebox", "Type: ${message.onebox_type}")
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            messageView.text = Html.fromHtml(message.contents, Html.FROM_HTML_MODE_LEGACY)
+                            messageView.text = Html.fromHtml(message.onebox_content, Html.FROM_HTML_MODE_LEGACY)
                         } else {
                             @Suppress("DEPRECATION")
-                            messageView.text = Html.fromHtml(message.contents)
+                            messageView.text = Html.fromHtml(message.onebox_content)
                         }
 
                     }
