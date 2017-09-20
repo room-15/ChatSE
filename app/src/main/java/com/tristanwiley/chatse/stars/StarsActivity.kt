@@ -73,7 +73,12 @@ class StarsActivity : AppCompatActivity() {
                             }
                             event.onebox_content = url
                         }
-                        "youtube" -> event.onebox_content = it.getElementsByClass("ob-youtube")[0].attr("href")
+                        "youtube" -> {
+                            event.onebox_content = it.getElementsByClass("ob-youtube")[0].child(0).attr("href")
+                            event.onebox_extra = it.getElementsByClass("ob-youtube-preview").attr("src")
+                            event.contents = it.getElementsByClass("ob-youtube-title")[0].text()
+                        }
+
                         "tweet" -> {
                             var contents = "<p>" + it.getElementsByClass("ob-status-text")[0].html() + "</p>"
                             contents += "<p>" + it.getElementsByClass("ob-tweet-info")[0].html() + "</p>"

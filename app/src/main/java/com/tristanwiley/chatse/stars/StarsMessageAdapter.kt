@@ -234,12 +234,12 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                 //For Youtube videos, display the image and some text, linking the view to the video on Youtube
                     "youtube" -> {
                         itemView.setOnClickListener {
-                            mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.onebox_extra)))
+                            mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.onebox_content)))
                         }
                         oneboxImage.visibility = View.VISIBLE
 
                         Ion.with(itemView.context)
-                                .load(message.onebox_content)
+                                .load(message.onebox_extra)
                                 .intoImageView(itemView.message_image)
                         messageView.text = message.contents
                     }
