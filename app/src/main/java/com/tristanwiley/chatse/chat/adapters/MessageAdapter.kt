@@ -129,7 +129,6 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                                         if (e != null || result == null) {
                                             Log.e("profilePic", e.toString())
                                         } else {
-                                            Log.i("profilePic", result.toString())
                                             userPicture.setImageBitmap(result)
                                             userBarBottom.setBackgroundColor(getDominantColor(result))
                                         }
