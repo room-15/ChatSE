@@ -35,6 +35,7 @@ import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.chat.ChatRoom
 import com.tristanwiley.chatse.event.EventList
 import com.tristanwiley.chatse.event.presenter.message.MessageEvent
+import com.tristanwiley.chatse.extensions.loadUrl
 import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import kotlinx.android.synthetic.main.list_item_message.view.*
@@ -189,16 +190,11 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                                 origHeight = layoutParams.height
                             }
 
-                            Ion.with(itemView.context)
-                                    .load(message.onebox_content)
-                                    .noCache()
-                                    .intoImageView(oneboxImage)
+                            oneboxImage.loadUrl(message.onebox_content)
 
                             val transitionListener = object : Transition.TransitionListener {
                                 override fun onTransitionEnd(transition: Transition) {
-                                    Ion.with(itemView.context)
-                                            .load(message.onebox_content)
-                                            .intoImageView(oneboxImage)
+                                    oneboxImage.loadUrl(message.onebox_content)
                                 }
 
                                 override fun onTransitionResume(transition: Transition) {}
@@ -267,9 +263,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                             }
                             oneboxImage.visibility = View.VISIBLE
 
-                            Ion.with(itemView.context)
-                                    .load(message.onebox_content)
-                                    .intoImageView(itemView.message_image)
+                            itemView.message_image.loadUrl(message.onebox_content)
                             messageView.text = message.content
                         }
                     //for twitter tweets, display the profile pic, profile name, and render the text. might need some css

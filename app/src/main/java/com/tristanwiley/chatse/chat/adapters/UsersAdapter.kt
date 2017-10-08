@@ -17,6 +17,7 @@ import android.widget.TextView
 import com.koushikdutta.ion.Ion
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.event.EventList
+import com.tristanwiley.chatse.extensions.loadUrl
 
 
 /**
@@ -55,10 +56,7 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
             //Set the username to the TextView
             userName.text = user.userName
 
-            //Load profile into ImageView with Ion
-            Ion.with(mContext)
-                    .load(user.email_hash)
-                    .intoImageView(userPicture)
+            userPicture.loadUrl(user.email_hash)
 
             //On click, show information about user
             itemView.setOnClickListener {
