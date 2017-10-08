@@ -1,8 +1,8 @@
 package com.tristanwiley.chatse.extensions
 
 import android.widget.ImageView
-import com.koushikdutta.ion.Ion
+import com.bumptech.glide.Glide
 
 fun ImageView.loadUrl(url: String) {
-    Ion.with(context).load(url).intoImageView(this)
+    Glide.with(this).load(url).into(this)
 }
