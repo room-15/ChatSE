@@ -26,7 +26,8 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.koushikdutta.ion.Ion
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.SimpleTarget
 import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.ListHolder
 import com.squareup.okhttp.FormEncodingBuilder
@@ -35,12 +36,15 @@ import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.chat.ChatRoom
 import com.tristanwiley.chatse.event.EventList
 import com.tristanwiley.chatse.event.presenter.message.MessageEvent
+import com.tristanwiley.chatse.extensions.loadUrl
 import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import kotlinx.android.synthetic.main.list_item_message.view.*
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.text.SimpleDateFormat
 import java.util.*
@@ -104,37 +108,37 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                 userPicture.setImageResource(R.drawable.box)
 
             //Load the profile pictures! Create a request to get the url for the picture
-            Ion.with(mContext)
-                    .load("${room?.site}/users/thumbs/${message.userId}")
-                    .asJsonObject()
-                    .setCallback { e, result ->
-                        if (e != null) {
-                            Log.e("MessageAdapter", e.message.toString())
-                        } else {
-                            //Get the email_hash attribute which contains either a link to Imgur or a hash for Gravatar
-                            val hash = result.get("email_hash").asString.replace("!", "")
-                            var imageLink = hash
-                            //If Gravatar, create link
-                            if (!hash.contains(".")) {
-                                imageLink = "https://www.gravatar.com/avatar/$hash"
-                            } else if (!hash.contains("http")) {
-                                imageLink = room?.site + hash
-                            }
+            doAsync {
+                val client = ClientManager.client
+                val request = Request.Builder()
+                        .url("${room?.site}/users/thumbs/${message.userId}")
+                        .build()
+                val response = client.newCall(request).execute()
+                val jsonResult = JSONObject(response.body().string())
 
-                            //Load it into the ImageView!
-                            Ion.with(mContext)
-                                    .load(imageLink)
-                                    .asBitmap()
-                                    .setCallback { e, result ->
-                                        if (e != null || result == null) {
-                                            Log.e("profilePic", e.toString())
-                                        } else {
-                                            userPicture.setImageBitmap(result)
-                                            userBarBottom.setBackgroundColor(getDominantColor(result))
-                                        }
-                                    }
-                        }
-                    }
+                //Get the email_hash attribute which contains either a link to Imgur or a hash for Gravatar
+                val hash = jsonResult.getString("email_hash").replace("!", "")
+                var imageLink = hash
+                //If Gravatar, create link
+                if (!hash.contains(".")) {
+                    imageLink = "https://www.gravatar.com/avatar/$hash"
+                } else if (!hash.contains("http")) {
+                    imageLink = room?.site + hash
+                }
+
+                uiThread {
+                    Glide.with(mContext)
+                            .asBitmap()
+                            .load(imageLink)
+                            .into(object : SimpleTarget<Bitmap>() {
+                                override fun onResourceReady(result: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>) {
+                                    //Load it into the ImageView!
+                                    userPicture.setImageBitmap(result)
+                                    userBarBottom.setBackgroundColor(getDominantColor(result))
+                                }
+                            })
+                }
+            }
 
             if (room?.site == Client.SITE_STACK_OVERFLOW) {
                 if (message.userId == mContext.defaultSharedPreferences.getInt("SOID", -1).toLong()) {
@@ -188,16 +192,11 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                                 origHeight = layoutParams.height
                             }
 
-                            Ion.with(itemView.context)
-                                    .load(message.onebox_content)
-                                    .noCache()
-                                    .intoImageView(oneboxImage)
+                            oneboxImage.loadUrl(message.onebox_content)
 
                             val transitionListener = object : Transition.TransitionListener {
                                 override fun onTransitionEnd(transition: Transition) {
-                                    Ion.with(itemView.context)
-                                            .load(message.onebox_content)
-                                            .intoImageView(oneboxImage)
+                                    oneboxImage.loadUrl(message.onebox_content)
                                 }
 
                                 override fun onTransitionResume(transition: Transition) {}
@@ -266,9 +265,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                             }
                             oneboxImage.visibility = View.VISIBLE
 
-                            Ion.with(itemView.context)
-                                    .load(message.onebox_content)
-                                    .intoImageView(itemView.message_image)
+                            itemView.message_image.loadUrl(message.onebox_content)
                             messageView.text = message.content
                         }
                     //for twitter tweets, display the profile pic, profile name, and render the text. might need some css

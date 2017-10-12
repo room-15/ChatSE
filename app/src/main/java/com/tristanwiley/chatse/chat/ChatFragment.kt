@@ -48,6 +48,8 @@ import kotlinx.android.synthetic.main.picker_footer.view.*
 import org.codehaus.jackson.JsonNode
 import org.codehaus.jackson.map.ObjectMapper
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -238,107 +240,109 @@ class ChatFragment : Fragment(), IncomingEventListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.room_information -> {
-                Ion.with(activity)
-                        .load("https://chat.stackoverflow.com/rooms/thumbs/${room.num}")
-                        .asJsonObject()
-                        .setCallback { e, result ->
-                            if (e != null) {
-                                Log.e("ChatFragment", e.message.toString())
-                            } else {
-                                //Create dialog
-                                val builder = AlertDialog.Builder(context)
+                doAsync {
+                    val client = ClientManager.client
+                    val request = Request.Builder()
+                            .url("https://chat.stackoverflow.com/rooms/thumbs/${room.num}")
+                            .build()
+                    val response = client.newCall(request).execute()
+                    val jsonResult = JSONObject(response.body().string())
 
-                                //Set the dialog title to the room name
-                                builder.setTitle(result.get("name").asString)
+                    uiThread {
+                        //Create dialog
+                        val builder = AlertDialog.Builder(context)
 
-                                //Create a LinearLayout and set it's orientation to vertical
-                                val l = LinearLayout(context)
-                                l.orientation = LinearLayout.VERTICAL
+                        //Set the dialog title to the room name
+                        builder.setTitle(jsonResult.getString("name"))
 
-                                //Get the display density as a variable for use with padding
-                                val dpi = activity.resources.displayMetrics.density.toInt()
+                        //Create a LinearLayout and set it's orientation to vertical
+                        val l = LinearLayout(context)
+                        l.orientation = LinearLayout.VERTICAL
 
-                                //Set the padding of the layout so it looks natural
-                                l.setPadding((19 * dpi), (5 * dpi), (14 * dpi), (5 * dpi))
+                        //Get the display density as a variable for use with padding
+                        val dpi = activity.resources.displayMetrics.density.toInt()
 
-                                //Create a TextView that houses the description of the room
-                                val roomText = TextView(context)
+                        //Set the padding of the layout so it looks natural
+                        l.setPadding((19 * dpi), (5 * dpi), (14 * dpi), (5 * dpi))
 
-                                //Set the text size so it looks nice
-                                roomText.textSize = 18F
+                        //Create a TextView that houses the description of the room
+                        val roomText = TextView(context)
 
-                                //Make it so when clicking links, it opens in browser like expected
-                                roomText.autoLinkMask = Linkify.WEB_URLS
+                        //Set the text size so it looks nice
+                        roomText.textSize = 18F
 
-                                //Depending on SDK version, set the text from HTML different ways.
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    roomText.text = Html.fromHtml(result.get("description").asString, Html.FROM_HTML_MODE_COMPACT)
-                                } else {
-                                    @Suppress("DEPRECATION")
-                                    roomText.text = Html.fromHtml(result.get("description").asString)
-                                }
-                                //Set the TextView to match parent
-                                roomText.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+                        //Make it so when clicking links, it opens in browser like expected
+                        roomText.autoLinkMask = Linkify.WEB_URLS
 
-                                //Add the TextView to the Layoutt
-                                l.addView(roomText)
-
-                                //Create a FlowLayout (instead of LinearLayout so we can display multiple tags)
-                                val tagsLayout = FlowLayout(context)
-
-                                //For each tag create a TextView
-                                val tags = Jsoup.parse(result.get("tags").asString).getElementsByClass("tag")
-                                tags.forEach {
-                                    //Create a TextView
-                                    val tagview = TextView(context)
-                                    //Set the text from parsing the HTML
-                                    tagview.text = it.text()
-                                    //Set a variable to the tag url
-                                    val url = it.attr("href")
-
-                                    //On tag click, open the tag in the browser
-                                    tagview.setOnClickListener {
-                                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                                    }
-
-                                    //Set the text color to white
-                                    tagview.setTextColor(Color.WHITE)
-
-                                    //Set the TextView padding
-                                    tagview.setPadding(14, 14, 14, 14)
-
-                                    //Make sure the tag stays on one line
-                                    tagview.setSingleLine(true)
-
-                                    //Set the layout param
-                                    val layoutparam = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-
-                                    //Set some margins and set the LayoutParams to the TextView
-                                    layoutparam.setMargins(24, 0, 0, 0)
-                                    tagview.layoutParams = layoutparam
-
-                                    //Set the background to a rectangle to look like it does on the web
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                        tagview.background = ContextCompat.getDrawable(context, R.drawable.tag_background)
-                                    } else {
-                                        @Suppress("DEPRECATION")
-                                        tagview.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.tag_background))
-                                    }
-
-                                    //Add the tag to the layout
-                                    tagsLayout.addView(tagview)
-                                }
-
-                                //Add all the tags to the main layout
-                                l.addView(tagsLayout)
-
-                                //Set the LinearLayout as the AlertDialog view
-                                builder.setView(l)
-
-                                //Show that AlertDialog
-                                builder.show()
-                            }
+                        //Depending on SDK version, set the text from HTML different ways.
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            roomText.text = Html.fromHtml(jsonResult.getString("description"), Html.FROM_HTML_MODE_COMPACT)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            roomText.text = Html.fromHtml(jsonResult.getString("description"))
                         }
+                        //Set the TextView to match parent
+                        roomText.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+
+                        //Add the TextView to the Layoutt
+                        l.addView(roomText)
+
+                        //Create a FlowLayout (instead of LinearLayout so we can display multiple tags)
+                        val tagsLayout = FlowLayout(context)
+
+                        //For each tag create a TextView
+                        val tags = Jsoup.parse(jsonResult.getString("tags")).getElementsByClass("tag")
+                        tags.forEach {
+                            //Create a TextView
+                            val tagview = TextView(context)
+                            //Set the text from parsing the HTML
+                            tagview.text = it.text()
+                            //Set a variable to the tag url
+                            val url = it.attr("href")
+
+                            //On tag click, open the tag in the browser
+                            tagview.setOnClickListener {
+                                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                            }
+
+                            //Set the text color to white
+                            tagview.setTextColor(Color.WHITE)
+
+                            //Set the TextView padding
+                            tagview.setPadding(14, 14, 14, 14)
+
+                            //Make sure the tag stays on one line
+                            tagview.setSingleLine(true)
+
+                            //Set the layout param
+                            val layoutparam = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+
+                            //Set some margins and set the LayoutParams to the TextView
+                            layoutparam.setMargins(24, 0, 0, 0)
+                            tagview.layoutParams = layoutparam
+
+                            //Set the background to a rectangle to look like it does on the web
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                tagview.background = ContextCompat.getDrawable(context, R.drawable.tag_background)
+                            } else {
+                                @Suppress("DEPRECATION")
+                                tagview.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.tag_background))
+                            }
+
+                            //Add the tag to the layout
+                            tagsLayout.addView(tagview)
+                        }
+
+                        //Add all the tags to the main layout
+                        l.addView(tagsLayout)
+
+                        //Set the LinearLayout as the AlertDialog view
+                        builder.setView(l)
+
+                        //Show that AlertDialog
+                        builder.show()
+                    }
+                }
                 return true
             }
             R.id.room_stars -> {

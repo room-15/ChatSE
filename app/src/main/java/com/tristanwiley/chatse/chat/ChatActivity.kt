@@ -32,6 +32,7 @@ import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.room_nav_header.*
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
@@ -125,28 +126,32 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         val seID = defaultSharedPreferences.getInt("SEID", -1)
 
         //Does the user have a SO account? What about SE?
-        if (userID != -1) {
-            Ion.with(applicationContext)
-                    .load("https://chat.stackoverflow.com/users/thumbs/$userID")
-                    .asJsonObject()
-                    .setCallback { _, result ->
-                        if (result != null) {
-                            userName.text = result.get("name").asString
-                            userEmail.text = defaultSharedPreferences.getString("email", "")
-                        }
-                    }
-        } else if (seID != -1) {
-            Ion.with(applicationContext)
-                    .load("https://chat.stackexchange.com/users/thumbs/$userID")
-                    .asJsonObject()
-                    .setCallback { _, result ->
-                        if (result != null) {
-                            userName.text = result.get("name").asString
-                            userEmail.text = defaultSharedPreferences.getString("email", "")
-                        }
-                    }
-        } else {
-            Log.e("ChatActivity", "Userid not found")
+        when {
+            userID != -1 -> doAsync {
+                val client = ClientManager.client
+                val request = Request.Builder()
+                        .url("https://chat.stackoverflow.com/users/thumbs/$userID")
+                        .build()
+                val response = client.newCall(request).execute()
+                val jsonResult = JSONObject(response.body().string())
+                uiThread {
+                    userName.text = jsonResult.getString("name")
+                    userEmail.text = defaultSharedPreferences.getString("email", "")
+                }
+            }
+            seID != -1 -> doAsync {
+                val client = ClientManager.client
+                val request = Request.Builder()
+                        .url("https://chat.stackoverflow.com/users/thumbs/$userID")
+                        .build()
+                val response = client.newCall(request).execute()
+                val jsonResult = JSONObject(response.body().string())
+                uiThread {
+                    userName.text = jsonResult.getString("name")
+                    userEmail.text = defaultSharedPreferences.getString("email", "")
+                }
+            }
+            else -> Log.e("ChatActivity", "Userid not found")
         }
     }
 
