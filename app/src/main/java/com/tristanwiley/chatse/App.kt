@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import com.crashlytics.android.Crashlytics
 import io.fabric.sdk.android.Fabric
+import io.realm.Realm
 
 /**
  * Application class that manages certain constants for us.
@@ -14,7 +15,12 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         Fabric.with(this, Crashlytics())
+        initRealm()
         com.tristanwiley.chatse.App.Companion.instance = this
+    }
+
+    fun initRealm(){
+        Realm.init(this)
     }
 
     companion object {

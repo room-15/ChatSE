@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'kotlin-android'
+apply plugin: 'realm-android'
 
 def FABRIC_API_KEY = '"' + fabricApiKey + '"'
 def MANIFEST_FABRIC_API_KEY = fabricApiKey
