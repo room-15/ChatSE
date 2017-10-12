@@ -13,6 +13,9 @@ import android.widget.Toast
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.database.Repository
+import com.tristanwiley.chatse.database.User
+import com.tristanwiley.chatse.database.UserRepository
 import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import org.jetbrains.anko.defaultSharedPreferences
@@ -38,6 +41,10 @@ class LoginActivity : AppCompatActivity() {
     lateinit var loginButton: FloatingActionButton
     lateinit var prefs: SharedPreferences
     lateinit var dialog: ProgressDialog
+
+    var user: User = User()
+
+    private val userRepository : Repository<String, User> = UserRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -158,6 +165,7 @@ class LoginActivity : AppCompatActivity() {
                     loginToSE(client)
                     loginToSite(client, "https://stackoverflow.com", email, password)
                     runOnUiThread {
+                        saveUser(user)
                         prefs.edit().putBoolean(com.tristanwiley.chatse.App.PREF_HAS_CREDS, true).apply()
                         this@LoginActivity.startActivity(Intent(this@LoginActivity, com.tristanwiley.chatse.chat.ChatActivity::class.java))
                         this@LoginActivity.finish()
@@ -241,6 +249,9 @@ class LoginActivity : AppCompatActivity() {
 
                 //Save the two IDs in the shared preferences
                 defaultSharedPreferences.edit().putInt("SOID", SOID).putInt("SEMAINID", SEID).putString("email", email).apply()
+                user.soid=SOID
+                user.email=email
+                //SEMAINID is never used, could be added to user object if needed
             } else {
                 return false
             }
@@ -346,5 +357,8 @@ class LoginActivity : AppCompatActivity() {
         //Split the URL and get's their id which is between two slashes /theirid/their-profile-name
         val res = url.split("/")[2]
         defaultSharedPreferences.edit().putInt("SEID", res.toInt()).apply()
+        user.seID=res.toInt()
     }
+
+    fun saveUser(user: User) = userRepository.insert(user)
 }

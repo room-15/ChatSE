@@ -26,6 +26,9 @@ import com.koushikdutta.ion.Ion
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.database.Repository
+import com.tristanwiley.chatse.database.User
+import com.tristanwiley.chatse.database.UserRepository
 import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import kotlinx.android.synthetic.main.activity_chat.*
@@ -54,6 +57,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     lateinit var soRoomAdapter: com.tristanwiley.chatse.chat.adapters.RoomAdapter
     lateinit var seRoomAdapter: com.tristanwiley.chatse.chat.adapters.RoomAdapter
     var isBound = false
+
+    val userRepository: Repository<String, User> = UserRepository()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -121,8 +127,17 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
      * Function to load user data and set it to the NavigationDrawer header
      */
     fun loadUserData() {
-        val userID = defaultSharedPreferences.getInt("SOID", -1)
-        val seID = defaultSharedPreferences.getInt("SEID", -1)
+
+        val user = userRepository.findOne("1")
+                ?: User(-1, -1, "", "")
+
+        val userID = user.soid//defaultSharedPreferences.getInt("SOID", -1)
+        val seID = user.seID//defaultSharedPreferences.getInt("SEID", -1)
+
+        //load offline user data to drawer, get from callback and update
+
+        userName.text = user.name
+        userEmail.text = user.email
 
         //Does the user have a SO account? What about SE?
         if (userID != -1) {
@@ -131,8 +146,13 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     .asJsonObject()
                     .setCallback { _, result ->
                         if (result != null) {
+                            user.name = result.get("name").asString
+
                             userName.text = result.get("name").asString
-                            userEmail.text = defaultSharedPreferences.getString("email", "")
+                            userEmail.text = user.email//defaultSharedPreferences.getString("email", "")
+
+                            //update user in db
+                            userRepository.insert(user)
                         }
                     }
         } else if (seID != -1) {
@@ -141,8 +161,14 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     .asJsonObject()
                     .setCallback { _, result ->
                         if (result != null) {
+                            user.name = result.get("name").asString
+
                             userName.text = result.get("name").asString
-                            userEmail.text = defaultSharedPreferences.getString("email", "")
+                            userEmail.text = user.email//defaultSharedPreferences.getString("email", "")
+
+                            //update user in db
+                            userRepository.insert(user)
+
                         }
                     }
         } else {
