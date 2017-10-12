@@ -46,10 +46,6 @@ class CircleImageView : AppCompatImageView {
     private var mTileModeX: Shader.TileMode? = DEFAULT_TILE_MODE
     private var mTileModeY: Shader.TileMode? = DEFAULT_TILE_MODE
 
-//    init {
-//        init()
-//    }
-
     constructor(context: Context) : super(context) {
         init()
     }
@@ -227,14 +223,11 @@ class CircleImageView : AppCompatImageView {
                     .setTileModeX(mTileModeX)
                     .setTileModeY(mTileModeY)
 
-            if (this !is CircleImageView) {
-                val tl = mCornerRadii[Corner.TOP_LEFT.ordinal]
-                val tr = mCornerRadii[Corner.TOP_RIGHT.ordinal]
-                val br = mCornerRadii[Corner.BOTTOM_RIGHT.ordinal]
-                val bl = mCornerRadii[Corner.BOTTOM_LEFT.ordinal]
-                drawable.setCornerRadius(tl, tr, br, bl)
-            }
-
+            val tl = mCornerRadii[Corner.TOP_LEFT.ordinal]
+            val tr = mCornerRadii[Corner.TOP_RIGHT.ordinal]
+            val br = mCornerRadii[Corner.BOTTOM_RIGHT.ordinal]
+            val bl = mCornerRadii[Corner.BOTTOM_LEFT.ordinal]
+            drawable.setCornerRadius(tl, tr, br, bl)
 
             applyColorMod()
         } else if (drawable is LayerDrawable) {
@@ -261,7 +254,7 @@ class CircleImageView : AppCompatImageView {
         }
     }
 
-    fun setOval(isOval: Boolean) {
+    private fun setOval(isOval: Boolean) {
         if (isOval == mIsOval) return
 
         mIsOval = isOval
@@ -270,7 +263,7 @@ class CircleImageView : AppCompatImageView {
         invalidate()
     }
 
-    fun mutateBackground(mutate: Boolean) {
+    private fun mutateBackground(mutate: Boolean) {
         if (mutate == mMutateBackground) return
 
         mMutateBackground = mutate
