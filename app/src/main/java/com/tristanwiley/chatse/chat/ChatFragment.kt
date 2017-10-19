@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.ActivityManager
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
@@ -405,28 +406,20 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 }
             //If from the gallery
                 1 -> {
-//                    val cursor: Cursor
+                    val cursor: Cursor
                     if (data.data != null) {
-//                        //Get the photo
-//                        val selectedImage = data.data
-//                        val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
-//                        cursor = activity.contentResolver.query(selectedImage, filePathColumn, null, null, null)
-//                        cursor.use {
-//                            it.moveToFirst()
-//                            val picturePath = it.getString(it.getColumnIndex(filePathColumn[0]))
-//                            Log.wtf("PATH", picturePath)
-//                            it.close()
-//                            //Get the path and get it as a File and upload it
-//                            uploadFileToImgur(File(picturePath))
+                        //Get the photo
                         val selectedImage = data.data
                         val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
-                        val cursor = activity.contentResolver.query(selectedImage, filePathColumn, null, null, null)
-                        cursor.moveToFirst()
-                        val columnIndex = cursor.getColumnIndex(filePathColumn[0])
-                        val picturePath = cursor.getString(columnIndex)
-                        cursor.close()
-                        Log.wtf("PATH", picturePath)
-                        uploadFileToImgur(File(picturePath))
+                        cursor = activity.contentResolver.query(selectedImage, filePathColumn, null, null, null)
+                        cursor.use {
+                            it.moveToFirst()
+                            val picturePath = it.getString(it.getColumnIndex(filePathColumn[0]))
+                            Log.wtf("PATH", picturePath)
+                            it.close()
+                            //Get the path and get it as a File and upload it
+                            uploadFileToImgur(File(picturePath))
+                        }
                     }
                 }
             }
@@ -566,61 +559,61 @@ class ChatFragment : Fragment(), IncomingEventListener {
     }
 
 
-        /**
-         * Map a message to an object and return a JsonNode
-         */
-        @Throws(IOException::class)
-        private fun getMessagesObject(client: Client, room: ChatRoom, count: Int): JsonNode {
-            val getMessagesRequestBody = FormEncodingBuilder()
-                    .add("since", 0.toString())
-                    .add("mode", "Messages")
-                    .add("msgCount", count.toString())
-                    .add("fkey", chatFkey)
-                    .build()
-            val getMessagesRequest = Request.Builder()
-                    .url(room.site + "/chats/" + room.num + "/events")
-                    .post(getMessagesRequestBody)
-                    .build()
+    /**
+     * Map a message to an object and return a JsonNode
+     */
+    @Throws(IOException::class)
+    private fun getMessagesObject(client: Client, room: ChatRoom, count: Int): JsonNode {
+        val getMessagesRequestBody = FormEncodingBuilder()
+                .add("since", 0.toString())
+                .add("mode", "Messages")
+                .add("msgCount", count.toString())
+                .add("fkey", chatFkey)
+                .build()
+        val getMessagesRequest = Request.Builder()
+                .url(room.site + "/chats/" + room.num + "/events")
+                .post(getMessagesRequestBody)
+                .build()
 
-            val getMessagesResponse = client.newCall(getMessagesRequest).execute()
-            return mapper.readTree(getMessagesResponse.body().byteStream())
-        }
-
-        /**
-         * Create a new message and post it to the chat, creating it!
-         */
-        @Throws(IOException::class)
-        private fun newMessage(client: Client, room: ChatRoom,
-                               fkey: String?, message: String) {
-            val newMessageRequestBody = FormEncodingBuilder()
-                    .add("text", message)
-                    .add("fkey", fkey)
-                    .build()
-            val newMessageRequest = Request.Builder()
-                    .url(room.site + "/chats/" + room.num + "/messages/new/")
-                    .post(newMessageRequestBody)
-                    .build()
-
-            client.newCall(newMessageRequest).execute()
-        }
-
-        companion object {
-
-            private val EXTRA_ROOM = "room"
-            private val EXTRA_NAME = "name"
-            private val EXTRA_FKEY = "fkey"
-
-            fun createInstance(room: ChatRoom, name: String, fkey: String): ChatFragment {
-                val b = Bundle(3)
-                b.putParcelable(ChatFragment.Companion.EXTRA_ROOM, room)
-                b.putString(ChatFragment.Companion.EXTRA_NAME, name)
-                b.putString(ChatFragment.Companion.EXTRA_FKEY, fkey)
-
-                val fragment = ChatFragment()
-                fragment.arguments = b
-                return fragment
-            }
-        }
-
-
+        val getMessagesResponse = client.newCall(getMessagesRequest).execute()
+        return mapper.readTree(getMessagesResponse.body().byteStream())
     }
+
+    /**
+     * Create a new message and post it to the chat, creating it!
+     */
+    @Throws(IOException::class)
+    private fun newMessage(client: Client, room: ChatRoom,
+                           fkey: String?, message: String) {
+        val newMessageRequestBody = FormEncodingBuilder()
+                .add("text", message)
+                .add("fkey", fkey)
+                .build()
+        val newMessageRequest = Request.Builder()
+                .url(room.site + "/chats/" + room.num + "/messages/new/")
+                .post(newMessageRequestBody)
+                .build()
+
+        client.newCall(newMessageRequest).execute()
+    }
+
+    companion object {
+
+        private val EXTRA_ROOM = "room"
+        private val EXTRA_NAME = "name"
+        private val EXTRA_FKEY = "fkey"
+
+        fun createInstance(room: ChatRoom, name: String, fkey: String): ChatFragment {
+            val b = Bundle(3)
+            b.putParcelable(ChatFragment.Companion.EXTRA_ROOM, room)
+            b.putString(ChatFragment.Companion.EXTRA_NAME, name)
+            b.putString(ChatFragment.Companion.EXTRA_FKEY, fkey)
+
+            val fragment = ChatFragment()
+            fragment.arguments = b
+            return fragment
+        }
+    }
+
+
+}
