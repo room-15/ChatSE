@@ -2,11 +2,14 @@ package com.tristanwiley.chatse.event.presenter.message
 
 import android.content.Context
 import android.util.Log
-import com.koushikdutta.ion.Ion
+import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.chat.ChatRoom
 import com.tristanwiley.chatse.event.ChatEvent
 import com.tristanwiley.chatse.event.presenter.EventPresenter
 import com.tristanwiley.chatse.network.Client
+import com.tristanwiley.chatse.network.ClientManager
+import org.jetbrains.anko.doAsync
+import org.json.JSONObject
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -47,34 +50,38 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                     url = "https://chat.stackexchange.com/users/thumbs/${event.user_id}"
                 }
                 //Make a call with Ion (for parsing simplicity) and parse the result
-                Ion.with(context)
-                        .load(url)
-                        .asJsonObject()
-                        .setCallback { e, result ->
-                            //Ensure there's no error and the result is not null
-                            if (e != null) {
-                                Log.w("MessageEventPresenter", e.message.toString())
+                doAsync {
+                    val client = ClientManager.client
+
+                    val soChatPageRequest = Request.Builder()
+                            .url(url)
+                            .build()
+                    val response = client.newCall(soChatPageRequest).execute()
+                    val jsonData = response.body().string()
+                    val result = JSONObject(jsonData)
+
+                    //Get the rooms array
+                    val rooms = result.getJSONArray("rooms")
+                    //Find the current room from it
+                    val r: JSONObject? = (0..(rooms.length() - 1))
+                            .map { rooms.getJSONObject(it) }
+                            .lastOrNull {
+                                it.getInt("id") == roomNum
                             }
-                            if (result != null) {
-                                //Get the rooms array
-                                val rooms = result.get("rooms").asJsonArray
-                                //Find the current room from it
-                                val r = rooms.find { it.asJsonObject.get("id").asInt == roomNum }
-                                //Ensure the user is in the room
-                                if (r != null) {
-                                    //Get the profile picture for the user and add it to the user in the users list
-                                    val newEvent = MessageEvent(event)
-                                    newEvent.isForUsersList = true
-                                    val image_url = result.get("email_hash").asString.replace("!", "")
-                                    if (image_url.contains(".")) {
-                                        newEvent.email_hash = image_url
-                                    } else {
-                                        newEvent.email_hash = "https://www.gravatar.com/avatar/$image_url"
-                                    }
-                                    users.put(newEvent.userId, newEvent)
-                                }
-                            }
+                    //Ensure the user is in the room
+                    if (r != null) {
+                        //Get the profile picture for the user and add it to the user in the users list
+                        val newEvent = MessageEvent(event)
+                        newEvent.isForUsersList = true
+                        val imageUrl = result.getString("email_hash").replace("!", "")
+                        if (imageUrl.contains(".")) {
+                            newEvent.email_hash = imageUrl
+                        } else {
+                            newEvent.email_hash = "https://www.gravatar.com/avatar/$imageUrl"
                         }
+                        users.put(newEvent.userId, newEvent)
+                    }
+                }
             }
         }
 

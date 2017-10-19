@@ -22,15 +22,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.koushikdutta.ion.Ion
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.SimpleTarget
+import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.chat.ChatRoom
 import com.tristanwiley.chatse.event.ChatEvent
 import com.tristanwiley.chatse.extensions.loadUrl
 import com.tristanwiley.chatse.network.Client
+import com.tristanwiley.chatse.network.ClientManager
 import kotlinx.android.synthetic.main.list_item_message.view.*
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import org.jetbrains.anko.defaultSharedPreferences
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.util.*
 import kotlin.collections.ArrayList
@@ -82,37 +88,41 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                 userPicture.setImageResource(R.drawable.box)
 
             //Load the profile pictures! Create a request to get the url for the picture
-            Ion.with(mContext)
-                    .load("${room.site}/users/thumbs/${message.user_id}")
-                    .asJsonObject()
-                    .setCallback { e, result ->
-                        if (e != null) {
-                            Log.e("MessageAdapter", e.message.toString())
-                        } else {
-                            //Get the email_hash attribute which contains either a link to Imgur or a hash for Gravatar
-                            val hash = result.get("email_hash").asString.replace("!", "")
-                            var imageLink = hash
-                            //If Gravatar, create link
-                            if (!hash.contains(".")) {
-                                imageLink = "https://www.gravatar.com/avatar/$hash"
-                            } else if (!hash.contains("http")) {
-                                imageLink = room.site + hash
-                            }
 
-                            //Load it into the ImageView!
-                            Ion.with(mContext)
-                                    .load(imageLink)
-                                    .asBitmap()
-                                    .setCallback { error, imageResult ->
-                                        if (error != null || imageResult == null) {
-                                            Log.e("profilePic", e.toString())
-                                        } else {
-                                            userPicture.setImageBitmap(imageResult)
-                                            userBarBottom.setBackgroundColor(getDominantColor(imageResult))
-                                        }
-                                    }
-                        }
-                    }
+            doAsync {
+                val client = ClientManager.client
+
+                val soChatPageRequest = Request.Builder()
+                        .url("${room.site}/users/thumbs/${message.user_id}")
+                        .build()
+                val response = client.newCall(soChatPageRequest).execute()
+                val jsonData = response.body().string()
+                val result = JSONObject(jsonData)
+
+                //Get the email_hash attribute which contains either a link to Imgur or a hash for Gravatar
+                val hash = result.getString("email_hash").replace("!", "")
+                var imageLink = hash
+                //If Gravatar, create link
+                if (!hash.contains(".")) {
+                    imageLink = "https://www.gravatar.com/avatar/$hash"
+                } else if (!hash.contains("http")) {
+                    imageLink = room.site + hash
+                }
+
+                uiThread {
+                    //Load it into the ImageView!
+                    Glide.with(mContext)
+                            .asBitmap()
+                            .load(imageLink)
+                            .into(object : SimpleTarget<Bitmap>() {
+                                override fun onResourceReady(result: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>) {
+                                    //Load it into the ImageView!
+                                    userPicture.setImageBitmap(result)
+                                    userBarBottom.setBackgroundColor(getDominantColor(result))
+                                }
+                            })
+                }
+            }
 
             if (room.site == Client.SITE_STACK_OVERFLOW) {
                 if (message.user_id == mContext.defaultSharedPreferences.getInt("SOID", -1)) {

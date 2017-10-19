@@ -7,17 +7,20 @@ import android.support.v7.widget.RecyclerView
 import android.text.Html
 import android.text.SpannableString
 import android.text.util.Linkify
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.koushikdutta.ion.Ion
+import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.event.EventList
 import com.tristanwiley.chatse.extensions.loadUrl
+import com.tristanwiley.chatse.network.ClientManager
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
+import org.json.JSONObject
 
 
 /**
@@ -60,57 +63,60 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
 
             //On click, show information about user
             itemView.setOnClickListener {
-                Ion.with(mContext)
-                        .load("https://chat.stackoverflow.com/users/thumbs/${user.userId}")
-                        .asJsonObject()
-                        .setCallback { e, result ->
-                            if (e != null) {
-                                Log.e("ChatFragment", e.message.toString())
+                doAsync {
+                    val client = ClientManager.client
+                    val request = Request.Builder()
+                            .url("https://chat.stackoverflow.com/users/thumbs/${user.userId}")
+                            .build()
+                    val response = client.newCall(request).execute()
+                    val result = JSONObject(response.body().string())
+
+                    uiThread {
+                        //Create AlertDialog with title of their name
+                        val builder = AlertDialog.Builder(mContext)
+                                .setTitle(result.getString("name"))
+
+                        //Create layout
+                        val layout = LinearLayout(mContext)
+
+                        //Get DPI so we can add padding and look natural
+                        val dpi = mContext.resources.displayMetrics.density.toInt()
+                        layout.setPadding((19 * dpi), (5 * dpi), (14 * dpi), (5 * dpi))
+
+                        val s: SpannableString
+
+                        //Set user message to the body of the AlertDialog and Linkify links
+                        if (!result.isNull("user_message")) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                s = SpannableString(Html.fromHtml(result.getString("user_message"), Html.FROM_HTML_MODE_COMPACT))
                             } else {
-                                //Create AlertDialog with title of their name
-                                val builder = AlertDialog.Builder(mContext)
-                                        .setTitle(result.get("name").asString)
-
-                                //Create layout
-                                val layout = LinearLayout(mContext)
-
-                                //Get DPI so we can add padding and look natural
-                                val dpi = mContext.resources.displayMetrics.density.toInt()
-                                layout.setPadding((19 * dpi), (5 * dpi), (14 * dpi), (5 * dpi))
-
-                                val s: SpannableString
-
-                                //Set user message to the body of the AlertDialog and Linkify links
-                                if (!result.get("user_message").isJsonNull) {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                        s = SpannableString(Html.fromHtml(result.get("user_message").asString, Html.FROM_HTML_MODE_COMPACT))
-                                    } else {
-                                        @Suppress("DEPRECATION")
-                                        s = SpannableString(Html.fromHtml(result.get("user_message").asString))
-                                    }
-                                    Linkify.addLinks(s, Linkify.ALL)
-                                } else {
-                                    s = SpannableString("There's no user bio! :(")
-                                }
-
-                                //Set SpannableString to TextView
-                                val tv = TextView(mContext)
-                                tv.text = s
-
-                                //Add TextView to Layout and set Layout to AlertDialog view
-                                layout.addView(tv)
-                                builder.setView(layout)
-
-                                //Create cancel button to cancel dialog
-                                builder.setNegativeButton("Cancel", { dialog, _ ->
-                                    dialog.cancel()
-                                })
-
-                                //Show Dialog
-                                builder.show()
+                                @Suppress("DEPRECATION")
+                                s = SpannableString(Html.fromHtml(result.getString("user_message")))
                             }
+                            Linkify.addLinks(s, Linkify.ALL)
+                        } else {
+                            s = SpannableString("There's no user bio! :(")
                         }
+
+                        //Set SpannableString to TextView
+                        val tv = TextView(mContext)
+                        tv.text = s
+
+                        //Add TextView to Layout and set Layout to AlertDialog view
+                        layout.addView(tv)
+                        builder.setView(layout)
+
+                        //Create cancel button to cancel dialog
+                        builder.setNegativeButton("Cancel", { dialog, _ ->
+                            dialog.cancel()
+                        })
+
+                        //Show Dialog
+                        builder.show()
+                    }
+                }
             }
         }
     }
 }
+

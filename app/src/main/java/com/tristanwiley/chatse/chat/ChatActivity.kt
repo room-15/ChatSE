@@ -22,7 +22,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import com.koushikdutta.ion.Ion
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
@@ -207,84 +206,86 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     fun addRoomsToDrawer(fkey: String) {
         val soID = defaultSharedPreferences.getInt("SOID", -1)
 
-        //If the user has a StackOverflow ID then load rooms
-        if (soID != -1) {
-            Ion.with(applicationContext)
-                    .load("${Client.SITE_STACK_OVERFLOW}/users/thumbs/$soID")
-                    .asJsonObject()
-                    .setCallback { _, result ->
-                        if (result != null) {
-                            //Clear all the rooms and make the text visible
-                            soRoomList.clear()
-                            runOnUiThread {
-                                so_header_text.visibility = View.VISIBLE
-                                stackoverflow_room_list.visibility = View.VISIBLE
-                            }
-                            //For each room, create a room and add it to the list
-                            val rooms = result.get("rooms").asJsonArray
-                            rooms.forEach {
-                                val room = it.asJsonObject
-                                val roomName = room.get("name").asString
-                                val roomNum = room.get("id").asLong
-                                //Create room and add it to the list
-                                createRoom(Client.SITE_STACK_OVERFLOW, roomName, roomNum, 0, fkey)
-                            }
-                            //If the rooms are empty then remove the list and header
-                            if (rooms.size() == 0) {
-                                runOnUiThread {
-                                    so_header_text.visibility = View.GONE
-                                    stackoverflow_room_list.visibility = View.GONE
-                                }
-                            }
-                        }
-                    }
-        } else {
-            runOnUiThread {
-                so_header_text.visibility = View.GONE
-                stackoverflow_room_list.visibility = View.GONE
-            }
-        }
+        doAsync {
+            //If the user has a StackOverflow ID then load rooms
+            if (soID != -1) {
+                val client = ClientManager.client
 
-        //If the user has a StackExchange ID then load rooms
-        val seID = defaultSharedPreferences.getInt("SEID", -1)
-        if (seID != -1) {
-            Ion.with(applicationContext)
-                    .load("${Client.SITE_STACK_EXCHANGE}/users/thumbs/$seID")
-                    .asJsonObject()
-                    .setCallback { e, result ->
-                        if (e != null) {
-                            Log.e("addRoomsToDrawer", e.message.toString())
-                        } else {
-                            if (result != null) {
-                                //Clear all the rooms and make the text visible
-                                seRoomList.clear()
-                                runOnUiThread {
-                                    se_header_text.visibility = View.VISIBLE
-                                    stackexchange_room_list.visibility = View.VISIBLE
-                                }
-                                //For each room, create a room and add it to the list
-                                val rooms = result.get("rooms").asJsonArray
-                                rooms.forEach {
-                                    val room = it.asJsonObject
-                                    val roomName = room.get("name").asString
-                                    val roomNum = room.get("id").asLong
-                                    //Create room and add it to the list
-                                    createRoom(Client.SITE_STACK_EXCHANGE, roomName, roomNum, 0, fkey)
-                                }
-                                //If the rooms are empty then remove the list and header
-                                if (rooms.size() == 0) {
-                                    runOnUiThread {
-                                        se_header_text.visibility = View.GONE
-                                        stackexchange_room_list.visibility = View.GONE
-                                    }
-                                }
-                            }
-                        }
+                val soChatPageRequest = Request.Builder()
+                        .url("${Client.SITE_STACK_OVERFLOW}/users/thumbs/$soID")
+                        .build()
+                val response = client.newCall(soChatPageRequest).execute()
+                val jsonData = response.body().string()
+                val result = JSONObject(jsonData)
+
+                //Clear all the rooms and make the text visible
+                soRoomList.clear()
+                runOnUiThread {
+                    so_header_text.visibility = View.VISIBLE
+                    stackoverflow_room_list.visibility = View.VISIBLE
+                }
+                //For each room, create a room and add it to the list
+                val rooms = result.getJSONArray("rooms")
+                for (i in 0..(rooms.length() - 1)) {
+                    val room = rooms.getJSONObject(i)
+                    val roomName = room.getString("name")
+                    val roomNum = room.getLong("id")
+                    //Create room and add it to the list
+                    createRoom(Client.SITE_STACK_OVERFLOW, roomName, roomNum, 0, fkey)
+                }
+                //If the rooms are empty then remove the list and header
+                if (rooms.length() == 0) {
+                    runOnUiThread {
+                        so_header_text.visibility = View.GONE
+                        stackoverflow_room_list.visibility = View.GONE
                     }
-        } else {
-            runOnUiThread {
-                se_header_text.visibility = View.GONE
-                stackexchange_room_list.visibility = View.GONE
+                }
+            } else {
+                runOnUiThread {
+                    so_header_text.visibility = View.GONE
+                    stackoverflow_room_list.visibility = View.GONE
+                }
+            }
+
+            //If the user has a StackExchange ID then load rooms
+            val seID = defaultSharedPreferences.getInt("SEID", -1)
+            if (seID != -1) {
+                val client = ClientManager.client
+
+                val soChatPageRequest = Request.Builder()
+                        .url("${Client.SITE_STACK_EXCHANGE}/users/thumbs/$seID")
+                        .build()
+                val response = client.newCall(soChatPageRequest).execute()
+                val jsonData = response.body().string()
+                val result = JSONObject(jsonData)
+
+                //Clear all the rooms and make the text visible
+                seRoomList.clear()
+                runOnUiThread {
+                    se_header_text.visibility = View.VISIBLE
+                    stackexchange_room_list.visibility = View.VISIBLE
+                }
+                //For each room, create a room and add it to the list
+                val rooms = result.getJSONArray("rooms")
+                for (i in 0..(rooms.length() - 1)) {
+                    val room = rooms.getJSONObject(i)
+                    val roomName = room.getString("name")
+                    val roomNum = room.getLong("id")
+                    //Create room and add it to the list
+                    createRoom(Client.SITE_STACK_EXCHANGE, roomName, roomNum, 0, fkey)
+                }
+                //If the rooms are empty then remove the list and header
+                if (rooms.length() == 0) {
+                    runOnUiThread {
+                        se_header_text.visibility = View.GONE
+                        stackexchange_room_list.visibility = View.GONE
+                    }
+                }
+            } else {
+                runOnUiThread {
+                    se_header_text.visibility = View.GONE
+                    stackexchange_room_list.visibility = View.GONE
+                }
             }
         }
     }
