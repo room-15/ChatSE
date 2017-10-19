@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.ActivityManager
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
@@ -406,19 +405,28 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 }
             //If from the gallery
                 1 -> {
-                    val cursor: Cursor
+//                    val cursor: Cursor
                     if (data.data != null) {
-                        //Get the photo
+//                        //Get the photo
+//                        val selectedImage = data.data
+//                        val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
+//                        cursor = activity.contentResolver.query(selectedImage, filePathColumn, null, null, null)
+//                        cursor.use {
+//                            it.moveToFirst()
+//                            val picturePath = it.getString(it.getColumnIndex(filePathColumn[0]))
+//                            Log.wtf("PATH", picturePath)
+//                            it.close()
+//                            //Get the path and get it as a File and upload it
+//                            uploadFileToImgur(File(picturePath))
                         val selectedImage = data.data
                         val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
-                        cursor = activity.contentResolver.query(selectedImage, filePathColumn, null, null, null)
-                        cursor.use {
-                            it.moveToFirst()
-                            val picturePath = it.getString(it.getColumnIndex(filePathColumn[0]))
-                            it.close()
-                            //Get the path and get it as a File and upload it
-                            uploadFileToImgur(File(picturePath))
-                        }
+                        val cursor = activity.contentResolver.query(selectedImage, filePathColumn, null, null, null)
+                        cursor.moveToFirst()
+                        val columnIndex = cursor.getColumnIndex(filePathColumn[0])
+                        val picturePath = cursor.getString(columnIndex)
+                        cursor.close()
+                        Log.wtf("PATH", picturePath)
+                        uploadFileToImgur(File(picturePath))
                     }
                 }
             }
@@ -451,7 +459,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
     }
 
     //Open the file chooser so we can get an image to upload to imgur
-    fun openFileChooser() {
+    private fun openFileChooser() {
         val getIntent = Intent(Intent.ACTION_GET_CONTENT)
         getIntent.type = "image/*"
 
@@ -481,34 +489,64 @@ class ChatFragment : Fragment(), IncomingEventListener {
      * @param content: A string that contains either bytes or a URL
      */
     fun uploadToImgur(content: String) {
-        //Make network request with Ion for simplicity
-        Ion.with(activity)
-                .load("POST", "https://api.imgur.com/3/image")
-                .addHeader("authorization", "Client-ID c4b0ceea1a1b029")
-                .setBodyParameter("image", content)
-                .asJsonObject()
-                .setCallback { e, result ->
-                    if (e != null) {
-                        Toast.makeText(activity, "Failed to Upload Image", Toast.LENGTH_SHORT).show()
-                        Log.w("OnImgurUpload", e.message.toString())
-                    }
-                    //Check to see if the result is good and data was uploaded
-                    if (result.has("data") && result.get("data").asJsonObject.has("link")) {
-                        //Submit the url to the chat
-                        onSubmit(result.get("data").asJsonObject.get("link").asString)
-                        //Dismiss the DialogPlus dialog
-                        dialog.dismiss()
-                    } else {
-                        Toast.makeText(activity, "Failed to Upload Image", Toast.LENGTH_SHORT).show()
-                    }
-                }
+        doAsync {
+            val client = ClientManager.client
+
+            //Create RequestBody with image bytes
+            val imgurRequestBody = FormEncodingBuilder()
+                    .add("image", content)
+                    .build()
+
+            //Build request to post bytes and upload image
+            val newMessageRequest = Request.Builder()
+                    .url("https://api.imgur.com/3/image")
+                    .addHeader("authorization", "Client-ID c4b0ceea1a1b029")
+                    .post(imgurRequestBody)
+                    .build()
+
+            //Upload image and get result
+            val response = client.newCall(newMessageRequest).execute()
+            val result = JSONObject(response.body().string())
+
+            //Check to see if the result is good and data was uploaded
+            if (result.has("data") && result.getJSONObject("data").has("link")) {
+                //Submit the url to the chat
+                onSubmit(result.getJSONObject("data").getString("link"))
+                //Dismiss the DialogPlus dialog
+                dialog.dismiss()
+            } else {
+                Toast.makeText(activity, "Failed to Upload Image", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     /**
      * Upload to Imgur some content
      * @param content: A string that contains a File
      */
-    fun uploadFileToImgur(photo: File) {
+    private fun uploadFileToImgur(photo: File) {
+//        doAsync {
+//            val client = ClientManager.client
+//
+//            //Create RequestBody with image bytes
+//            val imgurRequestBody = MultipartBuilder()
+//                    .type(MultipartBuilder.FORM)
+//                    .addFormDataPart("file", photo.name,
+//                            RequestBody.create(MediaType.parse("text/csv"), photo))
+//                    .addFormDataPart("some-field", "some-value")
+//                    .build()
+//
+//            //Build request to post bytes and upload image
+//            val newMessageRequest = Request.Builder()
+//                    .url("https://api.imgur.com/3/image")
+//                    .addHeader("authorization", "Client-ID c4b0ceea1a1b029")
+//                    .post(imgurRequestBody)
+//                    .build()
+//
+//            //Upload image and get result
+//            val response = client.newCall(newMessageRequest).execute()
+//            val result = JSONObject(response.body().string())
+
         Ion.with(activity)
                 .load("POST", "https://api.imgur.com/3/image")
                 .addHeader("authorization", "Client-ID c4b0ceea1a1b029")
@@ -519,66 +557,70 @@ class ChatFragment : Fragment(), IncomingEventListener {
                         Toast.makeText(activity, "Failed to Upload Image", Toast.LENGTH_SHORT).show()
                         Log.w("OnFileUploadImgur", e.message.toString())
                     } else {
-                        //Get the result from the data and submit it to the chat
+//            Get the result from the data and submit it to the chat
                         onSubmit(result.get("data").asJsonObject.get("link").asString)
                         dialog.dismiss()
                     }
+//        }
                 }
     }
 
-    /**
-     * Map a message to an object and return a JsonNode
-     */
-    @Throws(IOException::class)
-    private fun getMessagesObject(client: Client, room: ChatRoom, count: Int): JsonNode {
-        val getMessagesRequestBody = FormEncodingBuilder()
-                .add("since", 0.toString())
-                .add("mode", "Messages")
-                .add("msgCount", count.toString())
-                .add("fkey", chatFkey)
-                .build()
-        val getMessagesRequest = Request.Builder()
-                .url(room.site + "/chats/" + room.num + "/events")
-                .post(getMessagesRequestBody)
-                .build()
 
-        val getMessagesResponse = client.newCall(getMessagesRequest).execute()
-        return mapper.readTree(getMessagesResponse.body().byteStream())
-    }
+        /**
+         * Map a message to an object and return a JsonNode
+         */
+        @Throws(IOException::class)
+        private fun getMessagesObject(client: Client, room: ChatRoom, count: Int): JsonNode {
+            val getMessagesRequestBody = FormEncodingBuilder()
+                    .add("since", 0.toString())
+                    .add("mode", "Messages")
+                    .add("msgCount", count.toString())
+                    .add("fkey", chatFkey)
+                    .build()
+            val getMessagesRequest = Request.Builder()
+                    .url(room.site + "/chats/" + room.num + "/events")
+                    .post(getMessagesRequestBody)
+                    .build()
 
-    /**
-     * Create a new message and post it to the chat, creating it!
-     */
-    @Throws(IOException::class)
-    private fun newMessage(client: Client, room: ChatRoom,
-                           fkey: String?, message: String) {
-        val newMessageRequestBody = FormEncodingBuilder()
-                .add("text", message)
-                .add("fkey", fkey)
-                .build()
-        val newMessageRequest = Request.Builder()
-                .url(room.site + "/chats/" + room.num + "/messages/new/")
-                .post(newMessageRequestBody)
-                .build()
-
-        client.newCall(newMessageRequest).execute()
-    }
-
-    companion object {
-
-        private val EXTRA_ROOM = "room"
-        private val EXTRA_NAME = "name"
-        private val EXTRA_FKEY = "fkey"
-
-        fun createInstance(room: ChatRoom, name: String, fkey: String): ChatFragment {
-            val b = Bundle(3)
-            b.putParcelable(ChatFragment.Companion.EXTRA_ROOM, room)
-            b.putString(ChatFragment.Companion.EXTRA_NAME, name)
-            b.putString(ChatFragment.Companion.EXTRA_FKEY, fkey)
-
-            val fragment = ChatFragment()
-            fragment.arguments = b
-            return fragment
+            val getMessagesResponse = client.newCall(getMessagesRequest).execute()
+            return mapper.readTree(getMessagesResponse.body().byteStream())
         }
+
+        /**
+         * Create a new message and post it to the chat, creating it!
+         */
+        @Throws(IOException::class)
+        private fun newMessage(client: Client, room: ChatRoom,
+                               fkey: String?, message: String) {
+            val newMessageRequestBody = FormEncodingBuilder()
+                    .add("text", message)
+                    .add("fkey", fkey)
+                    .build()
+            val newMessageRequest = Request.Builder()
+                    .url(room.site + "/chats/" + room.num + "/messages/new/")
+                    .post(newMessageRequestBody)
+                    .build()
+
+            client.newCall(newMessageRequest).execute()
+        }
+
+        companion object {
+
+            private val EXTRA_ROOM = "room"
+            private val EXTRA_NAME = "name"
+            private val EXTRA_FKEY = "fkey"
+
+            fun createInstance(room: ChatRoom, name: String, fkey: String): ChatFragment {
+                val b = Bundle(3)
+                b.putParcelable(ChatFragment.Companion.EXTRA_ROOM, room)
+                b.putString(ChatFragment.Companion.EXTRA_NAME, name)
+                b.putString(ChatFragment.Companion.EXTRA_FKEY, fkey)
+
+                val fragment = ChatFragment()
+                fragment.arguments = b
+                return fragment
+            }
+        }
+
+
     }
-}
