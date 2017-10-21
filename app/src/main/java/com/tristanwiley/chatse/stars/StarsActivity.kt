@@ -7,6 +7,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.MenuItem
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
@@ -51,8 +52,18 @@ class StarsActivity : AppCompatActivity() {
             val messages = doc.getElementsByClass("monologue")
             messages.forEach {
                 val event = ChatEvent()
-                event.user_id = it.classNames().toList()[1].removePrefix("user-").toInt()
-                event.user_name = it.getElementsByClass("username")[0].child(0).text()
+                var userID = -1
+                if (it.classNames().toList()[1].removePrefix("user-").isNotEmpty()) {
+                    userID = it.classNames().toList()[1].removePrefix("user-").toInt()
+                }
+                event.user_id = userID
+
+                if (it.getElementsByClass("username")[0].children().isEmpty()) {
+                    event.user_name = it.getElementsByClass("username")[0].text()
+                } else {
+                    event.user_name = it.getElementsByClass("username")[0].child(0).text()
+                }
+
                 event.contents = it.getElementsByClass("content")[0].html()
                 event.message_starred = true
                 val times = it.getElementsByClass("times")[0].text()
@@ -61,8 +72,9 @@ class StarsActivity : AppCompatActivity() {
                 } else {
                     event.message_stars = 1
                 }
-                if (event.contents.contains("onebox")) {
+                if (Jsoup.parse(event.contents).child(0).hasClass("onebox")) {
                     event.message_onebox = true
+                    Log.wtf("CONTENT", event.contents)
                     event.onebox_type = it.getElementsByClass("content")[0].child(0).classNames().toList()[1].removePrefix("ob-")
                     when (event.onebox_type) {
                         "image" -> {
