@@ -218,6 +218,8 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                                 cSet.constrainWidth(R.id.message_image, origWidth)
                                 cSet.constrainHeight(R.id.message_image, origHeight)
 
+                                cSet.connect(R.id.message_image, ConstraintSet.LEFT, R.id.message_edit_indicator, ConstraintSet.RIGHT)
+                                cSet.connect(R.id.message_image, ConstraintSet.START, R.id.message_edit_indicator, ConstraintSet.END)
                                 cSet.connect(R.id.message_image, ConstraintSet.RIGHT, R.id.guideline_80, ConstraintSet.LEFT)
                                 cSet.connect(R.id.message_image, ConstraintSet.END, R.id.guideline_80, ConstraintSet.START)
 
