@@ -4,13 +4,12 @@ import android.Manifest
 import android.app.ActivityManager
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -28,7 +27,6 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import com.koushikdutta.ion.Ion
 import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.GridHolder
 import com.squareup.okhttp.FormEncodingBuilder
@@ -52,8 +50,9 @@ import org.jetbrains.anko.uiThread
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.io.ByteArrayOutputStream
-import java.io.File
+import java.io.FileNotFoundException
 import java.io.IOException
+import java.io.InputStream
 
 /**
  * ChatFragment is the fragment used to display the current ChatRoom
@@ -406,20 +405,9 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 }
             //If from the gallery
                 1 -> {
-                    val cursor: Cursor
                     if (data.data != null) {
-                        //Get the photo
-                        val selectedImage = data.data
-                        val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
-                        cursor = activity.contentResolver.query(selectedImage, filePathColumn, null, null, null)
-                        cursor.use {
-                            it.moveToFirst()
-                            val picturePath = it.getString(it.getColumnIndex(filePathColumn[0]))
-                            Log.wtf("PATH", picturePath)
-                            it.close()
-                            //Get the path and get it as a File and upload it
-                            uploadFileToImgur(File(picturePath))
-                        }
+                        val photoBytes = getImageBytes(data.data)
+                        uploadToImgur(Base64.encodeToString(photoBytes, Base64.DEFAULT))
                     }
                 }
             }
@@ -513,51 +501,23 @@ class ChatFragment : Fragment(), IncomingEventListener {
         }
     }
 
-    /**
-     * Upload to Imgur some content
-     * @param content: A string that contains a File
-     */
-    private fun uploadFileToImgur(photo: File) {
-//        doAsync {
-//            val client = ClientManager.client
-//
-//            //Create RequestBody with image bytes
-//            val imgurRequestBody = MultipartBuilder()
-//                    .type(MultipartBuilder.FORM)
-//                    .addFormDataPart("file", photo.name,
-//                            RequestBody.create(MediaType.parse("text/csv"), photo))
-//                    .addFormDataPart("some-field", "some-value")
-//                    .build()
-//
-//            //Build request to post bytes and upload image
-//            val newMessageRequest = Request.Builder()
-//                    .url("https://api.imgur.com/3/image")
-//                    .addHeader("authorization", "Client-ID c4b0ceea1a1b029")
-//                    .post(imgurRequestBody)
-//                    .build()
-//
-//            //Upload image and get result
-//            val response = client.newCall(newMessageRequest).execute()
-//            val result = JSONObject(response.body().string())
+    private fun getImageBytes(uri: Uri): ByteArray? {
+        var inStream: InputStream? = null
+        var bitmap: Bitmap? = null
 
-        Ion.with(activity)
-                .load("POST", "https://api.imgur.com/3/image")
-                .addHeader("authorization", "Client-ID c4b0ceea1a1b029")
-                .setMultipartFile("image", photo)
-                .asJsonObject()
-                .setCallback { e, result ->
-                    if (e != null) {
-                        Toast.makeText(activity, "Failed to Upload Image", Toast.LENGTH_SHORT).show()
-                        Log.w("OnFileUploadImgur", e.message.toString())
-                    } else {
-//            Get the result from the data and submit it to the chat
-                        onSubmit(result.get("data").asJsonObject.get("link").asString)
-                        dialog.dismiss()
-                    }
-//        }
-                }
+        return try {
+            inStream = activity.contentResolver.openInputStream(uri)
+            bitmap = BitmapFactory.decodeStream(inStream)
+            val outStream = ByteArrayOutputStream()
+            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, outStream)
+            outStream.toByteArray()
+        } catch (e: FileNotFoundException) {
+            null
+        } finally {
+            inStream?.close()
+            bitmap?.recycle()
+        }
     }
-
 
     /**
      * Map a message to an object and return a JsonNode
