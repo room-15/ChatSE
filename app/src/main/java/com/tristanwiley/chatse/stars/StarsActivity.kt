@@ -72,9 +72,8 @@ class StarsActivity : AppCompatActivity() {
                 } else {
                     event.message_stars = 1
                 }
-                if (Jsoup.parse(event.contents).child(0).hasClass("onebox")) {
+                if (Jsoup.parse(event.contents).getElementsByClass("onebox").isNotEmpty()) {
                     event.message_onebox = true
-                    Log.wtf("CONTENT", event.contents)
                     event.onebox_type = it.getElementsByClass("content")[0].child(0).classNames().toList()[1].removePrefix("ob-")
                     when (event.onebox_type) {
                         "image" -> {
@@ -90,14 +89,12 @@ class StarsActivity : AppCompatActivity() {
                             event.onebox_extra = it.getElementsByClass("ob-youtube-preview").attr("src")
                             event.contents = it.getElementsByClass("ob-youtube-title")[0].text()
                         }
-
                         "tweet" -> {
                             var contents = "<p>" + it.getElementsByClass("ob-status-text")[0].html() + "</p>"
                             contents += "<p>" + it.getElementsByClass("ob-tweet-info")[0].html() + "</p>"
                             event.onebox_content = contents
                         }
                     }
-
                 }
                 event.star_timestamp = it.getElementsByClass("timestamp")[0].text()
                 eventList.add(event)

@@ -160,7 +160,6 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                 }
                 BetterLinkMovementMethod.linkify(Linkify.ALL, messageView)
             } else {
-                Log.wtf("ONEBOX_CONTENT", message.onebox_content)
                 //if it's a onebox, then display it specially
                 when (message.onebox_type) {
                     "image" -> {
