@@ -271,11 +271,12 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                             messageView.text = Html.fromHtml(message.contents, Html.FROM_HTML_MODE_LEGACY)
                         } else {
                             @Suppress("DEPRECATION")
-                            messageView.text = Html.fromHtml(message.contents)
+                             messageView.text = Html.fromHtml(message.contents)
                         }
                     }
                 }
             }
+
 
             //Set the username view to the message's user's name
             userNameView.text = message.user_name

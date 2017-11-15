@@ -69,7 +69,7 @@ class AboutActivity : AppCompatActivity() {
         // Rate app
         headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
                 R.drawable.ic_star_black,
-                getString(R.string.buy_coffee),
+                getString(R.string.rate_app),
                 View.OnClickListener {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.tristanwiley.chatse")))
                 }))
@@ -144,7 +144,7 @@ class AboutActivity : AppCompatActivity() {
         val tristanPoko = com.tristanwiley.chatse.about.pokos.DevPoko(
                 "Tristan Wiley",
                 "Full stack developer",
-                "A lover of Android development and code of all stacks. Currently pursuing a Computer Science degree at The University at Buffalo.",
+                "A lover of Android development, Kotlin and all stacks. Currently pursuing a Computer Science degree at The University at Buffalo.",
                 R.drawable.dev_tristan,
                 generateAboutIconArray("https://github.com/TristanWiley", "http://tristanwiley.com/", "https://stackoverflow.com/users/1064310/tristan-wiley", "tristan@tristanwiley.com", "https://twitter.com/lesirhype")
         )

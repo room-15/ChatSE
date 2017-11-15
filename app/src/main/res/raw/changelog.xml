@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog bulletedList="true">
 
-    <changelogversion versionName="1.0" changeDate="Sep 10,2017">
-        <changelogtext>Initial release.</changelogtext>
+    <changelogversion versionName="0.5" changeDate="Nov 14, 2017">
+        <changelogtext>First public beta release.</changelogtext>
+        <changelogtext>[b]Known Bug:[/b] Oneboxing for non-text quotes is broken.</changelogtext>
+        <changelogtext>To contribute, go to <![CDATA[<a href="https://github.com/room-15/ChatSE">our GitHub repo</a>]]></changelogtext>
     </changelogversion>
 
 </changelog>
