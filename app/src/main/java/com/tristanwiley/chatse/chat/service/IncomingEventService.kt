@@ -51,7 +51,7 @@ class IncomingEventService : Service(), com.tristanwiley.chatse.chat.service.Cha
                 appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
             return true
         } else if (appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_TOP_SLEEPING ||
-                appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_BACKGROUND) {
+                appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_CACHED) {
             return false
         }
 
@@ -74,7 +74,7 @@ class IncomingEventService : Service(), com.tristanwiley.chatse.chat.service.Cha
             if (roomNode.has("e")) {
                 holder.listener.handleNewEvents(roomNode.get("e"))
                 if (!isAppInForeground(this)) {
-                    val mBuilder = NotificationCompat.Builder(this)
+                    val mBuilder = NotificationCompat.Builder(this, "new_message")
                             .setSmallIcon(R.mipmap.ic_launcher)
                             .setContentTitle("New messages in room " + holder.room.num)
                             .setAutoCancel(true)
