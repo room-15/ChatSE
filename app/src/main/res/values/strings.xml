@@ -41,4 +41,5 @@
     <string name="about_app_header_donate">Donate</string>
     <string name="our_developers">Our developers</string>
     <string name="share_app">Share App</string>
+    <string name="avatar">Avatar</string>
 </resources>
