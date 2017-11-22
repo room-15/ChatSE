@@ -24,9 +24,17 @@ import android.view.View
 import android.widget.*
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
+import com.tristanwiley.chatse.App
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.about.AboutActivity
+import com.tristanwiley.chatse.chat.adapters.RoomAdapter
+import com.tristanwiley.chatse.chat.service.IncomingEventService
+import com.tristanwiley.chatse.chat.service.IncomingEventServiceBinder
+import com.tristanwiley.chatse.login.LoginActivity
 import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
+import com.tristanwiley.chatse.network.cookie.PersistentCookieStore
+import com.tristanwiley.chatse.views.DividerItemDecoration
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.room_nav_header.*
 import org.jetbrains.anko.defaultSharedPreferences
@@ -39,21 +47,21 @@ import java.io.IOException
 /**
  * ChatActivity is the main activity that sets the Fragment and Drawer layouts
  *
- * @param serviceBinder: IncomingEventServiceBinder that is used to load rooms
- * @param soRoomList: A list of all the rooms the user is currently in for StackOverflow
- * @param seRoomList: A list of all the rooms the user is currently in for StackExchange
- * @param fkey: The glorious fkey used to authenticate requests
- * @param soRoomAdapter: Adapter for StackOverflow Rooms the user is in
- * @param seRoomAdapter: Adapter for StackExchange Rooms the user is in
+ * @property serviceBinder: IncomingEventServiceBinder that is used to load rooms
+ * @property soRoomList: A list of all the rooms the user is currently in for StackOverflow
+ * @property seRoomList: A list of all the rooms the user is currently in for StackExchange
+ * @property fkey: The glorious fkey used to authenticate requests
+ * @property soRoomAdapter: Adapter for StackOverflow Rooms the user is in
+ * @property seRoomAdapter: Adapter for StackExchange Rooms the user is in
  */
 class ChatActivity : AppCompatActivity(), ServiceConnection {
-    private lateinit var serviceBinder: com.tristanwiley.chatse.chat.service.IncomingEventServiceBinder
-    val soRoomList = arrayListOf<com.tristanwiley.chatse.chat.Room>()
-    val seRoomList = arrayListOf<com.tristanwiley.chatse.chat.Room>()
-    lateinit var fkey: String
-    lateinit var soRoomAdapter: com.tristanwiley.chatse.chat.adapters.RoomAdapter
-    lateinit var seRoomAdapter: com.tristanwiley.chatse.chat.adapters.RoomAdapter
-    var isBound = false
+    private lateinit var serviceBinder: IncomingEventServiceBinder
+    private val soRoomList = arrayListOf<Room>()
+    private val seRoomList = arrayListOf<Room>()
+    private lateinit var fkey: String
+    private lateinit var soRoomAdapter: RoomAdapter
+    private lateinit var seRoomAdapter: RoomAdapter
+    private var isBound = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,12 +91,14 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         } */
 
         //Create adapters for current user's rooms
-        soRoomAdapter = com.tristanwiley.chatse.chat.adapters.RoomAdapter(Client.SITE_STACK_OVERFLOW, soRoomList, this)
-        seRoomAdapter = com.tristanwiley.chatse.chat.adapters.RoomAdapter(Client.SITE_STACK_EXCHANGE, seRoomList, this)
+        soRoomAdapter = RoomAdapter(Client.SITE_STACK_OVERFLOW, soRoomList, this)
+        seRoomAdapter = RoomAdapter(Client.SITE_STACK_EXCHANGE, seRoomList, this)
 
         //Set adapters to RecyclerViews along with LayoutManagers
+        stackoverflow_room_list.addItemDecoration(DividerItemDecoration(this))
         stackoverflow_room_list.adapter = soRoomAdapter
         stackoverflow_room_list.layoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
+        stackexchange_room_list.addItemDecoration(DividerItemDecoration(this))
         stackexchange_room_list.adapter = seRoomAdapter
         stackexchange_room_list.layoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
 
@@ -112,7 +122,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         //Load the user data for the NavigationDrawer header
         loadUserData()
 
-        val serviceIntent = Intent(this, com.tristanwiley.chatse.chat.service.IncomingEventService::class.java)
+        val serviceIntent = Intent(this, IncomingEventService::class.java)
         this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
         isBound = true
     }
@@ -159,7 +169,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
      */
     override fun onServiceConnected(name: ComponentName, binder: IBinder) {
         Log.d("onServiceConnected", "Service connect")
-        serviceBinder = binder as com.tristanwiley.chatse.chat.service.IncomingEventServiceBinder
+        serviceBinder = binder as IncomingEventServiceBinder
 
         //Asynchronously add rooms to drawer
         doAsync {
@@ -181,9 +191,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
             unbindService(this)
             isBound = false
         }
-        if (!defaultSharedPreferences.getBoolean(com.tristanwiley.chatse.App.PREF_HAS_CREDS, false)) {
-            com.tristanwiley.chatse.network.cookie.PersistentCookieStore(com.tristanwiley.chatse.App.instance).removeAll()
-            startActivity(Intent(applicationContext, com.tristanwiley.chatse.login.LoginActivity::class.java))
+        if (!defaultSharedPreferences.getBoolean(App.PREF_HAS_CREDS, false)) {
+            PersistentCookieStore(App.instance).removeAll()
+            startActivity(Intent(applicationContext, LoginActivity::class.java))
             finish()
         }
     }
@@ -194,7 +204,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     override fun onResume() {
         super.onResume()
         if (!isBound) {
-            val serviceIntent = Intent(this, com.tristanwiley.chatse.chat.service.IncomingEventService::class.java)
+            val serviceIntent = Intent(this, IncomingEventService::class.java)
             this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
             isBound = true
         }
@@ -293,7 +303,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     /**
      * Create a room from the information we got in addRoomsToDrawer(), but get more information
      */
-    fun createRoom(site: String, roomName: String, roomNum: Long, lastActive: Long, fkey: String) {
+    private fun createRoom(site: String, roomName: String, roomNum: Long, lastActive: Long, fkey: String) {
         doAsync {
             val client = ClientManager.client
 
@@ -316,12 +326,12 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
             //If this is for StackOverflow then add it to the SO list
             //Otherwise, add it to the SE list
             if (site == Client.SITE_STACK_OVERFLOW) {
-                soRoomList.add(com.tristanwiley.chatse.chat.Room(roomName, roomNum, description, lastActive, isFavorite, tags, fkey))
+                soRoomList.add(Room(roomName, roomNum, description, lastActive, isFavorite, tags, fkey))
                 runOnUiThread {
                     soRoomAdapter.notifyDataSetChanged()
                 }
             } else {
-                seRoomList.add(com.tristanwiley.chatse.chat.Room(roomName, roomNum, description, lastActive, isFavorite, tags, fkey))
+                seRoomList.add(Room(roomName, roomNum, description, lastActive, isFavorite, tags, fkey))
                 runOnUiThread {
                     seRoomAdapter.notifyDataSetChanged()
                 }
@@ -416,7 +426,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     builder.show()
                 }
                 R.id.action_about -> {
-                    startActivity(Intent(this, com.tristanwiley.chatse.about.AboutActivity::class.java))
+                    startActivity(Intent(this, AboutActivity::class.java))
                 }
             //Logout of app by clearing all SharedPreferences and loading the LoginActivity
                 R.id.action_logout -> {
@@ -445,7 +455,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     }
 
     //Add the fragment by replacing the current fragment with the new ChatFragment
-    private fun addChatFragment(fragment: com.tristanwiley.chatse.chat.ChatFragment) {
+    private fun addChatFragment(fragment: ChatFragment) {
         runOnUiThread {
             supportFragmentManager
                     .beginTransaction()
@@ -456,11 +466,11 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
     //Create the ChatFragment by joining room and creating an instance of the ChatFragment
     @Throws(IOException::class, JSONException::class)
-    private fun createChatFragment(room: ChatRoom): com.tristanwiley.chatse.chat.ChatFragment {
+    private fun createChatFragment(room: ChatRoom): ChatFragment {
         val roomInfo = serviceBinder.loadRoom(room)
         rejoinFavoriteRooms()
         serviceBinder.joinRoom(room, roomInfo.fkey)
-        val chatFragment = com.tristanwiley.chatse.chat.ChatFragment.Companion.createInstance(room, roomInfo.name, roomInfo.fkey)
+        val chatFragment = ChatFragment.createInstance(room, roomInfo.name, roomInfo.fkey)
         serviceBinder.registerListener(room, chatFragment)
 
         //Set the title and color of Toolbar depending on room
@@ -490,7 +500,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
      * Function to rejoin the user's favorite rooms
      */
 
-    fun rejoinFavoriteRooms() {
+    private fun rejoinFavoriteRooms() {
         val client = ClientManager.client
         doAsync {
             //Get the fkey to make a call

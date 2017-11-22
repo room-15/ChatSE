@@ -33,7 +33,7 @@
                     android:id="@+id/so_header_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="5dp"
+                    android:padding="@dimen/single_margin"
                     android:text="@string/stackoverflow"
                     android:textSize="17sp" />
 
@@ -47,7 +47,7 @@
                     android:id="@+id/se_header_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="5dp"
+                    android:padding="@dimen/single_margin"
                     android:text="@string/stackexchange"
                     android:textSize="17sp" />
 
