@@ -15,14 +15,18 @@ import android.view.View
 import android.widget.TextView
 import com.tristanwiley.chatse.BuildConfig
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.about.adapters.AboutDevCardAdapter
+import com.tristanwiley.chatse.about.adapters.AboutIconAdapter
+import com.tristanwiley.chatse.about.pokos.AboutIconPoko
+import com.tristanwiley.chatse.about.pokos.DevPoko
 
 
 class AboutActivity : AppCompatActivity() {
 
-    lateinit var tvHeaderAppAbout: TextView
-    lateinit var tvHeaderVersion: TextView
-    lateinit var rvHeader: RecyclerView
-    lateinit var rvDevs: RecyclerView
+    private lateinit var tvHeaderAppAbout: TextView
+    private lateinit var tvHeaderVersion: TextView
+    private lateinit var rvHeader: RecyclerView
+    private lateinit var rvDevs: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +55,7 @@ class AboutActivity : AppCompatActivity() {
         })
     }
 
-    fun getUiElements() {
+    private fun getUiElements() {
         tvHeaderVersion = findViewById(R.id.about_text_app_version)
         tvHeaderAppAbout = findViewById(R.id.about_text_app)
 
@@ -65,9 +69,9 @@ class AboutActivity : AppCompatActivity() {
         rvHeader.layoutManager =
                 GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false)
 
-        val headerArray = ArrayList<com.tristanwiley.chatse.about.pokos.AboutIconPoko>()
+        val headerArray = ArrayList<AboutIconPoko>()
         // Rate app
-        headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
+        headerArray.add(AboutIconPoko(
                 R.drawable.ic_star_black,
                 getString(R.string.rate_app),
                 View.OnClickListener {
@@ -75,7 +79,7 @@ class AboutActivity : AppCompatActivity() {
                 }))
 
         // Play Store
-        headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
+        headerArray.add(AboutIconPoko(
                 R.drawable.ic_google_play,
                 getString(R.string.about_app_header_play_store),
                 View.OnClickListener {
@@ -84,7 +88,7 @@ class AboutActivity : AppCompatActivity() {
         ))
 
         // Share app
-        headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
+        headerArray.add(AboutIconPoko(
                 R.drawable.ic_share_black_24dp,
                 getString(R.string.share_app),
                 View.OnClickListener {
@@ -98,7 +102,7 @@ class AboutActivity : AppCompatActivity() {
         ))
 
         // Changelog
-        headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
+        headerArray.add(AboutIconPoko(
                 R.drawable.ic_log_black_24dp,
                 getString(R.string.about_app_header_changelog),
                 View.OnClickListener {
@@ -114,7 +118,7 @@ class AboutActivity : AppCompatActivity() {
         ))
 
         // Contact us
-        headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
+        headerArray.add(AboutIconPoko(
                 R.drawable.ic_feedback_black_24dp,
                 getString(R.string.about_app_header_contact_us),
                 View.OnClickListener {
@@ -127,21 +131,21 @@ class AboutActivity : AppCompatActivity() {
         ))
 
         // Donate
-        headerArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
+        headerArray.add(AboutIconPoko(
                 R.drawable.ic_favorite_black_24dp,
                 getString(R.string.buy_coffee),
                 View.OnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://ko-fi.com/A44341P5"))) }
         ))
 
-        rvHeader.adapter = com.tristanwiley.chatse.about.adapters.AboutIconAdapter(this, headerArray)
+        rvHeader.adapter = AboutIconAdapter(this, headerArray)
 
         // Devs RV
         rvDevs = findViewById(R.id.rv_about_devs)
         rvDevs.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
-        val devList: ArrayList<com.tristanwiley.chatse.about.pokos.DevPoko> = ArrayList()
+        val devList: ArrayList<DevPoko> = ArrayList()
 
-        val tristanPoko = com.tristanwiley.chatse.about.pokos.DevPoko(
+        val tristanPoko = DevPoko(
                 "Tristan Wiley",
                 "Full stack developer",
                 "A lover of Android development, Kotlin and all stacks. Currently pursuing a Computer Science degree at The University at Buffalo.",
@@ -149,7 +153,7 @@ class AboutActivity : AppCompatActivity() {
                 generateAboutIconArray("https://github.com/TristanWiley", "http://tristanwiley.com/", "https://stackoverflow.com/users/1064310/tristan-wiley", "tristan@tristanwiley.com", "https://twitter.com/lesirhype")
         )
 
-        val maukerPoko = com.tristanwiley.chatse.about.pokos.DevPoko(
+        val maukerPoko = DevPoko(
                 "Mauricio Pessoa",
                 "Software Engineer",
                 "Computer Science Master's Student on UFMA and a tech lover. Sometimes I also grab my Nikon and go out for some pictures.\n" +
@@ -159,7 +163,7 @@ class AboutActivity : AppCompatActivity() {
                 generateAboutIconArray("https://github.com/mauker1", "", "https://stackoverflow.com/users/4070469/mauker", "mauricio.ufma@gmail.com", "https://twitter.com/mauker")
         )
 
-        val anoobianPoko = com.tristanwiley.chatse.about.pokos.DevPoko(
+        val anoobianPoko = DevPoko(
                 "Shreyas",
                 "Full stack developer",
                 "Developer of the base application, got too busy with life <3.",
@@ -167,7 +171,7 @@ class AboutActivity : AppCompatActivity() {
                 generateAboutIconArray("https://github.com/AnubianN00b", "", "", "", "")
         )
 
-        val adamPoko = com.tristanwiley.chatse.about.pokos.DevPoko(
+        val adamPoko = DevPoko(
                 "Adam McNeilly",
                 "Full stack Android developer",
                 "Android developer at HelloWorld, and author of @androidessence. Also an organizer for @GrizzHacks.",
@@ -175,7 +179,7 @@ class AboutActivity : AppCompatActivity() {
                 generateAboutIconArray("https://github.com/AdamMc331", "http://adammcneilly.com/", "https://stackoverflow.com/users/3131147/adammc331", "amcneilly331@gmail.com", "https://twitter.com/adammc331")
         )
 
-        val ericPoko = com.tristanwiley.chatse.about.pokos.DevPoko(
+        val ericPoko = DevPoko(
                 "Eric Cugota",
                 "Android developer",
                 "...",
@@ -191,18 +195,18 @@ class AboutActivity : AppCompatActivity() {
         devList.add(adamPoko)
         devList.add(ericPoko)
 
-        rvDevs.adapter = com.tristanwiley.chatse.about.adapters.AboutDevCardAdapter(this, devList)
+        rvDevs.adapter = AboutDevCardAdapter(this, devList)
     }
 
     /**
      * Function to create clickable icons in the About cards
      */
-    fun generateAboutIconArray(githubURL: String, websiteURL: String, stackoverflowURL: String, emailAddress: String, twitterURL: String): ArrayList<com.tristanwiley.chatse.about.pokos.AboutIconPoko> {
-        val iconArray = ArrayList<com.tristanwiley.chatse.about.pokos.AboutIconPoko>()
+    private fun generateAboutIconArray(githubURL: String, websiteURL: String, stackoverflowURL: String, emailAddress: String, twitterURL: String): ArrayList<AboutIconPoko> {
+        val iconArray = ArrayList<AboutIconPoko>()
 
         if (!githubURL.isBlank()) {
             // Github
-            iconArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
+            iconArray.add(AboutIconPoko(
                     R.drawable.ic_github_circle,
                     "Github",
                     View.OnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(githubURL))) }
@@ -211,7 +215,7 @@ class AboutActivity : AppCompatActivity() {
 
         if (!websiteURL.isBlank()) {
             // Website
-            iconArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
+            iconArray.add(AboutIconPoko(
                     R.drawable.ic_web_black_24dp,
                     "Website",
                     View.OnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(websiteURL))) }
@@ -220,7 +224,7 @@ class AboutActivity : AppCompatActivity() {
 
         if (!stackoverflowURL.isBlank()) {
             // Website
-            iconArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
+            iconArray.add(AboutIconPoko(
                     R.drawable.ic_web_black_24dp,
                     "StackOverflow",
                     View.OnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(stackoverflowURL))) }
@@ -229,7 +233,7 @@ class AboutActivity : AppCompatActivity() {
 
         if (!emailAddress.isBlank()) {
             // Email
-            iconArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
+            iconArray.add(AboutIconPoko(
                     R.drawable.ic_email_black_24dp,
                     "Email",
                     View.OnClickListener {
@@ -244,7 +248,7 @@ class AboutActivity : AppCompatActivity() {
 
         if (!twitterURL.isBlank()) {
             // Twitter
-            iconArray.add(com.tristanwiley.chatse.about.pokos.AboutIconPoko(
+            iconArray.add(AboutIconPoko(
                     R.drawable.ic_twitter_circle,
                     "Twitter",
                     View.OnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(twitterURL))) }

@@ -8,17 +8,18 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.about.pokos.AboutIconPoko
 
 /**
- * Created by mauker on 31/08/17.
+ * Adapter for displaying a list of icons about a user, but vertically.
  */
-class AboutVerticalIconAdapter(mContext: Context, val data: ArrayList<com.tristanwiley.chatse.about.pokos.AboutIconPoko>) : RecyclerView.Adapter<com.tristanwiley.chatse.about.adapters.AboutVerticalIconAdapter.ViewHolder>() {
+class AboutVerticalIconAdapter(mContext: Context, val data: ArrayList<AboutIconPoko>) : RecyclerView.Adapter<AboutVerticalIconAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val icon: ImageView = itemView.findViewById(R.id.item_about_dev_icon)
         val message: TextView = itemView.findViewById(R.id.item_about_dev_text)
 
-        fun bind(item: com.tristanwiley.chatse.about.pokos.AboutIconPoko) {
+        fun bind(item: AboutIconPoko) {
             icon.setImageResource(item.iconResource)
             message.text = item.message
             itemView.setOnClickListener(item.clickListener)
@@ -27,13 +28,13 @@ class AboutVerticalIconAdapter(mContext: Context, val data: ArrayList<com.trista
 
     private val li: LayoutInflater = LayoutInflater.from(mContext)
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): com.tristanwiley.chatse.about.adapters.AboutVerticalIconAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): AboutVerticalIconAdapter.ViewHolder {
         val itemView: View = li.inflate(R.layout.item_about_dev, parent, false)
 
         return ViewHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: com.tristanwiley.chatse.about.adapters.AboutVerticalIconAdapter.ViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: AboutVerticalIconAdapter.ViewHolder?, position: Int) {
         holder?.bind(data[position])
     }
 
