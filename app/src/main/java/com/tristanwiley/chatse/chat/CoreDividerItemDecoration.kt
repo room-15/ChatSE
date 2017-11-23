@@ -10,10 +10,11 @@ import android.view.View
 
 /**
  * Adapted from Adam's RecyclerViewUtils library:
+ * TODO: I think this is a duplicate of the one in the views package. Consider consolidating and testing later.
  *
  * https://github.com/AdamMc331/RecyclerViewUtils/blob/develop/lib/src/main/java/com/adammcneilly/CoreDividerItemDecoration.kt
  */
-class CoreDividerItemDecoration @JvmOverloads constructor(context: Context, orientation: Int = com.tristanwiley.chatse.chat.CoreDividerItemDecoration.Companion.VERTICAL_LIST) : RecyclerView.ItemDecoration() {
+class CoreDividerItemDecoration @JvmOverloads constructor(context: Context, orientation: Int = VERTICAL_LIST) : RecyclerView.ItemDecoration() {
     /**
      * The orientation of the list.
      */
@@ -25,8 +26,8 @@ class CoreDividerItemDecoration @JvmOverloads constructor(context: Context, orie
     private val divider: Drawable
 
     init {
-        val a = context.obtainStyledAttributes(com.tristanwiley.chatse.chat.CoreDividerItemDecoration.Companion.ATTRS)
-        divider = a.getDrawable(com.tristanwiley.chatse.chat.CoreDividerItemDecoration.Companion.DIVIDER_POSITION)
+        val a = context.obtainStyledAttributes(ATTRS)
+        divider = a.getDrawable(DIVIDER_POSITION)
         a.recycle()
         setOrientation(orientation)
     }
@@ -36,8 +37,8 @@ class CoreDividerItemDecoration @JvmOverloads constructor(context: Context, orie
      * the two given orientations.
      */
     private fun setOrientation(orientation: Int) {
-        if (orientation != com.tristanwiley.chatse.chat.CoreDividerItemDecoration.Companion.HORIZONTAL_LIST && orientation != com.tristanwiley.chatse.chat.CoreDividerItemDecoration.Companion.VERTICAL_LIST) {
-            throw IllegalArgumentException(com.tristanwiley.chatse.chat.CoreDividerItemDecoration.Companion.INVALID_ORIENTATION)
+        if (orientation != HORIZONTAL_LIST && orientation != VERTICAL_LIST) {
+            throw IllegalArgumentException(INVALID_ORIENTATION)
         }
 
         this.orientation = orientation
@@ -48,8 +49,8 @@ class CoreDividerItemDecoration @JvmOverloads constructor(context: Context, orie
      */
     override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State?) {
         when (orientation) {
-            com.tristanwiley.chatse.chat.CoreDividerItemDecoration.Companion.VERTICAL_LIST -> drawVertical(c, parent)
-            com.tristanwiley.chatse.chat.CoreDividerItemDecoration.Companion.HORIZONTAL_LIST -> drawHorizontal(c, parent)
+            VERTICAL_LIST -> drawVertical(c, parent)
+            HORIZONTAL_LIST -> drawHorizontal(c, parent)
         }
     }
 
@@ -61,7 +62,7 @@ class CoreDividerItemDecoration @JvmOverloads constructor(context: Context, orie
         val right = parent.width - parent.paddingRight
 
         val childCount = parent.childCount
-        for (i in 0..childCount - 1) {
+        for (i in 0 until childCount) {
             val child = parent.getChildAt(i)
             val params = child
                     .layoutParams as RecyclerView.LayoutParams
@@ -80,7 +81,7 @@ class CoreDividerItemDecoration @JvmOverloads constructor(context: Context, orie
         val bottom = parent.height - parent.paddingBottom
 
         val childCount = parent.childCount
-        for (i in 0..childCount - 1) {
+        for (i in 0 until childCount) {
             val child = parent.getChildAt(i)
             val params = child
                     .layoutParams as RecyclerView.LayoutParams
@@ -96,8 +97,8 @@ class CoreDividerItemDecoration @JvmOverloads constructor(context: Context, orie
      */
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State?) {
         when (orientation) {
-            com.tristanwiley.chatse.chat.CoreDividerItemDecoration.Companion.VERTICAL_LIST -> outRect.set(0, 0, 0, divider.intrinsicHeight)
-            com.tristanwiley.chatse.chat.CoreDividerItemDecoration.Companion.HORIZONTAL_LIST -> outRect.set(0, 0, divider.intrinsicWidth, 0)
+            VERTICAL_LIST -> outRect.set(0, 0, 0, divider.intrinsicHeight)
+            HORIZONTAL_LIST -> outRect.set(0, 0, divider.intrinsicWidth, 0)
         }
     }
 

@@ -13,6 +13,7 @@ import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.squareup.okhttp.ws.WebSocketCall
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.chat.ChatActivity
 import com.tristanwiley.chatse.chat.ChatRoom
 import com.tristanwiley.chatse.network.Client
 import org.codehaus.jackson.JsonNode
@@ -26,12 +27,12 @@ import java.util.*
 /**
  * Service that handles incoming events and listens to the websocket
  */
-class IncomingEventService : Service(), com.tristanwiley.chatse.chat.service.ChatWebSocketListener.ServiceWebsocketListener {
-    private val listeners = ArrayList<com.tristanwiley.chatse.chat.service.IncomingEventService.MessageListenerHolder>()
-    private val siteStatuses = HashMap<String, com.tristanwiley.chatse.chat.service.IncomingEventService.WebsocketConnectionStatus>()
+class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketListener {
+    private val listeners = ArrayList<MessageListenerHolder>()
+    private val siteStatuses = HashMap<String, WebsocketConnectionStatus>()
 
     override fun onBind(intent: Intent): IBinder? {
-        return com.tristanwiley.chatse.chat.service.IncomingEventServiceBinder(this)
+        return IncomingEventServiceBinder(this)
     }
 
     override fun onDestroy() {
@@ -39,9 +40,9 @@ class IncomingEventService : Service(), com.tristanwiley.chatse.chat.service.Cha
         Log.d("IncomingEventService", "onDestroy")
     }
 
-    fun registerListener(room: ChatRoom, listener: com.tristanwiley.chatse.chat.service.IncomingEventListener) {
+    fun registerListener(room: ChatRoom, listener: IncomingEventListener) {
         listeners.clear()
-        listeners.add(com.tristanwiley.chatse.chat.service.IncomingEventService.MessageListenerHolder(room, listener))
+        listeners.add(MessageListenerHolder(room, listener))
     }
 
     private fun isAppInForeground(context: Context): Boolean {
@@ -56,6 +57,7 @@ class IncomingEventService : Service(), com.tristanwiley.chatse.chat.service.Cha
         }
 
         val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        //TODO: This is deprecated, Tinker and test with this - https://stackoverflow.com/a/35423996/3131147
         val foregroundTaskInfo = am.getRunningTasks(1)[0]
         val foregroundTaskPackageName = foregroundTaskInfo.topActivity.packageName
         return foregroundTaskPackageName.toLowerCase() == context.packageName.toLowerCase()
@@ -79,7 +81,7 @@ class IncomingEventService : Service(), com.tristanwiley.chatse.chat.service.Cha
                             .setContentTitle("New messages in room " + holder.room.num)
                             .setAutoCancel(true)
                     val mNotificationId = 1
-                    val resultIntent = Intent(this, com.tristanwiley.chatse.chat.ChatActivity::class.java)
+                    val resultIntent = Intent(this, ChatActivity::class.java)
                     resultIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     val resultPendingIntent = PendingIntent.getActivity(
                             this,
@@ -97,11 +99,11 @@ class IncomingEventService : Service(), com.tristanwiley.chatse.chat.service.Cha
     }
 
     override fun onConnect(site: String, success: Boolean) {
-        siteStatuses.put(site, com.tristanwiley.chatse.chat.service.IncomingEventService.WebsocketConnectionStatus.ESTABLISHED)
+        siteStatuses.put(site, WebsocketConnectionStatus.ESTABLISHED)
     }
 
     @Throws(IOException::class)
-    internal fun loadRoom(client: Client, room: ChatRoom): com.tristanwiley.chatse.chat.service.IncomingEventService.RoomInfo {
+    internal fun loadRoom(client: Client, room: ChatRoom): RoomInfo {
         val chatPageRequest = Request.Builder()
                 .url(room.site + "/rooms/" + room.num)
                 .build()
@@ -111,17 +113,17 @@ class IncomingEventService : Service(), com.tristanwiley.chatse.chat.service.Cha
         val fkey = chatPage.select("input[name=fkey]").attr("value")
         val name = chatPage.select("span[id=roomname]").text()
 
-        return com.tristanwiley.chatse.chat.service.IncomingEventService.RoomInfo(name, fkey)
+        return RoomInfo(name, fkey)
     }
 
     @Throws(IOException::class, JSONException::class)
     internal fun joinRoom(client: Client, room: ChatRoom, chatFkey: String) {
         if (!siteStatuses.containsKey(room.site)) {
-            siteStatuses.put(room.site, com.tristanwiley.chatse.chat.service.IncomingEventService.WebsocketConnectionStatus.DISCONNECTED)
+            siteStatuses.put(room.site, WebsocketConnectionStatus.DISCONNECTED)
         }
         val wsUrl = registerRoom(client, room, chatFkey)
-        if (siteStatuses[room.site] != com.tristanwiley.chatse.chat.service.IncomingEventService.WebsocketConnectionStatus.ESTABLISHED) {
-            siteStatuses.put(room.site, com.tristanwiley.chatse.chat.service.IncomingEventService.WebsocketConnectionStatus.CREATING)
+        if (siteStatuses[room.site] != WebsocketConnectionStatus.ESTABLISHED) {
+            siteStatuses.put(room.site, WebsocketConnectionStatus.CREATING)
             initWs(client, wsUrl, room.site)
         }
         val soRequestBody = FormEncodingBuilder()
@@ -161,14 +163,14 @@ class IncomingEventService : Service(), com.tristanwiley.chatse.chat.service.Cha
                 .url(wsUrl + "?l=0")
                 .build()
         val wsCall = WebSocketCall.create(client.httpClient, wsRequest)
-        wsCall.enqueue(com.tristanwiley.chatse.chat.service.ChatWebSocketListener(site, this))
+        wsCall.enqueue(ChatWebSocketListener(site, this))
     }
 
     private enum class WebsocketConnectionStatus {
         ESTABLISHED, CREATING, DISCONNECTED
     }
 
-    class MessageListenerHolder(val room: ChatRoom, val listener: com.tristanwiley.chatse.chat.service.IncomingEventListener)
+    class MessageListenerHolder(val room: ChatRoom, val listener: IncomingEventListener)
 
     class RoomInfo internal constructor(val name: String, val fkey: String)
 }

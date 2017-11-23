@@ -16,6 +16,7 @@ import android.widget.TextView
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.event.EventList
+import com.tristanwiley.chatse.event.presenter.message.MessageEvent
 import com.tristanwiley.chatse.extensions.loadUrl
 import com.tristanwiley.chatse.network.ClientManager
 import org.jetbrains.anko.doAsync
@@ -29,11 +30,11 @@ import org.json.JSONObject
  * @param events: All the events to get the users from
  */
 
-class UsersAdapter(val mContext: Context, val events: EventList, var users: ArrayList<com.tristanwiley.chatse.event.presenter.message.MessageEvent> = ArrayList()) : RecyclerView.Adapter<com.tristanwiley.chatse.chat.adapters.UsersAdapter.UsersViewHolder>() {
+class UsersAdapter(private val mContext: Context, private val events: EventList, private var users: ArrayList<MessageEvent> = ArrayList()) : RecyclerView.Adapter<UsersAdapter.UsersViewHolder>() {
 
-    override fun onBindViewHolder(viewHolder: com.tristanwiley.chatse.chat.adapters.UsersAdapter.UsersViewHolder?, pos: Int) {
+    override fun onBindViewHolder(viewHolder: UsersAdapter.UsersViewHolder?, pos: Int) {
         val user = users[pos]
-        val holder = viewHolder as com.tristanwiley.chatse.chat.adapters.UsersAdapter.UsersViewHolder
+        val holder = viewHolder as UsersAdapter.UsersViewHolder
         holder.bindMessage(user)
     }
 
@@ -44,18 +45,18 @@ class UsersAdapter(val mContext: Context, val events: EventList, var users: Arra
         this.notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): com.tristanwiley.chatse.chat.adapters.UsersAdapter.UsersViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): UsersAdapter.UsersViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.list_item_user, parent, false)
-        return com.tristanwiley.chatse.chat.adapters.UsersAdapter.UsersViewHolder(mContext, view)
+        return UsersAdapter.UsersViewHolder(mContext, view)
     }
 
     override fun getItemCount() = users.size
 
-    class UsersViewHolder(val mContext: Context, itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val userPicture = itemView.findViewById<ImageView>(R.id.user_icon)
-        val userName = itemView.findViewById<TextView>(R.id.user_name)
+    class UsersViewHolder(private val mContext: Context, itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val userPicture: ImageView = itemView.findViewById(R.id.user_icon)
+        private val userName: TextView = itemView.findViewById(R.id.user_name)
 
-        fun bindMessage(user: com.tristanwiley.chatse.event.presenter.message.MessageEvent) {
+        fun bindMessage(user: MessageEvent) {
             //Set the username to the TextView
             userName.text = user.userName
 

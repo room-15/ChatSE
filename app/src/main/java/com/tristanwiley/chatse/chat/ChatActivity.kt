@@ -130,7 +130,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     /**
      * Function to load user data and set it to the NavigationDrawer header
      */
-    fun loadUserData() {
+    private fun loadUserData() {
         val userID = defaultSharedPreferences.getInt("SOID", -1)
         val seID = defaultSharedPreferences.getInt("SEID", -1)
 

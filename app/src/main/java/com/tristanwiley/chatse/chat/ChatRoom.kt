@@ -25,6 +25,7 @@ class ChatRoom(val site: String, val num: Int) : Parcelable {
 
     companion object {
         @JvmField
+        @Suppress("Unused")
         val CREATOR: Parcelable.Creator<ChatRoom> = object : Parcelable.Creator<ChatRoom> {
             override fun createFromParcel(`in`: Parcel): ChatRoom {
                 return ChatRoom(`in`)

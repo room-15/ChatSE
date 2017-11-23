@@ -10,7 +10,9 @@ import android.widget.TextView
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.chat.ChatActivity
 import com.tristanwiley.chatse.chat.ChatRoom
+import com.tristanwiley.chatse.chat.Room
 import com.tristanwiley.chatse.network.ClientManager
 import org.jetbrains.anko.doAsync
 
@@ -21,27 +23,26 @@ import org.jetbrains.anko.doAsync
  * @param list: MutableList of rooms
  * @param context: Application Context
  */
-class RoomAdapter(val site: String, val list: MutableList<com.tristanwiley.chatse.chat.Room>, val context: Context) : RecyclerView.Adapter<com.tristanwiley.chatse.chat.adapters.RoomAdapter.ListRowHolder>() {
+class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Context) : RecyclerView.Adapter<RoomAdapter.ListRowHolder>() {
 
-    override fun onBindViewHolder(viewHolder: com.tristanwiley.chatse.chat.adapters.RoomAdapter.ListRowHolder?, position: Int) {
+    override fun onBindViewHolder(viewHolder: RoomAdapter.ListRowHolder?, position: Int) {
         val room = list[position]
-        val holder = viewHolder
-        holder?.bindMessage(room)
+        viewHolder?.bindMessage(room)
     }
 
     override fun getItemCount() = list.size
 
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): com.tristanwiley.chatse.chat.adapters.RoomAdapter.ListRowHolder {
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RoomAdapter.ListRowHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.drawer_list_item, parent, false)
-        return com.tristanwiley.chatse.chat.adapters.RoomAdapter.ListRowHolder(context, view, site)
+        return RoomAdapter.ListRowHolder(context, view, site)
     }
 
     //Set the room to the RecyclerView
-    class ListRowHolder(val mContext: Context, itemView: View, val site: String) : RecyclerView.ViewHolder(itemView) {
-        val name = itemView.findViewById<TextView>(R.id.room_name)
+    class ListRowHolder(private val mContext: Context, itemView: View, val site: String) : RecyclerView.ViewHolder(itemView) {
+        val name: TextView = itemView.findViewById(R.id.room_name)
 
-        fun bindMessage(room: com.tristanwiley.chatse.chat.Room) {
+        fun bindMessage(room: Room) {
 
             //Set the text to the itemView TextView
             name.text = room.name
@@ -49,7 +50,7 @@ class RoomAdapter(val site: String, val list: MutableList<com.tristanwiley.chats
             //OnClick, load the chat fragment
             itemView.setOnClickListener {
                 val roomNum = room.roomID.toInt()
-                (mContext as com.tristanwiley.chatse.chat.ChatActivity).loadChatFragment(ChatRoom(site, roomNum))
+                (mContext as ChatActivity).loadChatFragment(ChatRoom(site, roomNum))
             }
 
             /*
@@ -57,13 +58,11 @@ class RoomAdapter(val site: String, val list: MutableList<com.tristanwiley.chats
              or to leave the room
             */
             itemView.setOnLongClickListener {
-                val favoriteToggleString: String
-
                 //Determine if already a favorite and if I should remove or add
-                if (room.isFavorite) {
-                    favoriteToggleString = "Remove from Favorites"
+                val favoriteToggleString: String = if (room.isFavorite) {
+                    "Remove from Favorites"
                 } else {
-                    favoriteToggleString = "Add to Favorites"
+                    "Add to Favorites"
                 }
 
                 //Create AlertDialog, set the title, message, and three buttons. One for each action
@@ -91,7 +90,7 @@ class RoomAdapter(val site: String, val list: MutableList<com.tristanwiley.chats
          * @param roomID: ID of current room
          * @param fkey: Magic. F. Key.
          */
-        fun leaveRoom(roomID: Long, fkey: String) {
+        private fun leaveRoom(roomID: Long, fkey: String) {
             doAsync {
                 val client = ClientManager.client
 
@@ -112,7 +111,7 @@ class RoomAdapter(val site: String, val list: MutableList<com.tristanwiley.chats
          * @param room: Current Room object
          * @param fkey: ooooooooooh glorious fkey
          */
-        fun toggleFavoriteRoom(room: com.tristanwiley.chatse.chat.Room, fkey: String) {
+        private fun toggleFavoriteRoom(room: Room, fkey: String) {
             room.isFavorite = !room.isFavorite
 
             doAsync {

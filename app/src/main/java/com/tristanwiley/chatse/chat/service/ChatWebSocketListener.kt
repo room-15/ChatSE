@@ -14,7 +14,7 @@ import java.io.IOException
 /**
  * WebSocketListener that listens to websocket
  */
-class ChatWebSocketListener(private val site: String, private val listener: com.tristanwiley.chatse.chat.service.ChatWebSocketListener.ServiceWebsocketListener) : WebSocketListener {
+class ChatWebSocketListener(private val site: String, private val listener: ChatWebSocketListener.ServiceWebsocketListener) : WebSocketListener {
     private val mapper = ObjectMapper()
 
     override fun onOpen(webSocket: WebSocket, response: Response) {

@@ -9,9 +9,9 @@ import java.io.IOException
 /**
  * Exposes methods from the IncomingEventService.
  */
-class IncomingEventServiceBinder internal constructor(private val service: com.tristanwiley.chatse.chat.service.IncomingEventService) : Binder() {
+class IncomingEventServiceBinder internal constructor(private val service: IncomingEventService) : Binder() {
 
-    fun registerListener(room: ChatRoom, listener: com.tristanwiley.chatse.chat.service.IncomingEventListener) {
+    fun registerListener(room: ChatRoom, listener: IncomingEventListener) {
         service.registerListener(room, listener)
     }
 
@@ -23,7 +23,7 @@ class IncomingEventServiceBinder internal constructor(private val service: com.t
      * @throws IOException If the page fails to load.
      */
     @Throws(IOException::class)
-    fun loadRoom(room: ChatRoom): com.tristanwiley.chatse.chat.service.IncomingEventService.RoomInfo {
+    fun loadRoom(room: ChatRoom): IncomingEventService.RoomInfo {
         return service.loadRoom(ClientManager.client, room)
     }
 
