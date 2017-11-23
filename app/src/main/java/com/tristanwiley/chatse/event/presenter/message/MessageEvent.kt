@@ -2,49 +2,27 @@ package com.tristanwiley.chatse.event.presenter.message
 
 import com.tristanwiley.chatse.event.ChatEvent
 
-class MessageEvent(baseEvent: ChatEvent) : Comparable<com.tristanwiley.chatse.event.presenter.message.MessageEvent> {
-    var content: String?
-    val timestamp: Long
-    val id: Long
-    var userId: Long
-    var userName: String
-    val roomId: Long
-    val roomName: String
-    val messageId: Int
-    val parentId: Long
-    val editCount: Int
-    val onebox: Boolean
-    val onebox_type: String
-    var message_stars: Int
-    val onebox_content: String
-    var onebox_extra: String
-    var message_starred: Boolean
-    var isForUsersList: Boolean
-    var email_hash: String
-    var star_timestamp: String
+class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
+    var content: String? = baseEvent.contents
+    val timestamp: Long = baseEvent.timeStamp
+    val id: Long = baseEvent.id.toLong()
+    var userId: Long = baseEvent.userId.toLong()
+    var userName: String = baseEvent.userName
+    private val roomId: Long = baseEvent.roomId.toLong()
+    private val roomName: String = baseEvent.roomName
+    val messageId: Int = baseEvent.messageId
+    private val parentId: Long = baseEvent.parentId.toLong()
+    private val editCount: Int = baseEvent.messageEdits
+    val onebox: Boolean = baseEvent.messageOnebox
+    val oneboxType: String = baseEvent.oneboxType
+    var messageStars: Int = baseEvent.messageStars
+    val oneboxContent: String = baseEvent.oneboxContent
+    var oneboxExtra: String = baseEvent.oneboxExtra
+    var messageStarred: Boolean = baseEvent.messageStarred
+    var isForUsersList: Boolean = baseEvent.isForUsersList
+    var emailHash: String = baseEvent.emailHash
+    var starTimestamp: String = baseEvent.starTimestamp
     internal var previous: MessageEvent? = null
-
-    init {
-        this.content = baseEvent.contents
-        this.timestamp = baseEvent.time_stamp
-        this.id = baseEvent.id.toLong()
-        this.userId = baseEvent.user_id.toLong()
-        this.userName = baseEvent.user_name
-        this.roomId = baseEvent.room_id.toLong()
-        this.roomName = baseEvent.room_name
-        this.messageId = baseEvent.message_id
-        this.parentId = baseEvent.parent_id.toLong()
-        this.editCount = baseEvent.message_edits
-        this.message_stars = baseEvent.message_stars
-        this.message_starred = baseEvent.message_starred
-        this.onebox = baseEvent.message_onebox
-        this.onebox_type = baseEvent.onebox_type
-        this.onebox_content = baseEvent.onebox_content
-        this.onebox_extra = baseEvent.onebox_extra
-        this.isForUsersList = baseEvent.isForUsersList
-        this.email_hash = baseEvent.email_hash
-        this.star_timestamp = baseEvent.star_timestamp
-    }
 
     val isDeleted: Boolean
         get() = content == null || content == ""
@@ -53,21 +31,22 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<com.tristanwiley.chatse.ev
         get() = (previous != null || editCount != 0) && !isDeleted
 
     override fun equals(other: Any?): Boolean {
-        if (other !is com.tristanwiley.chatse.event.presenter.message.MessageEvent) return false
-        val event = other as com.tristanwiley.chatse.event.presenter.message.MessageEvent?
+        if (other !is MessageEvent) return false
+        val event = other as MessageEvent?
         return this.messageId == event?.messageId
     }
 
-    override fun compareTo(other: com.tristanwiley.chatse.event.presenter.message.MessageEvent): Int {
+    override fun compareTo(other: MessageEvent): Int {
         if (this == other) {
 //            Log.d("compareTo", "This is equal - 0")
             return 0
         }
-        if (other.isForUsersList) {
-            return other.userId.compareTo(this.userId)
+
+        return if (other.isForUsersList) {
+            other.userId.compareTo(this.userId)
 
         } else {
-            return other.timestamp.compareTo(this.timestamp)
+            other.timestamp.compareTo(this.timestamp)
 
         }
 //        Log.d("compareTo", "This is not equal, comparing timestamps")
@@ -85,8 +64,8 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<com.tristanwiley.chatse.ev
         result = 31 * result + parentId.hashCode()
         result = 31 * result + editCount
         result = 31 * result + onebox.hashCode()
-        result = 31 * result + onebox_type.hashCode()
-        result = 31 * result + onebox_content.hashCode()
+        result = 31 * result + oneboxType.hashCode()
+        result = 31 * result + oneboxContent.hashCode()
         result = 31 * result + (previous?.hashCode() ?: 0)
         return result
     }

@@ -6,59 +6,59 @@ import org.unbescape.html.HtmlEscape
 /**
  * ChatEvent class that is used for all new messages, contains all parameters that gets json mapped to it
  *
- * @param event_type: An integer which signifies what type of event an object is
- * @param time_stamp: When the event occurred
- * @param room_id: ID of the room in which the event occurred
- * @param user_id: The ID of the user that did the event
- * @param user_name: The user's username
- * @param message_id: The ID of the message (if event_type is equal to 1)
- * @param show_parent: Unused
- * @param parent_id: Parent's ID
- * @param id = ID of event
- * @param room_name: Name of Room that event occurred
- * @param contents: Content of event
- * @param message_edits: Number of times the message was edited
- * @param message_stars: Number of times the message was starred
- * @param message_owner_stars: Unused
- * @param target_user_id: Unused
- * @param message_onebox: If the message is oneboxed (an image, wikipedia article, SO/SE post, etc.)
- * @param onebox_type: Type of oneboxed content
- * @param onebox_extra: Extra data from onebox
- * @param message_starred: If the message is starred
- * @param isForUsersList: If the message is for the list of users in MessageEventPresentor
- * @param email_hash: Email hash used for profile picture
+ * @property eventType: An integer which signifies what type of event an object is
+ * @property timeStamp: When the event occurred
+ * @property roomId: ID of the room in which the event occurred
+ * @property userId: The ID of the user that did the event
+ * @property userName: The user's username
+ * @property messageId: The ID of the message (if eventType is equal to 1)
+ * @property showParent: Unused
+ * @property parentId: Parent's ID
+ * @property id = ID of event
+ * @property roomName: Name of Room that event occurred
+ * @property contents: Content of event
+ * @property messageEdits: Number of times the message was edited
+ * @property messageStars: Number of times the message was starred
+ * @property messageOwnerStars: Unused
+ * @property targetUserId: Unused
+ * @property messageOnebox: If the message is oneboxed (an image, wikipedia article, SO/SE post, etc.)
+ * @property oneboxType: Type of oneboxed content
+ * @property oneboxExtra: Extra data from onebox
+ * @property messageStarred: If the message is starred
+ * @property isForUsersList: If the message is for the list of users in MessageEventPresentor
+ * @property emailHash: Email hash used for profile picture
  */
 class ChatEvent {
 
-    var event_type: Int = 0
-    var time_stamp: Long = 0
-    var room_id: Int = 0
-    var user_id: Int = 0
-    var user_name: String = ""
-    var message_id: Int = 0
+    var eventType: Int = 0
+    var timeStamp: Long = 0
+    var roomId: Int = 0
+    var userId: Int = 0
+    var userName: String = ""
+    var messageId: Int = 0
 
-    var show_parent = false
-    var parent_id = -1
+    private var showParent = false
+    var parentId = -1
 
     var id = -1
 
-    var room_name: String = ""
+    var roomName: String = ""
     var contents: String = ""
-    var message_edits = 0
-    var message_stars = 0
-    var message_owner_stars = 0
-    var target_user_id = -1
+    var messageEdits = 0
+    var messageStars = 0
+    private var messageOwnerStars = 0
+    private var targetUserId = -1
 
-    var message_onebox = false
-    var onebox_type = ""
-    var onebox_content = ""
-    var onebox_extra = ""
+    var messageOnebox = false
+    var oneboxType = ""
+    var oneboxContent = ""
+    var oneboxExtra = ""
 
-    var message_starred = false
+    var messageStarred = false
     var isForUsersList = false
-    var email_hash = ""
+    var emailHash = ""
 
-    var star_timestamp = ""
+    var starTimestamp = ""
 
     fun setContent(content: String) {
         val doc = Jsoup.parse(content, "http://chat.stackexchange.com/")
@@ -72,34 +72,34 @@ class ChatEvent {
                 obType.contains("ob-message") -> println("This is a quote")
                 obType.contains("ob-youtube") -> {
                     shouldSetContent = false
-                    message_onebox = true
-                    onebox_type = "youtube"
+                    messageOnebox = true
+                    oneboxType = "youtube"
                     this.contents = elements[0].child(0).getElementsByClass("ob-youtube-title").text()
-                    onebox_content = elements.select("img").attr("src")
-                    onebox_extra = elements[0].child(0).attr("href")
+                    oneboxContent = elements.select("img").attr("src")
+                    oneboxExtra = elements[0].child(0).attr("href")
                 }
                 obType.contains("ob-wikipedia") -> println("This is Wikipedia")
                 obType.contains("ob-image") -> {
                     val url = elements.select("img").first().absUrl("src")
-                    message_onebox = true
-                    onebox_type = "image"
-                    onebox_content = url
+                    messageOnebox = true
+                    oneboxType = "image"
+                    oneboxContent = url
                 }
                 obType.contains("ob-tweet") -> {
-                    message_onebox = true
-                    onebox_type = "tweet"
+                    messageOnebox = true
+                    oneboxType = "tweet"
                     val status = elements[2]
                     val writtenBy = elements[4]
-                    onebox_content = ""
-                    onebox_content += "<p>" + status.childNode(0).toString() + "</p>"
-                    onebox_content += "<p>" + writtenBy.toString() + "</p>"
+                    oneboxContent = ""
+                    oneboxContent += "<p>" + status.childNode(0).toString() + "</p>"
+                    oneboxContent += "<p>" + writtenBy.toString() + "</p>"
                     shouldSetContent = false
-                    this.contents = onebox_content
+                    this.contents = oneboxContent
                 }
                 else -> {
-                    message_onebox = false
-                    onebox_type = ""
-                    onebox_content = ""
+                    messageOnebox = false
+                    oneboxType = ""
+                    oneboxContent = ""
                 }
             }
         }

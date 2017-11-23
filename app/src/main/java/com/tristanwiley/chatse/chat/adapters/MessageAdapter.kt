@@ -116,8 +116,8 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                 val response = client.newCall(request).execute()
                 val jsonResult = JSONObject(response.body().string())
 
-                //Get the email_hash attribute which contains either a link to Imgur or a hash for Gravatar
-                val hash = jsonResult.getString("email_hash").replace("!", "")
+                //Get the emailHash attribute which contains either a link to Imgur or a hash for Gravatar
+                val hash = jsonResult.getString("emailHash").replace("!", "")
                 var imageLink = hash
                 //If Gravatar, create link
                 if (!hash.contains(".")) {
@@ -154,10 +154,10 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                 }
             }
             //If the message is starred, show the indicator and set the count text to the star count
-            if (message.message_stars > 0) {
+            if (message.messageStars > 0) {
                 starIndicator.visibility = View.VISIBLE
                 starCount.visibility = View.VISIBLE
-                starCount.text = message.message_stars.toString()
+                starCount.text = message.messageStars.toString()
             }
 
             //If the message is deleted, show the text "removed" and make it gray
@@ -181,7 +181,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                     BetterLinkMovementMethod.linkify(Linkify.ALL, messageView)
                 } else {
                     //if it's a onebox, then display it specially
-                    when (message.onebox_type) {
+                    when (message.oneboxType) {
                         "image" -> {
                             //For images, load the image into the ImageView, making sure it's visible
                             oneboxImage.visibility = View.VISIBLE
@@ -192,11 +192,11 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                                 origHeight = layoutParams.height
                             }
 
-                            oneboxImage.loadUrl(message.onebox_content)
+                            oneboxImage.loadUrl(message.oneboxContent)
 
                             val transitionListener = object : Transition.TransitionListener {
                                 override fun onTransitionEnd(transition: Transition) {
-                                    oneboxImage.loadUrl(message.onebox_content)
+                                    oneboxImage.loadUrl(message.oneboxContent)
                                 }
 
                                 override fun onTransitionResume(transition: Transition) {}
@@ -252,7 +252,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                             }
 
 //                            itemView.setOnClickListener {
-//                                mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.onebox_content)))
+//                                mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.oneboxContent)))
 //                            }
 
                             //Set the text to nothing just in case
@@ -261,11 +261,11 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                     //For Youtube videos, display the image and some text, linking the view to the video on Youtube
                         "youtube" -> {
                             itemView.setOnClickListener {
-                                mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.onebox_extra)))
+                                mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.oneboxExtra)))
                             }
                             oneboxImage.visibility = View.VISIBLE
 
-                            itemView.message_image.loadUrl(message.onebox_content)
+                            itemView.message_image.loadUrl(message.oneboxContent)
                             messageView.text = message.content
                         }
                     //for twitter tweets, display the profile pic, profile name, and render the text. might need some css
@@ -274,7 +274,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                             messageView.setPadding(15, 15, 15, 15)
                             messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
                             messageView.setLinkTextColor(ContextCompat.getColor(itemView.context, R.color.accent_twitter))
-                            Log.d("Onebox", "Type: ${message.onebox_type}")
+                            Log.d("Onebox", "Type: ${message.oneboxType}")
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 messageView.text = Html.fromHtml(message.content, Html.FROM_HTML_MODE_LEGACY)
                             } else {
@@ -285,7 +285,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                         }
                     //Other oneboxed items just display the HTML until we implement them all
                         else -> {
-                            Log.d("Onebox", "Type: ${message.onebox_type}")
+                            Log.d("Onebox", "Type: ${message.oneboxType}")
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 messageView.text = Html.fromHtml(message.content, Html.FROM_HTML_MODE_LEGACY)
                             } else {

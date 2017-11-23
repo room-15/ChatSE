@@ -60,7 +60,7 @@ class UsersAdapter(private val mContext: Context, private val events: EventList,
             //Set the username to the TextView
             userName.text = user.userName
 
-            userPicture.loadUrl(user.email_hash)
+            userPicture.loadUrl(user.emailHash)
 
             //On click, show information about user
             itemView.setOnClickListener {

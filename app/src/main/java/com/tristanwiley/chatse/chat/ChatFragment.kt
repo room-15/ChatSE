@@ -422,7 +422,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
         }
         messagesJson
                 .mapNotNull { chatEventGenerator.createEvent(it) }
-                .filter { it.room_id == room.num }
+                .filter { it.roomId == room.num }
                 .forEach {
                     events.addEvent(it, this.activity, room)
                 }

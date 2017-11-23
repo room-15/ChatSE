@@ -11,7 +11,7 @@ import com.tristanwiley.chatse.event.presenter.message.MessageEventPresenter
 class EventList(private val roomNum: Int) {
 
     //List of unfilteredEvents
-    var unfilteredPresenter = UnfilteredEventPresenter()
+    private var unfilteredPresenter = UnfilteredEventPresenter()
     //List of events used for messages
     var messagePresenter = MessageEventPresenter()
 

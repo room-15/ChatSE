@@ -93,14 +93,14 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                 val client = ClientManager.client
 
                 val soChatPageRequest = Request.Builder()
-                        .url("${room.site}/users/thumbs/${message.user_id}")
+                        .url("${room.site}/users/thumbs/${message.userId}")
                         .build()
                 val response = client.newCall(soChatPageRequest).execute()
                 val jsonData = response.body().string()
                 val result = JSONObject(jsonData)
 
-                //Get the email_hash attribute which contains either a link to Imgur or a hash for Gravatar
-                val hash = result.getString("email_hash").replace("!", "")
+                //Get the emailHash attribute which contains either a link to Imgur or a hash for Gravatar
+                val hash = result.getString("emailHash").replace("!", "")
                 var imageLink = hash
                 //If Gravatar, create link
                 if (!hash.contains(".")) {
@@ -125,13 +125,13 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
             }
 
             if (room.site == Client.SITE_STACK_OVERFLOW) {
-                if (message.user_id == mContext.defaultSharedPreferences.getInt("SOID", -1)) {
+                if (message.userId == mContext.defaultSharedPreferences.getInt("SOID", -1)) {
                     rootLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_stackoverflow_mine))
                 } else {
                     rootLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_other))
                 }
             } else {
-                if (message.user_id == mContext.defaultSharedPreferences.getInt("SEID", -1)) {
+                if (message.userId == mContext.defaultSharedPreferences.getInt("SEID", -1)) {
                     rootLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_stackexchange_mine))
                 } else {
                     rootLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_other))
@@ -139,14 +139,14 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
             }
 
             //If the message is starred, show the indicator and set the count text to the star count
-            if (message.message_stars > 0) {
+            if (message.messageStars > 0) {
                 starIndicator.visibility = View.VISIBLE
                 starCount.visibility = View.VISIBLE
-                starCount.text = message.message_stars.toString()
+                starCount.text = message.messageStars.toString()
             }
 
             //If it's just a plain message, then set the text from HTML
-            if (!message.message_onebox) {
+            if (!message.messageOnebox) {
                 messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.primary_text))
                 //If Android version is 24 and above use the updated version, otherwise use the deprecated version
                 val doc = Jsoup.parseBodyFragment("<span>" + message.contents + "</span>")
@@ -161,7 +161,7 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                 BetterLinkMovementMethod.linkify(Linkify.ALL, messageView)
             } else {
                 //if it's a onebox, then display it specially
-                when (message.onebox_type) {
+                when (message.oneboxType) {
                     "image" -> {
                         //For images, load the image into the ImageView, making sure it's visible
                         oneboxImage.visibility = View.VISIBLE
@@ -172,11 +172,11 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                             origHeight = layoutParams.height
                         }
 
-                        oneboxImage.loadUrl(message.onebox_content)
+                        oneboxImage.loadUrl(message.oneboxContent)
 
                         val transitionListener = object : Transition.TransitionListener {
                             override fun onTransitionEnd(transition: Transition) {
-                                oneboxImage.loadUrl(message.onebox_content)
+                                oneboxImage.loadUrl(message.oneboxContent)
                             }
 
                             override fun onTransitionResume(transition: Transition) {}
@@ -232,7 +232,7 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                         }
 
 //                            itemView.setOnClickListener {
-//                                mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.onebox_content)))
+//                                mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.oneboxContent)))
 //                            }
 
                         //Set the text to nothing just in case
@@ -241,11 +241,11 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                 //For Youtube videos, display the image and some text, linking the view to the video on Youtube
                     "youtube" -> {
                         itemView.setOnClickListener {
-                            mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.onebox_content)))
+                            mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.oneboxContent)))
                         }
                         oneboxImage.visibility = View.VISIBLE
 
-                        itemView.message_image.loadUrl(message.onebox_content)
+                        itemView.message_image.loadUrl(message.oneboxContent)
 
                         messageView.text = message.contents
                     }
@@ -255,18 +255,18 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
                         messageView.setPadding(15, 15, 15, 15)
                         messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
                         messageView.setLinkTextColor(ContextCompat.getColor(itemView.context, R.color.accent_twitter))
-                        Log.d("Onebox", "Type: ${message.onebox_type}")
+                        Log.d("Onebox", "Type: ${message.oneboxType}")
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            messageView.text = Html.fromHtml(message.onebox_content, Html.FROM_HTML_MODE_LEGACY)
+                            messageView.text = Html.fromHtml(message.oneboxContent, Html.FROM_HTML_MODE_LEGACY)
                         } else {
                             @Suppress("DEPRECATION")
-                            messageView.text = Html.fromHtml(message.onebox_content)
+                            messageView.text = Html.fromHtml(message.oneboxContent)
                         }
                         BetterLinkMovementMethod.linkify(Linkify.ALL, messageView)
                     }
                 //Other oneboxed items just display the HTML until we implement them all
                     else -> {
-                        Log.d("Onebox", "Type: ${message.onebox_type}")
+                        Log.d("Onebox", "Type: ${message.oneboxType}")
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             messageView.text = Html.fromHtml(message.contents, Html.FROM_HTML_MODE_LEGACY)
                         } else {
@@ -279,10 +279,10 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
 
 
             //Set the username view to the message's user's name
-            userNameView.text = message.user_name
+            userNameView.text = message.userName
 
             //Show the date
-            messageTimestamp.text = message.star_timestamp
+            messageTimestamp.text = message.starTimestamp
         }
 
 
