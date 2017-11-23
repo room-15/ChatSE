@@ -19,7 +19,7 @@ import com.tristanwiley.chatse.R
 
 
 /**
- * Created by mauker on 23/08/17.
+ * Displays an image in a circular view. Custom class as Android doesn't support this by default.
  */
 class CircleImageView : AppCompatImageView {
     companion object {
@@ -183,16 +183,16 @@ class CircleImageView : AppCompatImageView {
         return null
     }
 
-    fun setBorderWidth(width: Float) {
+    private fun setBorderWidth(width: Float) {
         if (width == mBorderWidth) return
         mBorderWidth = width
 
         updateDrawableAttrs()
-        updateBackgroundDrawableAttrs(false);
+        updateBackgroundDrawableAttrs(false)
         invalidate()
     }
 
-    fun setBorderColor(color: ColorStateList?) {
+    private fun setBorderColor(color: ColorStateList?) {
         if (mBorderColor == color) return
 
         mBorderColor = color ?: ColorStateList.valueOf(Color.WHITE)

@@ -44,7 +44,7 @@ import kotlin.collections.ArrayList
 /**
  * The fantastic adapter that displays all stars in a room
  */
-class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent>, val room: ChatRoom) : RecyclerView.Adapter<StarsMessageAdapter.MessageViewHolder>() {
+class StarsMessageAdapter(private val mContext: Context, private val events: ArrayList<ChatEvent>, val room: ChatRoom) : RecyclerView.Adapter<StarsMessageAdapter.MessageViewHolder>() {
 
     override fun onBindViewHolder(viewHolder: MessageViewHolder?, pos: Int) {
         val message = events[pos]
@@ -73,9 +73,9 @@ class StarsMessageAdapter(val mContext: Context, val events: ArrayList<ChatEvent
         private val userPicture = itemView.findViewById<ImageView>(R.id.message_user_picture)
         private val userBarBottom = itemView.findViewById<ImageView>(R.id.message_user_color)
         private val placeholderDrawable = ContextCompat.getDrawable(mContext, R.drawable.box) as Drawable
-        var isFullSize: Boolean = false
-        var origWidth = 0
-        var origHeight = 0
+        private var isFullSize: Boolean = false
+        private var origWidth = 0
+        private var origHeight = 0
 
         fun bindMessage(message: ChatEvent) {
             //Hide elements in case not used
