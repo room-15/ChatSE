@@ -9,4 +9,5 @@
     <dimen name="about_pic_border">3dp</dimen>
 
     <dimen name="single_margin">16dp</dimen>
+    <dimen name="double_margin">32dp</dimen>
 </resources>
