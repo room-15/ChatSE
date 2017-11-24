@@ -187,6 +187,14 @@ class AboutActivity : AppCompatActivity() {
                 generateAboutIconArray("https://github.com/tryadelion", "http://cugotaeric.wixsite.com/", "https://stackoverflow.com/users/4763177/cpteric", "", "https://twitter.com/lesirhype")
         )
 
+        val nabahPoko = DevPoko(
+                "Nabah Rizvi",
+                "Aspiring UI Designer & Engineer",
+                "Junior majoring in Information Technology with a minor in Digital Art & Design at the University of Toledo.",
+                R.drawable.dev_nabah,
+                generateAboutIconArray("https://github.com/nrizvi", "http://www.nrizvi.me/", "", "", "")
+        )
+
 
 
         devList.add(tristanPoko)
@@ -194,6 +202,7 @@ class AboutActivity : AppCompatActivity() {
         devList.add(anoobianPoko)
         devList.add(adamPoko)
         devList.add(ericPoko)
+        devList.add(nabahPoko)
 
         rvDevs.adapter = AboutDevCardAdapter(this, devList)
     }
