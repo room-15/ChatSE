@@ -12,7 +12,7 @@ import android.view.ViewGroup
  */
 class FlowLayout : ViewGroup {
 
-    private var line_height: Int = 0
+    private var lineHeight: Int = 0
 
     class LayoutParams
     /**
@@ -32,59 +32,57 @@ class FlowLayout : ViewGroup {
         val width = View.MeasureSpec.getSize(widthMeasureSpec) - paddingLeft - paddingRight
         var height = View.MeasureSpec.getSize(heightMeasureSpec) - paddingTop - paddingBottom
         val count = childCount
-        var line_height = 0
+        var lineHeight = 0
 
         var xpos = paddingLeft
         var ypos = paddingTop
 
-        val childHeightMeasureSpec: Int
-        if (View.MeasureSpec.getMode(heightMeasureSpec) == View.MeasureSpec.AT_MOST) {
-            childHeightMeasureSpec = View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.AT_MOST)
+        val childHeightMeasureSpec = if (View.MeasureSpec.getMode(heightMeasureSpec) == View.MeasureSpec.AT_MOST) {
+            View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.AT_MOST)
         } else {
-            childHeightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         }
 
-
-        for (i in 0..count - 1) {
+        for (i in 0 until count) {
             val child = getChildAt(i)
             if (child.visibility != View.GONE) {
-                val lp = child.layoutParams as com.tristanwiley.chatse.chat.FlowLayout.LayoutParams
+                val lp = child.layoutParams as FlowLayout.LayoutParams
                 child.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.AT_MOST), childHeightMeasureSpec)
                 val childw = child.measuredWidth
-                line_height = Math.max(line_height, child.measuredHeight + lp.vertical_spacing)
+                lineHeight = Math.max(lineHeight, child.measuredHeight + lp.vertical_spacing)
 
                 if (xpos + childw > width) {
                     xpos = paddingLeft
-                    ypos += line_height
+                    ypos += lineHeight
                 }
 
                 xpos += childw + lp.horizontal_spacing
             }
         }
-        this.line_height = line_height
+        this.lineHeight = lineHeight
 
         if (View.MeasureSpec.getMode(heightMeasureSpec) == View.MeasureSpec.UNSPECIFIED) {
-            height = ypos + line_height
+            height = ypos + lineHeight
 
         } else if (View.MeasureSpec.getMode(heightMeasureSpec) == View.MeasureSpec.AT_MOST) {
-            if (ypos + line_height < height) {
-                height = ypos + line_height
+            if (ypos + lineHeight < height) {
+                height = ypos + lineHeight
             }
         }
         setMeasuredDimension(width, height)
     }
 
     override fun generateDefaultLayoutParams(): ViewGroup.LayoutParams {
-        return com.tristanwiley.chatse.chat.FlowLayout.LayoutParams(1, 1) // default of 1px spacing
+        return FlowLayout.LayoutParams(1, 1) // default of 1px spacing
     }
 
     override fun generateLayoutParams(
             p: android.view.ViewGroup.LayoutParams): android.view.ViewGroup.LayoutParams {
-        return com.tristanwiley.chatse.chat.FlowLayout.LayoutParams(1, 1)
+        return FlowLayout.LayoutParams(1, 1)
     }
 
     override fun checkLayoutParams(p: ViewGroup.LayoutParams): Boolean {
-        if (p is com.tristanwiley.chatse.chat.FlowLayout.LayoutParams) {
+        if (p is FlowLayout.LayoutParams) {
             return true
         }
         return false
@@ -96,15 +94,15 @@ class FlowLayout : ViewGroup {
         var xpos = paddingLeft
         var ypos = paddingTop
 
-        for (i in 0..count - 1) {
+        for (i in 0 until count) {
             val child = getChildAt(i)
             if (child.visibility != View.GONE) {
                 val childw = child.measuredWidth
                 val childh = child.measuredHeight
-                val lp = child.layoutParams as com.tristanwiley.chatse.chat.FlowLayout.LayoutParams
+                val lp = child.layoutParams as FlowLayout.LayoutParams
                 if (xpos + childw > width) {
                     xpos = paddingLeft
-                    ypos += line_height
+                    ypos += lineHeight
                 }
                 child.layout(xpos, ypos, xpos + childw, ypos + childh)
                 xpos += childw + lp.horizontal_spacing

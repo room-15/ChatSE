@@ -30,18 +30,18 @@ class UploadImageAdapter(context: Context) : BaseAdapter() {
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
-        val viewHolder: com.tristanwiley.chatse.chat.adapters.UploadImageAdapter.ViewHolder
+        val viewHolder: UploadImageAdapter.ViewHolder
         var view = convertView
 
         if (view == null) {
             view = layoutInflater.inflate(R.layout.simple_grid_item, parent, false)
 
-            viewHolder = com.tristanwiley.chatse.chat.adapters.UploadImageAdapter.ViewHolder()
-            viewHolder.textView = view.findViewById<TextView>(R.id.text_view)
-            viewHolder.imageView = view.findViewById<ImageView>(R.id.image_view)
+            viewHolder = UploadImageAdapter.ViewHolder()
+            viewHolder.textView = view.findViewById(R.id.text_view)
+            viewHolder.imageView = view.findViewById(R.id.image_view)
             view.tag = viewHolder
         } else {
-            viewHolder = view.tag as com.tristanwiley.chatse.chat.adapters.UploadImageAdapter.ViewHolder
+            viewHolder = view.tag as UploadImageAdapter.ViewHolder
         }
 
         val context = parent.context

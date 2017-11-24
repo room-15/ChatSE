@@ -72,7 +72,7 @@ class Client internal constructor(val httpClient: OkHttpClient, private val cook
      * @param[cookieName] The name of the cookie to store.
      * @param[cookieContent] The content of the cookkie.
      */
-    fun putCookie(uri: URI, cookieName: String, cookieContent: String) {
+    private fun putCookie(uri: URI, cookieName: String, cookieContent: String) {
         cookieStore.add(uri, HttpCookie(cookieName, cookieContent))
     }
 

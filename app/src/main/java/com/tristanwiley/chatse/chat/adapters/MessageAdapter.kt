@@ -53,11 +53,11 @@ import kotlin.collections.ArrayList
 /**
  * The beautiful adapter that handles all new messages in the chat
  */
-class MessageAdapter(private val mContext: Context, private val events: EventList, val chatFkey: String?, val room: ChatRoom?, var messages: ArrayList<com.tristanwiley.chatse.event.presenter.message.MessageEvent> = ArrayList()) : RecyclerView.Adapter<com.tristanwiley.chatse.chat.adapters.MessageAdapter.MessageViewHolder>() {
+class MessageAdapter(private val mContext: Context, private val events: EventList, private val chatFkey: String?, val room: ChatRoom?, private var messages: ArrayList<MessageEvent> = ArrayList()) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
-    override fun onBindViewHolder(viewHolder: com.tristanwiley.chatse.chat.adapters.MessageAdapter.MessageViewHolder?, pos: Int) {
+    override fun onBindViewHolder(viewHolder: MessageViewHolder?, pos: Int) {
         val message = messages[pos]
-        val holder = viewHolder as com.tristanwiley.chatse.chat.adapters.MessageAdapter.MessageViewHolder
+        val holder = viewHolder as MessageAdapter.MessageViewHolder
         holder.bindMessage(message)
     }
 
@@ -70,9 +70,9 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
         this.notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): com.tristanwiley.chatse.chat.adapters.MessageAdapter.MessageViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): MessageAdapter.MessageViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.list_item_message, parent, false)
-        return com.tristanwiley.chatse.chat.adapters.MessageAdapter.MessageViewHolder(mContext, view, chatFkey, room)
+        return MessageAdapter.MessageViewHolder(mContext, view, chatFkey, room)
     }
 
     override fun getItemCount() = messages.size
@@ -93,9 +93,9 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
         private val userPicture = itemView.findViewById<ImageView>(R.id.message_user_picture)
         private val userBarBottom = itemView.findViewById<ImageView>(R.id.message_user_color)
         private val placeholderDrawable = ContextCompat.getDrawable(mContext, R.drawable.box) as Drawable
-        var isFullSize: Boolean = false
-        var origWidth = 0
-        var origHeight = 0
+        private var isFullSize: Boolean = false
+        private var origWidth = 0
+        private var origHeight = 0
 
         fun bindMessage(message: MessageEvent) {
             //Hide elements in case not used
@@ -116,7 +116,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                 val response = client.newCall(request).execute()
                 val jsonResult = JSONObject(response.body().string())
 
-                //Get the email_hash attribute which contains either a link to Imgur or a hash for Gravatar
+                //Get the emailHash attribute which contains either a link to Imgur or a hash for Gravatar
                 val hash = jsonResult.getString("email_hash").replace("!", "")
                 var imageLink = hash
                 //If Gravatar, create link
@@ -154,10 +154,10 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                 }
             }
             //If the message is starred, show the indicator and set the count text to the star count
-            if (message.message_stars > 0) {
+            if (message.messageStars > 0) {
                 starIndicator.visibility = View.VISIBLE
                 starCount.visibility = View.VISIBLE
-                starCount.text = message.message_stars.toString()
+                starCount.text = message.messageStars.toString()
             }
 
             //If the message is deleted, show the text "removed" and make it gray
@@ -181,7 +181,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                     BetterLinkMovementMethod.linkify(Linkify.ALL, messageView)
                 } else {
                     //if it's a onebox, then display it specially
-                    when (message.onebox_type) {
+                    when (message.oneboxType) {
                         "image" -> {
                             //For images, load the image into the ImageView, making sure it's visible
                             oneboxImage.visibility = View.VISIBLE
@@ -192,11 +192,11 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                                 origHeight = layoutParams.height
                             }
 
-                            oneboxImage.loadUrl(message.onebox_content)
+                            oneboxImage.loadUrl(message.oneboxContent)
 
                             val transitionListener = object : Transition.TransitionListener {
                                 override fun onTransitionEnd(transition: Transition) {
-                                    oneboxImage.loadUrl(message.onebox_content)
+                                    oneboxImage.loadUrl(message.oneboxContent)
                                 }
 
                                 override fun onTransitionResume(transition: Transition) {}
@@ -252,7 +252,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                             }
 
 //                            itemView.setOnClickListener {
-//                                mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.onebox_content)))
+//                                mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.oneboxContent)))
 //                            }
 
                             //Set the text to nothing just in case
@@ -261,11 +261,11 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                     //For Youtube videos, display the image and some text, linking the view to the video on Youtube
                         "youtube" -> {
                             itemView.setOnClickListener {
-                                mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.onebox_extra)))
+                                mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.oneboxExtra)))
                             }
                             oneboxImage.visibility = View.VISIBLE
 
-                            itemView.message_image.loadUrl(message.onebox_content)
+                            itemView.message_image.loadUrl(message.oneboxContent)
                             messageView.text = message.content
                         }
                     //for twitter tweets, display the profile pic, profile name, and render the text. might need some css
@@ -274,7 +274,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                             messageView.setPadding(15, 15, 15, 15)
                             messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
                             messageView.setLinkTextColor(ContextCompat.getColor(itemView.context, R.color.accent_twitter))
-                            Log.d("Onebox", "Type: ${message.onebox_type}")
+                            Log.d("Onebox", "Type: ${message.oneboxType}")
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 messageView.text = Html.fromHtml(message.content, Html.FROM_HTML_MODE_LEGACY)
                             } else {
@@ -285,7 +285,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                         }
                     //Other oneboxed items just display the HTML until we implement them all
                         else -> {
-                            Log.d("Onebox", "Type: ${message.onebox_type}")
+                            Log.d("Onebox", "Type: ${message.oneboxType}")
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 messageView.text = Html.fromHtml(message.content, Html.FROM_HTML_MODE_LEGACY)
                             } else {
@@ -318,17 +318,16 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
             editIndicator.visibility = if (message.isEdited) View.VISIBLE else View.INVISIBLE
         }
 
-        private fun loadMessageActionDialog(message: com.tristanwiley.chatse.event.presenter.message.MessageEvent) {
+        private fun loadMessageActionDialog(message: MessageEvent) {
             //Initiate a list of Strings, the current user ID, and a Boolean to determine if it's the user's message
             val dialogMessages = mutableListOf<String>()
-            val curUserId: Int
             val isUserMessage: Boolean
 
             //Set the user ID depending on the site
-            if (room?.site == Client.SITE_STACK_OVERFLOW) {
-                curUserId = mContext.defaultSharedPreferences.getInt("SOID", -1)
+            val curUserId: Int = if (room?.site == Client.SITE_STACK_OVERFLOW) {
+                mContext.defaultSharedPreferences.getInt("SOID", -1)
             } else {
-                curUserId = mContext.defaultSharedPreferences.getInt("SEID", -1)
+                mContext.defaultSharedPreferences.getInt("SEID", -1)
             }
 
             //Determine if it's the user's message
@@ -348,7 +347,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
             val dialog = DialogPlus.newDialog(mContext)
                     .setContentHolder(ListHolder())
                     .setGravity(Gravity.CENTER)
-                    .setAdapter(com.tristanwiley.chatse.chat.adapters.ModifyMessageAdapter(dialogMessages, mContext))
+                    .setAdapter(ModifyMessageAdapter(dialogMessages, mContext))
                     .setOnItemClickListener { plusDialog, _, _, position ->
                         //The clicking of items depends on how many and whether it's the user's message
                         if (isUserMessage) {
@@ -387,7 +386,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
          * @param messageId: Integer that is the message to star's ID
          * @param chatFkey: Magical fkey for the room
          */
-        fun starMessage(messageId: Int, chatFkey: String?) {
+        private fun starMessage(messageId: Int, chatFkey: String?) {
             val client = ClientManager.client
             doAsync {
                 //Create request body
@@ -410,7 +409,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
          * @param messageId: Integer that is the message to star's ID
          * @param chatFkey: Magical fkey for the room
          */
-        fun deleteMessage(messageId: Int, chatFkey: String?) {
+        private fun deleteMessage(messageId: Int, chatFkey: String?) {
             val client = ClientManager.client
             doAsync {
                 //Add fkey to body
@@ -433,7 +432,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
          * @param mContext: Application context
          * @param plusDialog: DialogPlus so we can dismiss
          */
-        fun showEditDialog(message: com.tristanwiley.chatse.event.presenter.message.MessageEvent, mContext: Context, plusDialog: DialogPlus) {
+        private fun showEditDialog(message: MessageEvent, mContext: Context, plusDialog: DialogPlus) {
             //Create AlertDialog
             val builder = AlertDialog.Builder(mContext)
 
@@ -478,7 +477,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
          * @param messageId: ID of the message we want to modify
          * @param chatFkey: MAGICAL FKEY
          */
-        fun editMessage(editText: String, messageId: Int, chatFkey: String?) {
+        private fun editMessage(editText: String, messageId: Int, chatFkey: String?) {
             val client = ClientManager.client
             doAsync {
                 //Create body with text and fkey
@@ -499,7 +498,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
         }
 
         fun getDominantColor(bitmap: Bitmap): Int {
-            val swatchesTemp = Palette.from(bitmap).generate().getSwatches()
+            val swatchesTemp = Palette.from(bitmap).generate().swatches
             val swatches = ArrayList<Palette.Swatch>(swatchesTemp)
             Collections.sort(swatches) { swatch1, swatch2 -> swatch2.population - swatch1.population }
             return if (swatches.size > 0) swatches[0].rgb else ContextCompat.getColor(mContext, (R.color.primary))
