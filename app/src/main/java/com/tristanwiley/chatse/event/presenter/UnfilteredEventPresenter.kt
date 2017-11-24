@@ -8,13 +8,12 @@ import java.util.*
 /**
  * An unfiltered event presenter, used alongside MessageEventPresentor
  */
-class UnfilteredEventPresenter : com.tristanwiley.chatse.event.presenter.EventPresenter<ChatEvent> {
+class UnfilteredEventPresenter : EventPresenter<ChatEvent> {
 
-
-    val events = ArrayList<ChatEvent>()
+    private val events = ArrayList<ChatEvent>()
 
     override fun addEvent(event: ChatEvent, roomNum: Int, context: Context, room: ChatRoom?) {
-        if (event.room_id == roomNum) {
+        if (event.roomId == roomNum) {
             events.add(event)
         }
     }

@@ -16,38 +16,37 @@ import kotlin.collections.ArrayList
 /**
  * One of the most important files
  * Where messages are added to an ArrayList of MessageEvents. This implements EventPresentor which overrides getEventsList and getUsersList which get the list of messages and users respectively.
- * Inside this class, events are handled based on the event_type that StackExchange assigns it.
+ * Inside this class, events are handled based on the eventType that StackExchange assigns it.
  * List of event types can be found in the ChatEvent file.
  *
- * @param messages: A TreeSet containing all the messages for a Room
- * @param users; A hashmap of all the users in a Room
+ * @property messages: A TreeSet containing all the messages for a Room
+ * @property users; A hashmap of all the users in a Room
  *
  * Get these by calling .getEventsList() and .getUsersList()
  */
 class MessageEventPresenter : EventPresenter<MessageEvent> {
 
-    internal var messages = TreeSet<MessageEvent>()
-    internal var users = hashMapOf<Long, MessageEvent>()
+    private var messages = TreeSet<MessageEvent>()
+    private var users = hashMapOf<Long, MessageEvent>()
 
     override fun addEvent(event: ChatEvent, roomNum: Int, context: Context, room: ChatRoom?) {
         //If the event type is not for leaving but definitely exists then continue so we can add the user to the UsersList
-        if (event.event_type != ChatEvent.EVENT_TYPE_LEAVE && event.user_id != 0) {
+        if (event.eventType != ChatEvent.EVENT_TYPE_LEAVE && event.userId != 0) {
             //If the user is already in the room, move them to the top
-            if (users.containsKey(event.user_id.toLong())) {
+            if (users.containsKey(event.userId.toLong())) {
                 //Create a new MessageEvent and say it's for the users list
                 val newEvent = MessageEvent(event)
                 newEvent.isForUsersList = true
 
                 //Put in the users list
-                users.put(event.user_id.toLong(), newEvent)
+                users.put(event.userId.toLong(), newEvent)
             } else {
                 //If the user is not in the users list get their profile picture
-                val url: String
                 //Determine what URL to use (StackOverflow or StackExchange)
-                if (room?.site == Client.SITE_STACK_OVERFLOW) {
-                    url = "https://chat.stackoverflow.com/users/thumbs/${event.user_id}"
+                val url: String = if (room?.site == Client.SITE_STACK_OVERFLOW) {
+                    "https://chat.stackoverflow.com/users/thumbs/${event.userId}"
                 } else {
-                    url = "https://chat.stackexchange.com/users/thumbs/${event.user_id}"
+                    "https://chat.stackexchange.com/users/thumbs/${event.userId}"
                 }
                 //Make a call with Ion (for parsing simplicity) and parse the result
                 doAsync {
@@ -75,9 +74,9 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                         newEvent.isForUsersList = true
                         val imageUrl = result.getString("email_hash").replace("!", "")
                         if (imageUrl.contains(".")) {
-                            newEvent.email_hash = imageUrl
+                            newEvent.emailHash = imageUrl
                         } else {
-                            newEvent.email_hash = "https://www.gravatar.com/avatar/$imageUrl"
+                            newEvent.emailHash = "https://www.gravatar.com/avatar/$imageUrl"
                         }
                         users.put(newEvent.userId, newEvent)
                     }
@@ -86,9 +85,9 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
         }
 
         //Make sure the room is the correct room
-        if (room?.num == event.room_id) {
+        if (room?.num == event.roomId) {
             //Kotlin version of the switch statement, determine what to do with the event
-            when (event.event_type) {
+            when (event.eventType) {
             //If the event is a message, add it to the messages
                 ChatEvent.EVENT_TYPE_MESSAGE -> messages.add(MessageEvent(event))
             //If the event is an edit, or a delete, then add that new event in place of the old.
@@ -110,8 +109,8 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                     if (originalMessage != null) {
                         newMessage.userId = originalMessage.userId
                         newMessage.userName = originalMessage.userName
-                        newMessage.message_stars = event.message_stars
-                        newMessage.message_starred = event.message_starred
+                        newMessage.messageStars = event.messageStars
+                        newMessage.messageStarred = event.messageStarred
                         messages.remove(originalMessage)
                         messages.add(newMessage)
                     }

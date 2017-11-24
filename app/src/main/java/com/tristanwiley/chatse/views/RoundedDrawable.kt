@@ -10,14 +10,14 @@ import android.util.Log
 import android.widget.ImageView.ScaleType
 
 /**
- * Created by mauker on 23/08/17.
+ * Represents a drawable with rounded corners.
  */
 class RoundedDrawable(bitmap: Bitmap) : Drawable() {
 
     private var mBounds = RectF()
     private var mDrawableRect = RectF()
     private var mBitmapRect = RectF()
-    private var mBitmap: Bitmap
+    private var mBitmap: Bitmap = bitmap
     private var mBitmapPaint: Paint
     private var mBitmapWidth: Int = 0
     private var mBitmapHeight: Int = 0
@@ -40,7 +40,6 @@ class RoundedDrawable(bitmap: Bitmap) : Drawable() {
     private var mScaleType = ScaleType.FIT_CENTER
 
     init {
-        mBitmap = bitmap
 
         mBitmapWidth = mBitmap.width
         mBitmapHeight = mBitmap.height
@@ -58,7 +57,7 @@ class RoundedDrawable(bitmap: Bitmap) : Drawable() {
     }
 
     companion object {
-        val LOG_TAG = RoundedDrawable::class.java.simpleName
+        val LOG_TAG: String = RoundedDrawable::class.java.simpleName
 
         val DEFAULT_BORDER_COLOR = Color.WHITE
 
@@ -248,14 +247,14 @@ class RoundedDrawable(bitmap: Bitmap) : Drawable() {
             throw IllegalArgumentException("Multiple nonzero corner radii not yet supported.")
         }
 
-        if (!radiusSet.isEmpty()) {
+        mCornerRadius = if (!radiusSet.isEmpty()) {
             val radius = radiusSet.iterator().next()
             if (java.lang.Float.isInfinite(radius) || java.lang.Float.isNaN(radius) || radius < 0) {
                 throw IllegalArgumentException("Invalid radius value: " + radius)
             }
-            mCornerRadius = radius
+            radius
         } else {
-            mCornerRadius = 0f
+            0f
         }
 
         mCornersRounded[Corner.TOP_LEFT.ordinal] = topLeft > 0
@@ -448,11 +447,11 @@ class RoundedDrawable(bitmap: Bitmap) : Drawable() {
 
     override fun onStateChange(state: IntArray?): Boolean {
         val newColor: Int = mBorderColor.getColorForState(state, 0)
-        if (mBorderPaint.color != newColor) {
+        return if (mBorderPaint.color != newColor) {
             mBorderPaint.color = newColor
-            return true
+            true
         } else {
-            return super.onStateChange(state)
+            super.onStateChange(state)
         }
     }
 
@@ -475,10 +474,10 @@ class RoundedDrawable(bitmap: Bitmap) : Drawable() {
 
         if (mOval) {
             if (mBorderWidth > 0) {
-                canvas.drawOval(mDrawableRect, mBitmapPaint);
-                canvas.drawOval(mBorderRect, mBorderPaint);
+                canvas.drawOval(mDrawableRect, mBitmapPaint)
+                canvas.drawOval(mBorderRect, mBorderPaint)
             } else {
-                canvas.drawOval(mDrawableRect, mBitmapPaint);
+                canvas.drawOval(mDrawableRect, mBitmapPaint)
             }
         } else {
             if (any(mCornersRounded)) {

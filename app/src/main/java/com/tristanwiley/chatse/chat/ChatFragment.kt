@@ -57,20 +57,18 @@ import java.io.InputStream
 /**
  * ChatFragment is the fragment used to display the current ChatRoom
  *
- * @param input: The EditText where new messages are inputted
- * @param messageList: The RecyclerView where all messages are contained
- * @param userList: The RecyclerView where all users are contained, for the right NavigationDrawer
- * @param events: EventList of all events
- * @param chatFkey: The fkey for the room
- * @param room: The current ChatRoom object
- * @param client: The OkHttp client
- * @param networkHandler: Handler that is used for the network requests
- * @param uiThreadHandler: Handler that is used for the uiThread
- * @param messageAdapter: Adapter for displaying all messages
- * @param usersAdapter: Adapter for displaying all users
- * @param mapper: ObjectMapper to get the Messages Object
- * @param chatEventGenerator: Generator that generates ChatEvent objects
- * @param dialog: Used for DialogPlus displaying the image uploading dialog.
+ * @property input: The EditText where new messages are inputted
+ * @property messageList: The RecyclerView where all messages are contained
+ * @property userList: The RecyclerView where all users are contained, for the right NavigationDrawer
+ * @property events: EventList of all events
+ * @property chatFkey: The fkey for the room
+ * @property room: The current ChatRoom object
+ * @property client: The OkHttp client
+ * @property messageAdapter: Adapter for displaying all messages
+ * @property usersAdapter: Adapter for displaying all users
+ * @property mapper: ObjectMapper to get the Messages Object
+ * @property chatEventGenerator: Generator that generates ChatEvent objects
+ * @property dialog: Used for DialogPlus displaying the image uploading dialog.
  */
 class ChatFragment : Fragment(), IncomingEventListener {
 
@@ -79,16 +77,16 @@ class ChatFragment : Fragment(), IncomingEventListener {
     private lateinit var userList: RecyclerView
     private lateinit var events: EventList
     private lateinit var loadMessagesLayout: SwipeRefreshLayout
-    lateinit var chatFkey: String
+    private lateinit var chatFkey: String
     lateinit var room: ChatRoom
-    lateinit var roomName: String
+    private lateinit var roomName: String
     private val client = ClientManager.client
     private lateinit var messageAdapter: MessageAdapter
     private lateinit var usersAdapter: UsersAdapter
     private val mapper = ObjectMapper()
     private val chatEventGenerator = ChatEventGenerator()
     lateinit var dialog: DialogPlus
-    var currentLoadCount = 50
+    private var currentLoadCount = 50
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -234,7 +232,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
 
     /**
      * onOptionsItemSelected - For each item in Toolbar
-     * @param room_information: When clicking on this, the dialog opens displaying room information
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -425,7 +422,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
         }
         messagesJson
                 .mapNotNull { chatEventGenerator.createEvent(it) }
-                .filter { it.room_id == room.num }
+                .filter { it.roomId == room.num }
                 .forEach {
                     events.addEvent(it, this.activity, room)
                 }
@@ -469,7 +466,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
      * Upload to Imgur some content
      * @param content: A string that contains either bytes or a URL
      */
-    fun uploadToImgur(content: String) {
+    private fun uploadToImgur(content: String) {
         doAsync {
             val client = ClientManager.client
 

@@ -12,7 +12,9 @@ import android.widget.EditText
 import android.widget.Toast
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
+import com.tristanwiley.chatse.App
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.chat.ChatActivity
 import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import org.jetbrains.anko.defaultSharedPreferences
@@ -24,28 +26,27 @@ import java.io.IOException
 
 /**
  * Activity to login the user.
+ *
+ * @property emailView: The EditText used to take in the user's email
+ * @property passwordView: The EditText used to take in the user's password
+ * @property dialog: The ProgressBar displayed while the authentication is being performed
+ * @property prefs: Variable used to contain the default SharedPreferences for the app. Set to App.sharedPreferences
  */
 class LoginActivity : AppCompatActivity() {
-    /**
-     * Initiate variables to be used.
-     * @param emailView: The EditText used to take in the user's email
-     * @param passwordView: The EditText used to take in the user's password
-     * @param progressBar: The ProgressBar displayed while the authentication is being performed
-     * @param prefs: Variable used to contain the default SharedPreferences for the app. Set to App.sharedPreferences
-     */
     lateinit var emailView: EditText
     lateinit var passwordView: EditText
     lateinit var loginButton: FloatingActionButton
     lateinit var prefs: SharedPreferences
+    //TODO: Replace deprecated version. Ticket is #50
     lateinit var dialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         //Determine if the user has logged in already, if they have, proceed to the ChatActivity and finish the LoginActivity
-        prefs = com.tristanwiley.chatse.App.sharedPreferences
-        if (prefs.getBoolean(com.tristanwiley.chatse.App.PREF_HAS_CREDS, false)) {
-            startActivity(Intent(this, com.tristanwiley.chatse.chat.ChatActivity::class.java))
+        prefs = App.sharedPreferences
+        if (prefs.getBoolean(App.PREF_HAS_CREDS, false)) {
+            startActivity(Intent(this, ChatActivity::class.java))
             finish()
             return
         }
@@ -71,7 +72,7 @@ class LoginActivity : AppCompatActivity() {
         loginButton.setOnClickListener { attemptLogin() }
 
         //Set the emailView text to the email saved in the preferences.
-        emailView.setText(prefs.getString(com.tristanwiley.chatse.App.PREF_EMAIL, ""))
+        emailView.setText(prefs.getString(App.PREF_EMAIL, ""))
 
         //When the user presses submit inside the passwordView, attempt a login.
         passwordView.setOnEditorActionListener({ _, id, _ ->
@@ -84,14 +85,8 @@ class LoginActivity : AppCompatActivity() {
 
     /**
      * Receives the input from the email and password views.
-     * @param emailView gets it's errors reset
-     * @param passwordView gets it's errors reset
-     * The inputs are validated
-     * @param loginButton is re-enabled if the inputs are not valid
-     * @param progressBar is visible if all inputs are valid and the login is attempted
-     * @param LoginAsyncTask is called
      */
-    fun attemptLogin() {
+    private fun attemptLogin() {
         loginButton.isClickable = false
 
         // Reset errors.
@@ -126,7 +121,7 @@ class LoginActivity : AppCompatActivity() {
             isValid = false
         }
 
-        if (password.isNullOrBlank()) {
+        if (password.isBlank()) {
             passwordView.error = getString(R.string.err_blank_password)
             isValid = false
         }
@@ -146,7 +141,7 @@ class LoginActivity : AppCompatActivity() {
     /**
      * Function that uses Anko's doAsync to login to all sites
      */
-    fun loginToSites(vararg params: String) {
+    private fun loginToSites(vararg params: String) {
         doAsync {
             val email = params[0]
             val password = params[1]
@@ -158,8 +153,8 @@ class LoginActivity : AppCompatActivity() {
                     loginToSE(client)
                     loginToSite(client, "https://stackoverflow.com", email, password)
                     runOnUiThread {
-                        prefs.edit().putBoolean(com.tristanwiley.chatse.App.PREF_HAS_CREDS, true).apply()
-                        this@LoginActivity.startActivity(Intent(this@LoginActivity, com.tristanwiley.chatse.chat.ChatActivity::class.java))
+                        prefs.edit().putBoolean(App.PREF_HAS_CREDS, true).apply()
+                        this@LoginActivity.startActivity(Intent(this@LoginActivity, ChatActivity::class.java))
                         this@LoginActivity.finish()
                     }
                 } else {

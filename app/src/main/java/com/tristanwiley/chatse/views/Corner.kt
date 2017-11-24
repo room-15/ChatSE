@@ -1,7 +1,7 @@
 package com.tristanwiley.chatse.views
 
 /**
- * Created by mauker on 23/08/17.
+ * Enum that defines each corner of a view that can be modified.
  */
 enum class Corner {
     TOP_LEFT, TOP_RIGHT, BOTTOM_RIGHT, BOTTOM_LEFT
