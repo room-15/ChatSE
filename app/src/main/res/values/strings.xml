@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Chat.SE</string>
+    <string name="app_name">ChatSE</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_logout">Logout</string>
     <string name="title_activity_login">LoginActivity</string>
@@ -17,8 +17,8 @@
     <string name="choose_from_gallery">Choose from Gallery</string>
     <string name="upload_from_url">Upload from URL</string>
     <string name="upload">Upload</string>
-    <string name="stackoverflow">Stackoverflow</string>
-    <string name="stackexchange">Stackexchange</string>
+    <string name="stackoverflow">Stack Overflow</string>
+    <string name="stackexchange">Stack Exchange</string>
     <string name="upload_image">Upload an Image</string>
     <string name="delete_message">Delete Message</string>
     <string name="star_message">Star Message</string>
@@ -30,7 +30,7 @@
 
     <string name="about">About</string>
     <string name="about_version">%1$s - Version %2$s</string>
-    <string name="about_app">This app was made with love by the StackExchange community &lt;3</string>
+    <string name="about_app">This app was made with love by the Stack Exchange community &lt;3</string>
 
     <string name="buy_coffee">Buy me a coffee</string>
     <string name="rate_app">Rate This this app!</string>
