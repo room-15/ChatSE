@@ -1,5 +1,6 @@
 package com.tristanwiley.chatse.event
 
+import org.codehaus.jackson.annotate.JsonProperty
 import org.jsoup.Jsoup
 import org.unbescape.html.HtmlEscape
 
@@ -29,36 +30,34 @@ import org.unbescape.html.HtmlEscape
  * @property emailHash: Email hash used for profile picture
  */
 class ChatEvent {
+    @JsonProperty("message_owner_stars") private var messageOwnerStars = 0
+    @JsonProperty("target_user_id") private var targetUserId = -1
+    @JsonProperty("show_parent") private var showParent = false
 
-    var eventType: Int = 0
-    var timeStamp: Long = 0
-    var roomId: Int = 0
-    var userId: Int = 0
-    var userName: String = ""
-    var messageId: Int = 0
+    @JsonProperty("message_starred") var messageStarred = false
+    @JsonProperty("message_onebox") var messageOnebox = false
 
-    private var showParent = false
-    var parentId = -1
+    @JsonProperty("onebox_content") var oneboxContent = ""
+    @JsonProperty("star_timestamp") var starTimestamp = ""
+    @JsonProperty("onebox_extra") var oneboxExtra = ""
+    @JsonProperty("onebox_type") var oneboxType = ""
+    @JsonProperty("email_hash") var emailHash = ""
+    @JsonProperty("user_name") var userName = ""
+    @JsonProperty("room_name") var roomName = ""
+
+    @JsonProperty("message_edits") var messageEdits = 0
+    @JsonProperty("message_stars") var messageStars = 0
+    @JsonProperty("time_stamp") var timeStamp = 0L
+    @JsonProperty("event_type") var eventType = 0
+    @JsonProperty("message_id") var messageId = 0
+    @JsonProperty("parent_id") var parentId = -1
+    @JsonProperty("room_id") var roomId = 0
+    @JsonProperty("user_id") var userId = 0
 
     var id = -1
-
-    var roomName: String = ""
     var contents: String = ""
-    var messageEdits = 0
-    var messageStars = 0
-    private var messageOwnerStars = 0
-    private var targetUserId = -1
-
-    var messageOnebox = false
-    var oneboxType = ""
-    var oneboxContent = ""
-    var oneboxExtra = ""
-
-    var messageStarred = false
     var isForUsersList = false
-    var emailHash = ""
 
-    var starTimestamp = ""
 
     fun setContent(content: String) {
         val doc = Jsoup.parse(content, "http://chat.stackexchange.com/")

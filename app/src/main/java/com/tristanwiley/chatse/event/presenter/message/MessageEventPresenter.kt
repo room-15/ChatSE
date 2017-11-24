@@ -72,7 +72,7 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                         //Get the profile picture for the user and add it to the user in the users list
                         val newEvent = MessageEvent(event)
                         newEvent.isForUsersList = true
-                        val imageUrl = result.getString("emailHash").replace("!", "")
+                        val imageUrl = result.getString("email_hash").replace("!", "")
                         if (imageUrl.contains(".")) {
                             newEvent.emailHash = imageUrl
                         } else {

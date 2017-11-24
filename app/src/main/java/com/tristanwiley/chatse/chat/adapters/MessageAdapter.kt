@@ -117,7 +117,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                 val jsonResult = JSONObject(response.body().string())
 
                 //Get the emailHash attribute which contains either a link to Imgur or a hash for Gravatar
-                val hash = jsonResult.getString("emailHash").replace("!", "")
+                val hash = jsonResult.getString("email_hash").replace("!", "")
                 var imageLink = hash
                 //If Gravatar, create link
                 if (!hash.contains(".")) {
