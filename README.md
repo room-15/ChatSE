@@ -12,7 +12,7 @@ The app also identifies what users are currently in the chat but viewing all use
 
 The ChatFragment is loaded into the ChatActivity and contains a RecyclerView where each item is a new chat. Each chat is handled by a few services and listeners. Some of the most important ones are as follows.
 
-  - MessageEventPresentor, where messages are added to an ArrayList of MessageEvents. This implements EventPresentor which overrides getEventsList and getUsersList which get the list of messages and users respectively. Inside this class, events are handled based on the eventType that Stackexchange assigns it. For example, the eventType of 1 is a new message, and we simply add a new MessageEvent to the messages list. 2 is an edit and it replaces the old message with the new, etc.
+  - MessageEventPresentor, where messages are added to an ArrayList of MessageEvents. This implements EventPresentor which overrides getEventsList and getUsersList which get the list of messages and users respectively. Inside this class, events are handled based on the event_type that Stackexchange assigns it. For example, the event_type of 1 is a new message, and we simply add a new MessageEvent to the messages list. 2 is an edit and it replaces the old message with the new, etc.
   
   - MessageAdapter is where messages in the main RecyclerView are handled. In this adapter, messages are displayed with the time, username, and content. Along with any appropriate stars and edit messages. On the long click of messages, the option to star, edit, and delete are displayed when the appropriate permissions are available for them.
   
