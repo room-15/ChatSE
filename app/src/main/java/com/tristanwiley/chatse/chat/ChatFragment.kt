@@ -1,6 +1,7 @@
 package com.tristanwiley.chatse.chat
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -70,7 +71,7 @@ import java.io.InputStream
  * @property chatEventGenerator: Generator that generates ChatEvent objects
  * @property dialog: Used for DialogPlus displaying the image uploading dialog.
  */
-class ChatFragment : Fragment(), IncomingEventListener {
+class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
 
     private lateinit var input: EditText
     private lateinit var messageList: RecyclerView
@@ -201,7 +202,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
         userList = activity.findViewById(R.id.room_users)
         loadMessagesLayout = view.findViewById(R.id.load_messages_layout)
 
-        messageAdapter = MessageAdapter(activity, events, chatFkey, room)
+        messageAdapter = MessageAdapter(activity, events, chatFkey, room, messageCallback = this)
         usersAdapter = UsersAdapter(activity, events)
         messageList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, true)
         messageList.adapter = messageAdapter
@@ -552,6 +553,12 @@ class ChatFragment : Fragment(), IncomingEventListener {
                 .build()
 
         client.newCall(newMessageRequest).execute()
+    }
+
+    @SuppressLint("all")
+    override fun onReplyMessage(id: Int) {
+        input.setText(":$id")
+        input.setSelection(input.length())
     }
 
     companion object {

@@ -31,6 +31,7 @@ import com.orhanobut.dialogplus.ListHolder
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.chat.ChatMessageCallback
 import com.tristanwiley.chatse.chat.ChatRoom
 import com.tristanwiley.chatse.event.EventList
 import com.tristanwiley.chatse.event.presenter.message.MessageEvent
@@ -51,7 +52,13 @@ import kotlin.collections.ArrayList
 /**
  * The beautiful adapter that handles all new messages in the chat
  */
-class MessageAdapter(private val mContext: Context, private val events: EventList, private val chatFkey: String?, val room: ChatRoom?, private var messages: ArrayList<MessageEvent> = ArrayList()) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
+class MessageAdapter(
+        private val mContext: Context,
+        private val events: EventList,
+        private val chatFkey: String?,
+        val room: ChatRoom?,
+        private var messages: ArrayList<MessageEvent> = ArrayList(),
+        private val messageCallback: ChatMessageCallback) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
     override fun onBindViewHolder(viewHolder: MessageViewHolder?, pos: Int) {
         val message = messages[pos]
@@ -70,7 +77,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): MessageAdapter.MessageViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.list_item_message, parent, false)
-        return MessageAdapter.MessageViewHolder(mContext, view, chatFkey, room)
+        return MessageAdapter.MessageViewHolder(mContext, view, chatFkey, room, messageCallback)
     }
 
     override fun getItemCount() = messages.size
@@ -78,7 +85,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
     /**
      * ViewHolder that handles setting all content in itemView
      */
-    class MessageViewHolder(private val mContext: Context, itemView: View, private val chatFkey: String?, val room: ChatRoom?) : RecyclerView.ViewHolder(itemView) {
+    class MessageViewHolder(private val mContext: Context, itemView: View, private val chatFkey: String?, val room: ChatRoom?, val messageCallback: ChatMessageCallback) : RecyclerView.ViewHolder(itemView) {
         private val root: LinearLayout = itemView.findViewById(R.id.message_root)
         private val rootMessageLayout = itemView.findViewById<ConstraintLayout>(R.id.message_root_container)
         private val timestampFormat = SimpleDateFormat("hh:mm aa", Locale.getDefault())
@@ -122,6 +129,30 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
             if (userPicture.drawable != placeholderDrawable)
                 userPicture.setImageResource(R.drawable.box)
 
+            actionSelfFlag.setOnClickListener {
+                // TODO
+            }
+
+            actionSelfEdit.setOnClickListener {
+                // TODO
+            }
+
+            actionSelfDelete.setOnClickListener {
+                // TODO
+            }
+
+            actionFlag.setOnClickListener {
+                // TODO
+            }
+
+            actionStar.setOnClickListener {
+                starMessage(message.messageId, chatFkey)
+            }
+
+            actionReply.setOnClickListener {
+                messageCallback.onReplyMessage(message.messageId)
+            }
+
             //Load the profile pictures! Create a request to get the url for the picture
             doAsync {
                 val client = ClientManager.client
@@ -161,22 +192,21 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
             }
 
             // Setting background color based on the SE chat the user is logged in.
-            if (room?.site == Client.SITE_STACK_OVERFLOW) {
-                bgColor = if (message.userId == mContext.defaultSharedPreferences.getInt("SOID", -1).toLong()) {
+            bgColor = if (room?.site == Client.SITE_STACK_OVERFLOW) {
+                if (message.userId == mContext.defaultSharedPreferences.getInt("SOID", -1).toLong()) {
                     ContextCompat.getColor(mContext, R.color.message_stackoverflow_mine)
 
                 } else {
                     ContextCompat.getColor(mContext, R.color.message_other)
                 }
-                rootMessageLayout.setBackgroundColor(bgColor)
             } else {
-                // TODO - BG change.
                 if (message.userId == mContext.defaultSharedPreferences.getInt("SEID", -1).toLong()) {
-                    rootMessageLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_stackexchange_mine))
+                    ContextCompat.getColor(mContext, R.color.message_stackexchange_mine)
                 } else {
-                    rootMessageLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_other))
+                    ContextCompat.getColor(mContext, R.color.message_other)
                 }
             }
+            rootMessageLayout.setBackgroundColor(bgColor)
 
             //If the message is starred, show the indicator and set the count text to the star count
             if (message.messageStars > 0) {
@@ -343,7 +373,6 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
             editIndicator.visibility = if (message.isEdited) View.VISIBLE else View.INVISIBLE
         }
 
-        // TODO - Show action area on the bottom.
         private fun checkIfSelected(isStarred: Boolean, messageUid: Int) {
             // TODO - Move this somewhere else.
             //Set the user ID depending on the site
@@ -374,13 +403,10 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                     actionStar.setColorFilter(Color.BLACK)
             }
             else {
-//                if (!isStarred)
-//                    starIndicator.visibility = View.INVISIBLE
 
                 rootMessageLayout.setBackgroundColor(bgColor)
                 footerSelf.visibility = View.GONE
                 footerOthers.visibility = View.GONE
-
             }
         }
 
