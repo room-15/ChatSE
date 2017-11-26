@@ -3,6 +3,7 @@ package com.tristanwiley.chatse.chat.adapters
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -22,10 +23,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.orhanobut.dialogplus.DialogPlus
@@ -81,7 +79,8 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
      * ViewHolder that handles setting all content in itemView
      */
     class MessageViewHolder(private val mContext: Context, itemView: View, private val chatFkey: String?, val room: ChatRoom?) : RecyclerView.ViewHolder(itemView) {
-        private val rootLayout = itemView.findViewById<ConstraintLayout>(R.id.message_root_container)
+        private val root: LinearLayout = itemView.findViewById(R.id.message_root)
+        private val rootMessageLayout = itemView.findViewById<ConstraintLayout>(R.id.message_root_container)
         private val timestampFormat = SimpleDateFormat("hh:mm aa", Locale.getDefault())
         private val messageView = itemView.findViewById<TextView>(R.id.message_content)
         private val userNameView = itemView.findViewById<TextView>(R.id.message_user_name)
@@ -96,6 +95,22 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
         private var isFullSize: Boolean = false
         private var origWidth = 0
         private var origHeight = 0
+        private var isSelected = false
+
+        private val footer: View = itemView.findViewById(R.id.message_footer_actions)
+
+        private val footerOthers: View = itemView.findViewById(R.id.footer_actions_others)
+        private val footerSelf: View = itemView.findViewById(R.id.footer_actions_self)
+
+        private val actionSelfFlag: ImageButton = itemView.findViewById(R.id.action_self_flag)
+        private val actionSelfEdit: ImageButton = itemView.findViewById(R.id.action_self_edit)
+        private val actionSelfDelete: ImageButton = itemView.findViewById(R.id.action_self_delete)
+
+        private val actionFlag: ImageButton = itemView.findViewById(R.id.action_others_flag)
+        private val actionStar: ImageButton = itemView.findViewById(R.id.action_others_star)
+        private val actionReply: ImageButton = itemView.findViewById(R.id.action_others_reply)
+
+        private var bgColor: Int = Color.WHITE
 
         fun bindMessage(message: MessageEvent) {
             //Hide elements in case not used
@@ -140,19 +155,29 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                 }
             }
 
+            itemView.setOnClickListener {
+                isSelected = !isSelected
+                checkIfSelected(message.messageStars > 0, message.userId.toInt())
+            }
+
+            // Setting background color based on the SE chat the user is logged in.
             if (room?.site == Client.SITE_STACK_OVERFLOW) {
-                if (message.userId == mContext.defaultSharedPreferences.getInt("SOID", -1).toLong()) {
-                    rootLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_stackoverflow_mine))
+                bgColor = if (message.userId == mContext.defaultSharedPreferences.getInt("SOID", -1).toLong()) {
+                    ContextCompat.getColor(mContext, R.color.message_stackoverflow_mine)
+
                 } else {
-                    rootLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_other))
+                    ContextCompat.getColor(mContext, R.color.message_other)
                 }
+                rootMessageLayout.setBackgroundColor(bgColor)
             } else {
+                // TODO - BG change.
                 if (message.userId == mContext.defaultSharedPreferences.getInt("SEID", -1).toLong()) {
-                    rootLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_stackexchange_mine))
+                    rootMessageLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_stackexchange_mine))
                 } else {
-                    rootLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_other))
+                    rootMessageLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.message_other))
                 }
             }
+
             //If the message is starred, show the indicator and set the count text to the star count
             if (message.messageStars > 0) {
                 starIndicator.visibility = View.VISIBLE
@@ -213,7 +238,7 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
 
                                 if (!isFullSize) {
                                     val cSet = ConstraintSet()
-                                    cSet.clone(rootLayout)
+                                    cSet.clone(rootMessageLayout)
 
                                     // Grow as much as it can.
                                     cSet.constrainWidth(R.id.message_image, ConstraintSet.MATCH_CONSTRAINT)
@@ -226,12 +251,12 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
 
                                     trans.addListener(transitionListener)
 
-                                    TransitionManager.beginDelayedTransition(rootLayout, trans)
-                                    cSet.applyTo(rootLayout)
+                                    TransitionManager.beginDelayedTransition(rootMessageLayout, trans)
+                                    cSet.applyTo(rootMessageLayout)
 
                                 } else {
                                     val cSet = ConstraintSet()
-                                    cSet.clone(rootLayout)
+                                    cSet.clone(rootMessageLayout)
 
                                     // Revert it back to its original size.
                                     cSet.constrainWidth(R.id.message_image, origWidth)
@@ -244,8 +269,8 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
 
                                     trans.addListener(transitionListener)
 
-                                    TransitionManager.beginDelayedTransition(rootLayout, trans)
-                                    cSet.applyTo(rootLayout)
+                                    TransitionManager.beginDelayedTransition(rootMessageLayout, trans)
+                                    cSet.applyTo(rootMessageLayout)
                                 }
 
                                 isFullSize = !isFullSize
@@ -316,6 +341,47 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
 
             //Show if it's been edited
             editIndicator.visibility = if (message.isEdited) View.VISIBLE else View.INVISIBLE
+        }
+
+        // TODO - Show action area on the bottom.
+        private fun checkIfSelected(isStarred: Boolean, messageUid: Int) {
+            // TODO - Move this somewhere else.
+            //Set the user ID depending on the site
+            val curUserId: Int = if (room?.site == Client.SITE_STACK_OVERFLOW) {
+                mContext.defaultSharedPreferences.getInt("SOID", -1)
+            } else {
+                mContext.defaultSharedPreferences.getInt("SEID", -1)
+            }
+
+            if (isSelected) {
+                val hsv = FloatArray(3)
+                Color.colorToHSV(bgColor, hsv)
+                hsv[2] *= 0.9f
+                rootMessageLayout.setBackgroundColor(Color.HSVToColor(hsv))
+
+                TransitionManager.beginDelayedTransition(root, AutoTransition())
+                // Show self actions
+                if (messageUid == curUserId) {
+                    footerSelf.visibility = View.VISIBLE
+                }
+                else {
+                    footerOthers.visibility = View.VISIBLE
+                }
+
+                if (isStarred && (curUserId == messageUid))
+                    actionStar.setColorFilter(ContextCompat.getColor(mContext, R.color.star_starred))
+                else
+                    actionStar.setColorFilter(Color.BLACK)
+            }
+            else {
+//                if (!isStarred)
+//                    starIndicator.visibility = View.INVISIBLE
+
+                rootMessageLayout.setBackgroundColor(bgColor)
+                footerSelf.visibility = View.GONE
+                footerOthers.visibility = View.GONE
+
+            }
         }
 
         private fun loadMessageActionDialog(message: MessageEvent) {

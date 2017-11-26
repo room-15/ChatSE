@@ -42,4 +42,12 @@
     <string name="our_developers">Our developers</string>
     <string name="share_app">Share App</string>
     <string name="avatar">Avatar</string>
+
+    <!-- Content Description Strings -->
+    <string name="content_desc_flag">Flag message to the moderators</string>
+    <string name="content_desc_star">Stars the message as interesting</string>
+    <string name="content_dec_reply">Reply to this message</string>
+
+    <string name="content_desc_reply">Reply to this message</string>
+    <string name="content_desc_edit">Edit this message</string>
 </resources>

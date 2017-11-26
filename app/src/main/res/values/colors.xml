@@ -29,4 +29,6 @@
     <color name="deleted">#BBBBBB</color>
     <color name="twitter_blue">#4099FF</color>
     <color name="accent_twitter">#1D8DEE</color>
+
+    <color name="star_starred">#FF9800</color>
 </resources>
