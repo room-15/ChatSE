@@ -52,7 +52,8 @@ The fkey is the most important String inside this application. It is used to aut
   - [TristanWiley](https://github.com/TristanWiley) - I've revived this project to the best of my abilities and it's almost done
   - [AnubianN00b](https://github.com/AnubianN00b) - Original creator of this project, ily <3
   - [AdamMc331](https://github.com/AdamMc331) - My best friend and also helped work on the project.
-  
+  - [Mauker](https://github.com/Mauker1) - r15 Dev Bro.
+  - [CptEric](https://github.com/tryadelion) - r15 Dev Bro.
   
 ~ Tristan Wiley
       
