@@ -1,5 +1,5 @@
 # ChatSE
-
+![banner-01](https://user-images.githubusercontent.com/37731582/42035461-47728cbc-7ae3-11e8-85b2-9d2c633cfa14.png)
 Android app for Stack Exchange chat. Currently in development, see https://github.com/room-15/ChatSE/issues to view active issues. We'd love any community help.
 
 # Application Flow
@@ -54,6 +54,7 @@ The fkey is the most important String inside this application. It is used to aut
   - [AdamMc331](https://github.com/AdamMc331) - My best friend and also helped work on the project.
   - [Mauker](https://github.com/Mauker1) - r15 Dev Bro.
   - [CptEric](https://github.com/tryadelion) - r15 Dev Bro.
+  - [CallMeFib3r](https://github.com/callmefib3r) - Provided logo for the project.
   
 ~ Tristan Wiley
       
