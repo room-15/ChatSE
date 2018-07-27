@@ -2,14 +2,11 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:padding="4dp"
     android:orientation="vertical"
-    android:paddingLeft="8dp"
-    android:paddingStart="8dp"
-    android:paddingRight="8dp"
-    android:paddingEnd="8dp"
-    android:paddingBottom="4dp"
     android:id="@+id/message_root">
 
     <!-- Removed:
@@ -28,48 +25,50 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.2" />
+            app:layout_constraintGuide_percent="0.18" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline_80"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.80" />
+            app:layout_constraintGuide_percent="0.82" />
 
         <ImageView
             android:id="@+id/message_user_picture"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_margin="8dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:background="@drawable/box"
             android:scaleType="centerCrop"
-            app:layout_constraintBottom_toTopOf="@+id/message_user_name"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/guideline_20"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5"
-            app:layout_constraintVertical_chainStyle="packed" />
+            app:layout_constraintBottom_toTopOf="@id/message_user_name"/>
 
-        <TextView
+        <android.support.v7.widget.AppCompatTextView
             android:id="@+id/message_user_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
             android:ellipsize="end"
             android:gravity="center_horizontal"
             android:maxLines="2"
             android:textColor="@android:color/black"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:autoSizeTextType="uniform"
+            app:autoSizeMinTextSize="10sp"
+            app:autoSizeMaxTextSize="12sp"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/guideline_20"
-            app:layout_constraintTop_toBottomOf="@+id/message_user_picture" />
+            app:layout_constraintTop_toBottomOf="@+id/message_user_picture"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0"
+            tools:text="Tim Casteljns"/>
 
         <ImageView
             android:id="@+id/message_edit_indicator"
@@ -89,32 +88,38 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:textSize="16sp"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toRightOf="@+id/message_edit_indicator"
             app:layout_constraintRight_toLeftOf="@+id/guideline_80"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5" />
+            app:layout_constraintVertical_bias="0.5"
+            tools:text="Test message bitches yeaah!"/>
 
-        <TextView
+        <android.support.v7.widget.AppCompatTextView
             android:id="@+id/message_timestamp"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:autoSizeTextType="uniform"
+            app:autoSizeMinTextSize="10sp"
+            app:autoSizeMaxTextSize="12sp"
+            app:layout_constraintBottom_toTopOf="@id/message_star_indicator"
             app:layout_constraintLeft_toRightOf="@+id/guideline_80"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+            tools:text="10:00 AM"/>
 
         <ImageView
             android:id="@+id/message_star_indicator"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
             android:layout_margin="8dp"
             android:alpha="0.2"
             android:tint="#FF9800"

@@ -52,14 +52,14 @@ class AboutDevCardAdapter(mContext: Context, val data: ArrayList<DevPoko>) : Rec
 
     private val li: LayoutInflater = LayoutInflater.from(mContext)
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): AboutDevCardAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AboutDevCardAdapter.ViewHolder {
         val itemView: View = li.inflate(R.layout.card_about, parent, false)
 
         return ViewHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: AboutDevCardAdapter.ViewHolder?, position: Int) {
-        holder?.bind(data[position])
+    override fun onBindViewHolder(holder: AboutDevCardAdapter.ViewHolder, position: Int) {
+        holder.bind(data[position])
     }
 
     override fun getItemCount(): Int = data.size

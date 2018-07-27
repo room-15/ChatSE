@@ -46,14 +46,13 @@ import kotlin.collections.ArrayList
  */
 class StarsMessageAdapter(private val mContext: Context, private val events: ArrayList<ChatEvent>, val room: ChatRoom) : RecyclerView.Adapter<StarsMessageAdapter.MessageViewHolder>() {
 
-    override fun onBindViewHolder(viewHolder: MessageViewHolder?, pos: Int) {
+    override fun onBindViewHolder(holder: MessageViewHolder, pos: Int) {
         val message = events[pos]
-        val holder = viewHolder as MessageViewHolder
         holder.bindMessage(message)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): MessageViewHolder {
-        val view = LayoutInflater.from(parent?.context).inflate(R.layout.list_item_message, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_message, parent, false)
         return MessageViewHolder(mContext, view, room)
     }
 
@@ -115,7 +114,7 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
                             .asBitmap()
                             .load(imageLink)
                             .into(object : SimpleTarget<Bitmap>() {
-                                override fun onResourceReady(result: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>) {
+                                override fun onResourceReady(result: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
                                     //Load it into the ImageView!
                                     userPicture.setImageBitmap(result)
                                     userBarBottom.setBackgroundColor(getDominantColor(result))

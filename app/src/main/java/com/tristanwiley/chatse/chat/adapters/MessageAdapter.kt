@@ -60,7 +60,7 @@ class MessageAdapter(
         private var messages: ArrayList<MessageEvent> = ArrayList(),
         private val messageCallback: ChatMessageCallback) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
-    override fun onBindViewHolder(viewHolder: MessageViewHolder?, pos: Int) {
+    override fun onBindViewHolder(viewHolder: MessageViewHolder, pos: Int) {
         val message = messages[pos]
         val holder = viewHolder as MessageAdapter.MessageViewHolder
         holder.bindMessage(message)
@@ -75,8 +75,8 @@ class MessageAdapter(
         this.notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): MessageAdapter.MessageViewHolder {
-        val view = LayoutInflater.from(parent?.context).inflate(R.layout.list_item_message, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageAdapter.MessageViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_message, parent, false)
         return MessageAdapter.MessageViewHolder(mContext, view, chatFkey, room, messageCallback)
     }
 
@@ -147,6 +147,8 @@ class MessageAdapter(
 
             actionStar.setOnClickListener {
                 starMessage(message.messageId, chatFkey)
+                isSelected = !isSelected
+                checkIfSelected(message.messageStars > 0, message.userId.toInt())
             }
 
             actionReply.setOnClickListener {
@@ -177,7 +179,7 @@ class MessageAdapter(
                             .asBitmap()
                             .load(imageLink)
                             .into(object : SimpleTarget<Bitmap>() {
-                                override fun onResourceReady(result: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>) {
+                                override fun onResourceReady(result: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
                                     //Load it into the ImageView!
                                     userPicture.setImageBitmap(result)
                                     userBarBottom.setBackgroundColor(getDominantColor(result))
@@ -403,7 +405,6 @@ class MessageAdapter(
                     actionStar.setColorFilter(Color.BLACK)
             }
             else {
-
                 rootMessageLayout.setBackgroundColor(bgColor)
                 footerSelf.visibility = View.GONE
                 footerOthers.visibility = View.GONE

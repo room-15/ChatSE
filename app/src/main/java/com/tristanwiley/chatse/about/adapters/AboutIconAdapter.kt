@@ -28,14 +28,14 @@ class AboutIconAdapter(mContext: Context, val data: ArrayList<AboutIconPoko>) : 
 
     private val li: LayoutInflater = LayoutInflater.from(mContext)
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): AboutIconAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AboutIconAdapter.ViewHolder {
         val itemView: View = li.inflate(R.layout.item_about_app, parent, false)
 
         return ViewHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: AboutIconAdapter.ViewHolder?, position: Int) {
-        holder?.bind(data[position])
+    override fun onBindViewHolder(holder: AboutIconAdapter.ViewHolder, position: Int) {
+        holder.bind(data[position])
     }
 
     override fun getItemCount(): Int = data.size
