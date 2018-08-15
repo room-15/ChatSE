@@ -42,5 +42,5 @@
     <string name="our_developers">Our developers</string>
     <string name="share_app">Share App</string>
     <string name="avatar">Avatar</string>
-    <string name="beta_text">Thanks for using the beta. Find bugs? Report them at https://github.com/room-15/</string>
+    <string name="beta_text">Thanks for using the alpha. Find bugs? Report them at https://github.com/room-15/</string>
 </resources>
