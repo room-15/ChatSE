@@ -15,7 +15,7 @@ repositories {
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId 'com.tristanwiley.chatse'
         minSdkVersion 16
@@ -49,7 +49,7 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     // Crashlytics Kit
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
+    implementation('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
         transitive = true
     }
     implementation 'com.android.support:design:26.1.0'
@@ -69,9 +69,9 @@ dependencies {
     implementation 'me.saket:better-link-movement-method:1.2'
     implementation 'com.github.gabrielemariotti.changeloglib:changelog:2.1.0'
     implementation 'com.github.bumptech.glide:glide:4.0.0'
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.9.5'
-    testCompile 'com.squareup.okhttp:mockwebserver:2.4.0'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:1.9.5'
+    testImplementation 'com.squareup.okhttp:mockwebserver:2.4.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0'
 }
 

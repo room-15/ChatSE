@@ -100,7 +100,7 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
                 val result = JSONObject(jsonData)
 
                 //Get the emailHash attribute which contains either a link to Imgur or a hash for Gravatar
-                val hash = result.getString("emailHash").replace("!", "")
+                val hash = result.getString("email_hash").replace("!", "")
                 var imageLink = hash
                 //If Gravatar, create link
                 if (!hash.contains(".")) {
@@ -251,6 +251,10 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
                     }
                 //for twitter tweets, display the profile pic, profile name, and render the text. might need some css
                     "tweet" -> {
+                        val twitterUrl = Jsoup.parse(message.oneboxContent).getElementsByTag("a")[1].attr("href")
+                        messageView.setOnClickListener {
+                            itemView.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(twitterUrl)))
+                        }
                         messageView.background = ContextCompat.getDrawable(itemView.context, R.drawable.background_twitter)
                         messageView.setPadding(15, 15, 15, 15)
                         messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))

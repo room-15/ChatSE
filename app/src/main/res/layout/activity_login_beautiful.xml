@@ -48,22 +48,24 @@
                     android:layout_height="wrap_content">
 
 
-                    <android.support.v7.widget.Toolbar
-                        android:id="@+id/activity_login_toolbar"
+                    <TextView
+                        android:id="@+id/betaText"
                         android:layout_width="match_parent"
-                        android:layout_height="?attr/actionBarSize" />
-
+                        android:layout_height="wrap_content"
+                        android:text="@string/beta_text"
+                        android:gravity="center_horizontal"
+                        android:layout_marginTop="10dp"/>
 
                     <android.support.constraint.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/activity_login_toolbar"
+                        android:layout_below="@id/betaText"
                         android:paddingBottom="32dp"
                         android:paddingEnd="16dp"
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
                         android:paddingStart="16dp"
-                        android:paddingTop="24dp">
+                        android:paddingTop="16dp">
 
                         <ImageView
                             android:id="@+id/activity_login_iv_logo"

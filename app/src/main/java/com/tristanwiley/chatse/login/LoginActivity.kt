@@ -3,12 +3,14 @@ package com.tristanwiley.chatse.login
 import android.app.ProgressDialog
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
@@ -33,6 +35,7 @@ import java.io.IOException
  * @property prefs: Variable used to contain the default SharedPreferences for the app. Set to App.sharedPreferences
  */
 class LoginActivity : AppCompatActivity() {
+    lateinit var betaText: TextView
     lateinit var emailView: EditText
     lateinit var passwordView: EditText
     lateinit var loginButton: FloatingActionButton
@@ -66,7 +69,10 @@ class LoginActivity : AppCompatActivity() {
         emailView = findViewById(R.id.login_email)
         passwordView = findViewById(R.id.login_password)
         loginButton = findViewById(R.id.fab_submit)
-
+        betaText = findViewById(R.id.betaText)
+        betaText.setOnClickListener {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/room-15/ChatSE/")))
+        }
 
         //If the loginButton is clicked attempt a login.
         loginButton.setOnClickListener { attemptLogin() }
@@ -182,7 +188,7 @@ class LoginActivity : AppCompatActivity() {
                             email: String, password: String): Boolean {
 
         //Connect to /users/login and get the fkey, this key is necessary to login to the site.
-        val soFkey = Jsoup.connect(site + "/users/login/")
+        val soFkey = Jsoup.connect("$site/users/login/")
                 .userAgent(Client.USER_AGENT).get()
                 .select("input[name=fkey]").attr("value")
 
@@ -195,7 +201,7 @@ class LoginActivity : AppCompatActivity() {
 
         //The login request is built by combining the URL and the request body created earlier
         val soLoginRequest = Request.Builder()
-                .url(site + "/users/login/")
+                .url("$site/users/login/")
                 .post(soLoginRequestBody)
                 .build()
 
@@ -251,7 +257,7 @@ class LoginActivity : AppCompatActivity() {
     private fun loginToSE(client: Client) {
         //Build the request for logging into StackExchange
         val loginPageRequest = Request.Builder()
-                .url("http://stackexchange.com/users/login/")
+                .url("https://stackexchange.com/users/login/")
                 .build()
         //Execute the request so we can parse the response
         val loginPageResponse = client.newCall(loginPageRequest).execute()

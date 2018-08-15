@@ -270,6 +270,10 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
                         }
                     //for twitter tweets, display the profile pic, profile name, and render the text. might need some css
                         "tweet" -> {
+                            val twitterUrl = Jsoup.parse(message.oneboxContent).getElementsByTag("a")[1].attr("href")
+                            messageView.setOnClickListener {
+                                itemView.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(twitterUrl)))
+                            }
                             messageView.background = ContextCompat.getDrawable(itemView.context, R.drawable.background_twitter)
                             messageView.setPadding(15, 15, 15, 15)
                             messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))

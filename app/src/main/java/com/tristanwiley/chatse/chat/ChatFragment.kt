@@ -43,6 +43,7 @@ import com.tristanwiley.chatse.network.ClientManager
 import com.tristanwiley.chatse.stars.StarsActivity
 import kotlinx.android.synthetic.main.fragment_chat.view.*
 import kotlinx.android.synthetic.main.picker_footer.view.*
+import kotlinx.android.synthetic.main.room_item.*
 import org.codehaus.jackson.JsonNode
 import org.codehaus.jackson.map.ObjectMapper
 import org.jetbrains.anko.doAsync
@@ -120,6 +121,7 @@ class ChatFragment : Fragment(), IncomingEventListener {
         }
         //Set the EventList by the room number
         events = EventList(room.num)
+        (activity as ChatActivity).createRoom(room.site, roomName, room.num.toLong(), 0, chatFkey)
     }
 
     //When the fragment view is created
@@ -431,7 +433,6 @@ class ChatFragment : Fragment(), IncomingEventListener {
         activity.runOnUiThread {
             messageAdapter.update()
             usersAdapter.update()
-            (activity as ChatActivity).addRoomsToDrawer(chatFkey)
             loadMessagesLayout.isRefreshing = false
         }
     }
