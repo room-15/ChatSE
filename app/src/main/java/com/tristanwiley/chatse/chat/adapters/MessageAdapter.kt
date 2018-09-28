@@ -60,9 +60,8 @@ class MessageAdapter(
         private var messages: ArrayList<MessageEvent> = ArrayList(),
         private val messageCallback: ChatMessageCallback) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
-    override fun onBindViewHolder(viewHolder: MessageViewHolder?, pos: Int) {
+    override fun onBindViewHolder(holder: MessageViewHolder, pos: Int) {
         val message = messages[pos]
-        val holder = viewHolder as MessageAdapter.MessageViewHolder
         holder.bindMessage(message)
     }
 
@@ -75,7 +74,7 @@ class MessageAdapter(
         this.notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): MessageAdapter.MessageViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.list_item_message, parent, false)
         return MessageAdapter.MessageViewHolder(mContext, view, chatFkey, room, messageCallback)
     }
@@ -325,6 +324,10 @@ class MessageAdapter(
                         }
                     //for twitter tweets, display the profile pic, profile name, and render the text. might need some css
                         "tweet" -> {
+                            val twitterUrl = Jsoup.parse(message.oneboxContent).getElementsByTag("a")[1].attr("href")
+                            messageView.setOnClickListener {
+                                itemView.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(twitterUrl)))
+                            }
                             messageView.background = ContextCompat.getDrawable(itemView.context, R.drawable.background_twitter)
                             messageView.setPadding(15, 15, 15, 15)
                             messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))

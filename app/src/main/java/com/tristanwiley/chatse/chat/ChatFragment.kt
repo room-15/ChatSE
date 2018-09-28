@@ -3,6 +3,7 @@ package com.tristanwiley.chatse.chat
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -28,6 +29,8 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.GridHolder
 import com.squareup.okhttp.FormEncodingBuilder
@@ -44,8 +47,6 @@ import com.tristanwiley.chatse.network.ClientManager
 import com.tristanwiley.chatse.stars.StarsActivity
 import kotlinx.android.synthetic.main.fragment_chat.view.*
 import kotlinx.android.synthetic.main.picker_footer.view.*
-import org.codehaus.jackson.JsonNode
-import org.codehaus.jackson.map.ObjectMapper
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.json.JSONObject
@@ -99,28 +100,35 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
         val args = arguments
 
         //Get the fkey from the arguments
-        chatFkey = args.getString(ChatFragment.Companion.EXTRA_FKEY)
+        args?.getString(ChatFragment.EXTRA_FKEY)?.let {
+            chatFkey = it
+        }
 
         //Get the current ChatRoom from the arguments
-        room = args.getParcelable(ChatFragment.Companion.EXTRA_ROOM)
+        args?.getParcelable<ChatRoom>(ChatFragment.EXTRA_ROOM)?.let {
+            room = it
+        }
 
         //Get the roomName from the arguments
-        roomName = args.getString(ChatFragment.Companion.EXTRA_NAME)
+        args?.getString(ChatFragment.EXTRA_NAME)?.let {
+            roomName = it
+        }
 
         if (room.site == Client.SITE_STACK_OVERFLOW) {
             //Set the multitasking color to orange
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                activity.setTaskDescription(ActivityManager.TaskDescription((activity as AppCompatActivity).supportActionBar?.title.toString(), ActivityManager.TaskDescription().icon, ContextCompat.getColor(activity, R.color.stackoverflow_orange)))
+                (activity as ChatActivity).setTaskDescription(ActivityManager.TaskDescription((activity as AppCompatActivity).supportActionBar?.title.toString(), ActivityManager.TaskDescription().icon, ContextCompat.getColor(activity as ChatActivity, R.color.stackoverflow_orange)))
             }
 
         } else if (room.site == Client.SITE_STACK_EXCHANGE) {
             //Set the multitasking color to blue
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                activity.setTaskDescription(ActivityManager.TaskDescription((activity as AppCompatActivity).supportActionBar?.title.toString(), ActivityManager.TaskDescription().icon, ContextCompat.getColor(activity, R.color.stackexchange_blue)))
+                (activity as ChatActivity).setTaskDescription(ActivityManager.TaskDescription((activity as AppCompatActivity).supportActionBar?.title.toString(), ActivityManager.TaskDescription().icon, ContextCompat.getColor(activity as ChatActivity, R.color.stackexchange_blue)))
             }
         }
         //Set the EventList by the room number
         events = EventList(room.num)
+        (activity as ChatActivity).createRoom(room.site, roomName, room.num.toLong(), 0, chatFkey)
     }
 
     //When the fragment view is created
@@ -134,13 +142,13 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
         if (room.site == Client.SITE_STACK_OVERFLOW) {
             //Check version and set status bar color, theme already defaulted to SO
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                activity.window.statusBarColor = ContextCompat.getColor(activity, R.color.primary_dark)
+                (activity as ChatActivity).window.statusBarColor = ContextCompat.getColor(activity as ChatActivity, R.color.primary_dark)
             }
         } else if (room.site == Client.SITE_STACK_EXCHANGE) {
             //Set theme to SE and color to SE color
             contextThemeWrapper = ContextThemeWrapper(activity, R.style.AppTheme_SE)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                activity.window.statusBarColor = ContextCompat.getColor(activity, R.color.se_primary_dark)
+                (activity as ChatActivity).window.statusBarColor = ContextCompat.getColor(activity as ChatActivity, R.color.se_primary_dark)
             }
         }
 
@@ -161,7 +169,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
             dialog = DialogPlus.newDialog(activity)
                     .setContentHolder(GridHolder(2))
                     .setGravity(Gravity.CENTER)
-                    .setAdapter(UploadImageAdapter(activity))
+                    .setAdapter(UploadImageAdapter(activity as ChatActivity))
                     .setOnItemClickListener { _, _, _, position ->
                         when (position) {
                             0 -> {
@@ -172,9 +180,9 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
                             1 -> {
                                 //When you click on the gallery button, open a camera intent and get the result in onActivityResult
                                 //Request external storage permission
-                                if (ContextCompat.checkSelfPermission(activity, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                                if (ContextCompat.checkSelfPermission(activity as ChatActivity, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                        ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
+                                        ActivityCompat.requestPermissions(activity as ChatActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
                                     } else {
                                         openFileChooser()
                                     }
@@ -199,7 +207,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
         //Set all variables from layout
         input = view.findViewById(R.id.chat_input_text)
         messageList = view.findViewById(R.id.chat_message_list)
-        userList = activity.findViewById(R.id.room_users)
+        userList = (activity as ChatActivity).findViewById(R.id.room_users)
         loadMessagesLayout = view.findViewById(R.id.load_messages_layout)
 
         messageAdapter = MessageAdapter(activity, events, chatFkey, room, messageCallback = this)
@@ -209,8 +217,8 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
 //        messageList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))
         userList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         userList.adapter = usersAdapter
-        userList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.Companion.VERTICAL_LIST))
-
+        userList.addItemDecoration(CoreDividerItemDecoration(activity as ChatActivity, CoreDividerItemDecoration.Companion.VERTICAL_LIST))
+        usersAdapter.notifyDataSetChanged()
         //When you reach the top and swipe to load more, add 25 to the current loaded amount and load more
         loadMessagesLayout.setOnRefreshListener {
             currentLoadCount += 25
@@ -247,7 +255,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
 
                     uiThread {
                         //Create dialog
-                        val builder = AlertDialog.Builder(context)
+                        val builder = AlertDialog.Builder(context as Context)
 
                         //Set the dialog title to the room name
                         builder.setTitle(jsonResult.getString("name"))
@@ -257,7 +265,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
                         l.orientation = LinearLayout.VERTICAL
 
                         //Get the display density as a variable for use with padding
-                        val dpi = activity.resources.displayMetrics.density.toInt()
+                        val dpi = (activity as ChatActivity).resources.displayMetrics.density.toInt()
 
                         //Set the padding of the layout so it looks natural
                         l.setPadding((19 * dpi), (5 * dpi), (14 * dpi), (5 * dpi))
@@ -285,7 +293,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
                         l.addView(roomText)
 
                         //Create a FlowLayout (instead of LinearLayout so we can display multiple tags)
-                        val tagsLayout = FlowLayout(context)
+                        val tagsLayout = FlowLayout(context as Context)
 
                         //For each tag create a TextView
                         val tags = Jsoup.parse(jsonResult.getString("tags")).getElementsByClass("tag")
@@ -320,10 +328,10 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
 
                             //Set the background to a rectangle to look like it does on the web
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                tagview.background = ContextCompat.getDrawable(context, R.drawable.tag_background)
+                                tagview.background = ContextCompat.getDrawable(context as Context, R.drawable.tag_background)
                             } else {
                                 @Suppress("DEPRECATION")
-                                tagview.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.tag_background))
+                                tagview.setBackgroundDrawable(ContextCompat.getDrawable(context as Context, R.drawable.tag_background))
                             }
 
                             //Add the tag to the layout
@@ -425,14 +433,14 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
                 .mapNotNull { chatEventGenerator.createEvent(it) }
                 .filter { it.roomId == room.num }
                 .forEach {
-                    events.addEvent(it, this.activity, room)
+                    events.addEvent(it, (this.activity as ChatActivity), room)
                 }
 
         //Update adapters so we know to check for new events
-        activity.runOnUiThread {
+        (activity as ChatActivity).runOnUiThread {
             messageAdapter.update()
             usersAdapter.update()
-            (activity as ChatActivity).addRoomsToDrawer(chatFkey)
+            usersAdapter.notifyDataSetChanged()
             loadMessagesLayout.isRefreshing = false
         }
     }
@@ -504,7 +512,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
         var bitmap: Bitmap? = null
 
         return try {
-            inStream = activity.contentResolver.openInputStream(uri)
+            inStream = (activity as ChatActivity).contentResolver.openInputStream(uri)
             bitmap = BitmapFactory.decodeStream(inStream)
             val outStream = ByteArrayOutputStream()
             bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, outStream)

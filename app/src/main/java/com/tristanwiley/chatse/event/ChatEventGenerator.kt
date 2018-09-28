@@ -1,9 +1,8 @@
 package com.tristanwiley.chatse.event
 
 import android.util.Log
-import org.codehaus.jackson.JsonNode
-import org.codehaus.jackson.map.ObjectMapper
-
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import java.io.IOException
 
 /**
@@ -21,7 +20,7 @@ class ChatEventGenerator {
     fun createEvent(json: JsonNode): ChatEvent? {
         var c: ChatEvent? = null
         try {
-            c = mapper.readValue<ChatEvent>(json, ChatEvent::class.java)
+            c = mapper.readValue<ChatEvent>(json.asText(), ChatEvent::class.java)
         } catch (e: IOException) {
             Log.e("ChatEventGenerator", "Failed to map json", e)
         }

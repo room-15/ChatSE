@@ -102,9 +102,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         stackexchange_room_list.adapter = seRoomAdapter
         stackexchange_room_list.layoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
 
-        //Notify data is changed
-        soRoomAdapter.notifyDataSetChanged()
-        seRoomAdapter.notifyDataSetChanged()
+//        //Notify data is changed
+//        soRoomAdapter.notifyDataSetChanged()
+//        seRoomAdapter.notifyDataSetChanged()
 
         //Set toolbar as SupportActionBar
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -215,6 +215,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
      */
     fun addRoomsToDrawer(fkey: String) {
         val soID = defaultSharedPreferences.getInt("SOID", -1)
+        soRoomList.clear()
+        seRoomList.clear()
 
         doAsync {
             //If the user has a StackOverflow ID then load rooms
@@ -226,26 +228,24 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                         .build()
                 val response = client.newCall(soChatPageRequest).execute()
                 val jsonData = response.body().string()
+                Log.wtf("JSON", jsonData)
                 val result = JSONObject(jsonData)
 
-                //Clear all the rooms and make the text visible
-                soRoomList.clear()
                 runOnUiThread {
+                    //Clear all the rooms and make the text visible
                     so_header_text.visibility = View.VISIBLE
                     stackoverflow_room_list.visibility = View.VISIBLE
-                }
-                //For each room, create a room and add it to the list
-                val rooms = result.getJSONArray("rooms")
-                for (i in 0..(rooms.length() - 1)) {
-                    val room = rooms.getJSONObject(i)
-                    val roomName = room.getString("name")
-                    val roomNum = room.getLong("id")
-                    //Create room and add it to the list
-                    createRoom(Client.SITE_STACK_OVERFLOW, roomName, roomNum, 0, fkey)
-                }
-                //If the rooms are empty then remove the list and header
-                if (rooms.length() == 0) {
-                    runOnUiThread {
+                    //For each room, create a room and add it to the list
+                    val rooms = result.getJSONArray("rooms")
+                    for (i in 0..(rooms.length() - 1)) {
+                        val room = rooms.getJSONObject(i)
+                        val roomName = room.getString("name")
+                        val roomNum = room.getLong("id")
+                        //Create room and add it to the list
+                        createRoom(Client.SITE_STACK_OVERFLOW, roomName, roomNum, 0, fkey)
+                    }
+                    //If the rooms are empty then remove the list and header
+                    if (rooms.length() == 0) {
                         so_header_text.visibility = View.GONE
                         stackoverflow_room_list.visibility = View.GONE
                     }
@@ -269,8 +269,6 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                 val jsonData = response.body().string()
                 val result = JSONObject(jsonData)
 
-                //Clear all the rooms and make the text visible
-                seRoomList.clear()
                 runOnUiThread {
                     se_header_text.visibility = View.VISIBLE
                     stackexchange_room_list.visibility = View.VISIBLE
@@ -303,7 +301,12 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     /**
      * Create a room from the information we got in addRoomsToDrawer(), but get more information
      */
-    private fun createRoom(site: String, roomName: String, roomNum: Long, lastActive: Long, fkey: String) {
+    fun createRoom(site: String, roomName: String, roomNum: Long, lastActive: Long, fkey: String) {
+        if (site == Client.SITE_STACK_OVERFLOW) {
+            if (soRoomList.any { it.roomID == roomNum }) return
+        } else {
+            if (seRoomList.any { it.roomID == roomNum }) return
+        }
         doAsync {
             val client = ClientManager.client
 
@@ -331,8 +334,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     soRoomAdapter.notifyDataSetChanged()
                 }
             } else {
-                seRoomList.add(Room(roomName, roomNum, description, lastActive, isFavorite, tags, fkey))
                 runOnUiThread {
+                    seRoomList.add(Room(roomName, roomNum, description, lastActive, isFavorite, tags, fkey))
                     seRoomAdapter.notifyDataSetChanged()
                 }
             }
