@@ -1,13 +1,13 @@
 package com.tristanwiley.chatse.chat.service
 
 import android.util.Log
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.squareup.okhttp.Response
 import com.squareup.okhttp.ws.WebSocket
 import com.squareup.okhttp.ws.WebSocketListener
 import okio.Buffer
 import okio.BufferedSource
-import org.codehaus.jackson.JsonNode
-import org.codehaus.jackson.map.ObjectMapper
 
 import java.io.IOException
 

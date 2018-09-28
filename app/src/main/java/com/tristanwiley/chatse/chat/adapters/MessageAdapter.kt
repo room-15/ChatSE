@@ -55,9 +55,8 @@ import kotlin.collections.ArrayList
  */
 class MessageAdapter(private val mContext: Context, private val events: EventList, private val chatFkey: String?, val room: ChatRoom?, private var messages: ArrayList<MessageEvent> = ArrayList()) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
-    override fun onBindViewHolder(viewHolder: MessageViewHolder?, pos: Int) {
+    override fun onBindViewHolder(holder: MessageViewHolder, pos: Int) {
         val message = messages[pos]
-        val holder = viewHolder as MessageAdapter.MessageViewHolder
         holder.bindMessage(message)
     }
 
@@ -70,8 +69,8 @@ class MessageAdapter(private val mContext: Context, private val events: EventLis
         this.notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): MessageAdapter.MessageViewHolder {
-        val view = LayoutInflater.from(parent?.context).inflate(R.layout.list_item_message, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_message, parent, false)
         return MessageAdapter.MessageViewHolder(mContext, view, chatFkey, room)
     }
 

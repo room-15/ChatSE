@@ -9,6 +9,7 @@ import android.content.Intent
 import android.os.IBinder
 import android.support.v4.app.NotificationCompat
 import android.util.Log
+import com.fasterxml.jackson.databind.JsonNode
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.squareup.okhttp.ws.WebSocketCall
@@ -16,7 +17,6 @@ import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.chat.ChatActivity
 import com.tristanwiley.chatse.chat.ChatRoom
 import com.tristanwiley.chatse.network.Client
-import org.codehaus.jackson.JsonNode
 import org.json.JSONException
 import org.json.JSONObject
 import org.jsoup.Jsoup

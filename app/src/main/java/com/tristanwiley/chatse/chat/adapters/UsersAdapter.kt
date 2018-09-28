@@ -32,9 +32,8 @@ import org.json.JSONObject
 
 class UsersAdapter(private val mContext: Context, private val events: EventList, private var users: ArrayList<MessageEvent> = ArrayList()) : RecyclerView.Adapter<UsersAdapter.UsersViewHolder>() {
 
-    override fun onBindViewHolder(viewHolder: UsersAdapter.UsersViewHolder?, pos: Int) {
+    override fun onBindViewHolder(holder: UsersViewHolder, pos: Int) {
         val user = users[pos]
-        val holder = viewHolder as UsersAdapter.UsersViewHolder
         holder.bindMessage(user)
     }
 
@@ -45,8 +44,8 @@ class UsersAdapter(private val mContext: Context, private val events: EventList,
         this.notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): UsersAdapter.UsersViewHolder {
-        val view = LayoutInflater.from(parent?.context).inflate(R.layout.list_item_user, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UsersViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_user, parent, false)
         return UsersAdapter.UsersViewHolder(mContext, view)
     }
 

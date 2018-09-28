@@ -1,6 +1,6 @@
 package com.tristanwiley.chatse.chat.service
 
-import org.codehaus.jackson.JsonNode
+import com.fasterxml.jackson.databind.JsonNode
 
 interface IncomingEventListener {
     fun handleNewEvents(messagesJson: JsonNode)
