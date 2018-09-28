@@ -565,7 +565,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
 
     @SuppressLint("all")
     override fun onReplyMessage(id: Int) {
-        input.setText(":$id")
+        input.setText(":$id ")
         input.setSelection(input.length())
     }
 
