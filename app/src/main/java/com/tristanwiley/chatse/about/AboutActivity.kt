@@ -37,8 +37,8 @@ class AboutActivity : AppCompatActivity() {
         val collapsingToolbarLayout = findViewById<CollapsingToolbarLayout>(R.id.collapsing_toolbar)
         val appBarLayout = findViewById<AppBarLayout>(R.id.about_appbar_layout)
         appBarLayout.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
-            internal var isShow = false
-            internal var scrollRange = -1
+            var isShow = false
+            var scrollRange = -1
 
             override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
                 if (scrollRange == -1) {
@@ -155,10 +155,10 @@ class AboutActivity : AppCompatActivity() {
 
         val maukerPoko = DevPoko(
                 "Mauricio Pessoa",
-                "Software Engineer",
-                "Computer Science Master's Student on UFMA and a tech lover. Sometimes I also grab my Nikon and go out for some pictures.\n" +
+                "Android engineer",
+                "MSc. in Computer Science and a tech lover. Sometimes I also grab my Nikon and go out for some pictures.\n" +
                         "\n" +
-                        "I'm mostly an Android developer, but I also have other unhealthy obsessions.",
+                        "Love all things Android since the first Donut bite.",
                 R.drawable.dev_mauker,
                 generateAboutIconArray("https://github.com/mauker1", "", "https://stackoverflow.com/users/4070469/mauker", "mauricio.ufma@gmail.com", "https://twitter.com/mauker")
         )
@@ -173,16 +173,16 @@ class AboutActivity : AppCompatActivity() {
 
         val adamPoko = DevPoko(
                 "Adam McNeilly",
-                "Full stack Android developer",
-                "Android developer at HelloWorld, and author of @androidessence. Also an organizer for @GrizzHacks.",
+                "Full stack Android engineer",
+                "Android engineer at OkCupid, and author of @androidessence. Also an organizer for @GrizzHacks.",
                 R.drawable.dev_adam,
                 generateAboutIconArray("https://github.com/AdamMc331", "http://adammcneilly.com/", "https://stackoverflow.com/users/3131147/adammc331", "amcneilly331@gmail.com", "https://twitter.com/adammc331")
         )
 
         val ericPoko = DevPoko(
                 "Eric Cugota",
-                "Android developer",
-                "...",
+                "Mobile developer at Useit",
+                "Rugby aficionado, couch surfer.",
                 R.drawable.dev_eric,
                 generateAboutIconArray("https://github.com/tryadelion", "http://cugotaeric.wixsite.com/", "https://stackoverflow.com/users/4763177/cpteric", "", "https://twitter.com/lesirhype")
         )
@@ -194,8 +194,6 @@ class AboutActivity : AppCompatActivity() {
                 R.drawable.dev_nabah,
                 generateAboutIconArray("https://github.com/nrizvi", "http://www.nrizvi.me/", "", "", "")
         )
-
-
 
         devList.add(tristanPoko)
         devList.add(maukerPoko)
