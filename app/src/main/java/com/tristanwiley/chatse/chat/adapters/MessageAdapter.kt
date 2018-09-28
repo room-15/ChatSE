@@ -130,18 +130,22 @@ class MessageAdapter(
 
             actionSelfFlag.setOnClickListener {
                 // TODO
+                Toast.makeText(itemView.context, "Will be added soon.", Toast.LENGTH_LONG).show()
             }
 
             actionSelfEdit.setOnClickListener {
                 // TODO
+                Toast.makeText(itemView.context, "Will be added soon.", Toast.LENGTH_LONG).show()
             }
 
             actionSelfDelete.setOnClickListener {
                 // TODO
+                Toast.makeText(itemView.context, "Will be added soon.", Toast.LENGTH_LONG).show()
             }
 
             actionFlag.setOnClickListener {
                 // TODO
+                Toast.makeText(itemView.context, "Will be added soon.", Toast.LENGTH_LONG).show()
             }
 
             actionStar.setOnClickListener {
