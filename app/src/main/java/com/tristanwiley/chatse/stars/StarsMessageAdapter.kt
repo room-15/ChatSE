@@ -109,7 +109,7 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
 
                 uiThread {
                     //Load it into the ImageView!
-                    Glide.with(mContext)
+                    Glide.with(itemView.context)
                             .asBitmap()
                             .load(imageLink)
                             .into(object : SimpleTarget<Bitmap>() {
