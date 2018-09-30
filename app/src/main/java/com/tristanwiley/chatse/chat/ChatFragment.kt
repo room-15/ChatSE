@@ -198,7 +198,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
                     .create()
 
             //If uploading from URL, upload url to Imgur
-            dialog.footerView.footer_confirm_button.setOnClickListener {
+            dialog.footerView.footer_confirm_button.setOnClickListener { _ ->
                 uploadToImgur(dialog.footerView.footer_url_box.text.toString())
             }
             dialog.show()
@@ -210,8 +210,8 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
         userList = (activity as ChatActivity).findViewById(R.id.room_users)
         loadMessagesLayout = view.findViewById(R.id.load_messages_layout)
 
-        messageAdapter = MessageAdapter(activity, events, chatFkey, room, messageCallback = this)
-        usersAdapter = UsersAdapter(activity, events)
+        messageAdapter = MessageAdapter(context!!, events, chatFkey, room, messageCallback = this)
+        usersAdapter = UsersAdapter(context!!, events)
         messageList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, true)
         messageList.adapter = messageAdapter
 //        messageList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))

@@ -76,6 +76,7 @@ class MessageAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.list_item_message, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_message, parent, false)
         return MessageAdapter.MessageViewHolder(mContext, view, chatFkey, room, messageCallback)
     }
 
@@ -180,10 +181,10 @@ class MessageAdapter(
                             .asBitmap()
                             .load(imageLink)
                             .into(object : SimpleTarget<Bitmap>() {
-                                override fun onResourceReady(result: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>) {
+                                override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
                                     //Load it into the ImageView!
-                                    userPicture.setImageBitmap(result)
-                                    userBarBottom.setBackgroundColor(getDominantColor(result))
+                                    userPicture.setImageBitmap(resource)
+                                    userBarBottom.setBackgroundColor(getDominantColor(resource))
                                 }
                             })
                 }

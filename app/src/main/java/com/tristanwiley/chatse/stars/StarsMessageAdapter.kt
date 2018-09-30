@@ -113,10 +113,10 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
                             .asBitmap()
                             .load(imageLink)
                             .into(object : SimpleTarget<Bitmap>() {
-                                override fun onResourceReady(result: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>) {
+                                override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
                                     //Load it into the ImageView!
-                                    userPicture.setImageBitmap(result)
-                                    userBarBottom.setBackgroundColor(getDominantColor(result))
+                                    userPicture.setImageBitmap(resource)
+                                    userBarBottom.setBackgroundColor(getDominantColor(resource))
                                 }
                             })
                 }
