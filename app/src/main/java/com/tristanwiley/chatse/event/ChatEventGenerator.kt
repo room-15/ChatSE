@@ -20,7 +20,7 @@ class ChatEventGenerator {
     fun createEvent(json: JsonNode): ChatEvent? {
         var c: ChatEvent? = null
         try {
-            c = mapper.readValue<ChatEvent>(json.asText(), ChatEvent::class.java)
+            c = mapper.readValue<ChatEvent>(json.toString(), ChatEvent::class.java)
         } catch (e: IOException) {
             Log.e("ChatEventGenerator", "Failed to map json", e)
         }
