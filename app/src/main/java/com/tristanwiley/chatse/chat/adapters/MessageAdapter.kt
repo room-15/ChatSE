@@ -134,13 +134,11 @@ class MessageAdapter(
             }
 
             actionSelfEdit.setOnClickListener {
-                // TODO
-                Toast.makeText(itemView.context, "Will be added soon.", Toast.LENGTH_LONG).show()
+                showEditDialog(message, mContext)
             }
 
             actionSelfDelete.setOnClickListener {
-                // TODO
-                Toast.makeText(itemView.context, "Will be added soon.", Toast.LENGTH_LONG).show()
+                deleteMessage(message.messageId, chatFkey)
             }
 
             actionFlag.setOnClickListener {
@@ -190,6 +188,11 @@ class MessageAdapter(
             }
 
             itemView.setOnClickListener {
+                isSelected = !isSelected
+                checkIfSelected(message.messageStars > 0, message.userId.toInt())
+            }
+
+            messageView.setOnClickListener {
                 isSelected = !isSelected
                 checkIfSelected(message.messageStars > 0, message.userId.toInt())
             }
@@ -359,17 +362,6 @@ class MessageAdapter(
                 }
             }
 
-            //On long clicking the itemView, show a dialog that allows you to edit, delete, or star, depending on the ownership of the message
-            itemView.setOnLongClickListener {
-                loadMessageActionDialog(message)
-                true
-            }
-
-            messageView.setOnLongClickListener {
-                loadMessageActionDialog(message)
-                true
-            }
-
             //Set the username view to the message's user's name
             userNameView.text = message.userName
 
@@ -410,74 +402,10 @@ class MessageAdapter(
                     actionStar.setColorFilter(Color.BLACK)
             }
             else {
-
                 rootMessageLayout.setBackgroundColor(bgColor)
                 footerSelf.visibility = View.GONE
                 footerOthers.visibility = View.GONE
             }
-        }
-
-        private fun loadMessageActionDialog(message: MessageEvent) {
-            //Initiate a list of Strings, the current user ID, and a Boolean to determine if it's the user's message
-            val dialogMessages = mutableListOf<String>()
-            val isUserMessage: Boolean
-
-            //Set the user ID depending on the site
-            val curUserId: Int = if (room?.site == Client.SITE_STACK_OVERFLOW) {
-                mContext.defaultSharedPreferences.getInt("SOID", -1)
-            } else {
-                mContext.defaultSharedPreferences.getInt("SEID", -1)
-            }
-
-            //Determine if it's the user's message
-            isUserMessage = curUserId == message.userId.toInt()
-
-            //If it's not the user's message, set the dialog messages to starring. Otherwise, let them delete and edit it!
-            if (curUserId != -1) {
-                if (isUserMessage) {
-                    dialogMessages.add(mContext.getString(R.string.edit_message))
-                    dialogMessages.add(mContext.getString(R.string.delete_message))
-                } else {
-                    dialogMessages.add(mContext.getString(R.string.star_message))
-                }
-            }
-
-            //Show the dialog
-            val dialog = DialogPlus.newDialog(mContext)
-                    .setContentHolder(ListHolder())
-                    .setGravity(Gravity.CENTER)
-                    .setAdapter(ModifyMessageAdapter(dialogMessages, mContext))
-                    .setOnItemClickListener { plusDialog, _, _, position ->
-                        //The clicking of items depends on how many and whether it's the user's message
-                        if (isUserMessage) {
-                            when (position) {
-                                0 -> {
-                                    //Show the dialog letting the user edit their message
-                                    showEditDialog(message, mContext, plusDialog)
-                                }
-                                1 -> {
-                                    //Delete message
-                                    deleteMessage(message.messageId, chatFkey)
-                                    plusDialog.dismiss()
-                                }
-                            }
-                        } else {
-                            when (position) {
-                                0 -> {
-                                    //Star the message
-                                    starMessage(message.messageId, chatFkey)
-                                    plusDialog.dismiss()
-                                }
-                            }
-                        }
-                    }
-                    //Set some nice padding
-                    .setPadding(50, 50, 50, 50)
-                    //Create the dialog
-                    .create()
-
-            //Show the dialog
-            dialog.show()
         }
 
         /**
@@ -531,7 +459,7 @@ class MessageAdapter(
          * @param mContext: Application context
          * @param plusDialog: DialogPlus so we can dismiss
          */
-        private fun showEditDialog(message: MessageEvent, mContext: Context, plusDialog: DialogPlus) {
+        private fun showEditDialog(message: MessageEvent, mContext: Context) {
             //Create AlertDialog
             val builder = AlertDialog.Builder(mContext)
 
@@ -545,6 +473,7 @@ class MessageAdapter(
             //Create EditText and populate with current message text
             val input = EditText(mContext)
             input.setText(message.content, TextView.BufferType.EDITABLE)
+            input.setSelection(input.length())
 
             //Set EditText layoutparams and add to view
             input.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
@@ -554,18 +483,16 @@ class MessageAdapter(
             builder.setView(l)
 
             //When you press okay, call the function to edit the message
-            builder.setPositiveButton("OK", { dialog, _ ->
+            builder.setPositiveButton("OK") { dialog, _ ->
                 editMessage(input.text.toString(), message.messageId, chatFkey)
 
-                //Dismiss both dialogs
                 dialog.dismiss()
-                plusDialog.dismiss()
-            })
+            }
 
             //Cancel the AlertDialog and dismiss
-            builder.setNegativeButton("Cancel", { dialog, _ ->
+            builder.setNegativeButton("Cancel") { dialog, _ ->
                 dialog.cancel()
-            })
+            }
 
             builder.show()
         }
