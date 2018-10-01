@@ -176,7 +176,7 @@ class MessageAdapter(
                 }
 
                 uiThread {
-                    Glide.with(itemView.context)
+                    Glide.with(itemView.context.applicationContext)
                             .asBitmap()
                             .load(imageLink)
                             .into(object : SimpleTarget<Bitmap>() {
