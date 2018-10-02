@@ -71,5 +71,5 @@
         app:layout_constraintBottom_toTopOf="@+id/login_email"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/sologo" />
+        app:srcCompat="@drawable/logo_chatse" />
 </android.support.constraint.ConstraintLayout>
