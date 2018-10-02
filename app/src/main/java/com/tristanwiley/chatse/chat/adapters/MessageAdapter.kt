@@ -182,6 +182,8 @@ class MessageAdapter(
 
             actionReply.setOnClickListener {
                 messageCallback.onReplyMessage(message.messageId)
+                selectionListener.deselectMessage(message.messageId)
+                checkIfSelected(selectionListener.isSelected(message.messageId), message.messageStars > 0, message.userId.toInt())
             }
 
             //Load the profile pictures! Create a request to get the url for the picture
