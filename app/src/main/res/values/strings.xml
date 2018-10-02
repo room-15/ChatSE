@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">ChatSE</string>
+
+    <string name="app_version">V: %1$s</string>
+
     <string name="hello_world">Hello world!</string>
     <string name="action_logout">Logout</string>
     <string name="title_activity_login">LoginActivity</string>

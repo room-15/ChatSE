@@ -15,15 +15,18 @@ import android.widget.Toast
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.App
+import com.tristanwiley.chatse.BuildConfig
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.chat.ChatActivity
 import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
+import kotlinx.android.synthetic.main.activity_login_beautiful.*
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.io.IOException
+import java.util.*
 
 
 /**
@@ -56,6 +59,8 @@ class LoginActivity : AppCompatActivity() {
 
         //If the user has not logged in already, display the chat login layout
         setContentView(R.layout.activity_login_beautiful)
+
+        activity_login_tv_version.text = String.format(Locale.getDefault(),getString(R.string.app_version), BuildConfig.VERSION_NAME)
 
         dialog = ProgressDialog(this)
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
