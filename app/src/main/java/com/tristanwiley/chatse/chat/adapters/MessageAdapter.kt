@@ -48,6 +48,7 @@ import org.jsoup.Jsoup
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 /**
  * The beautiful adapter that handles all new messages in the chat
@@ -58,7 +59,19 @@ class MessageAdapter(
         private val chatFkey: String?,
         val room: ChatRoom?,
         private var messages: ArrayList<MessageEvent> = ArrayList(),
-        private val messageCallback: ChatMessageCallback) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
+        private val messageCallback: ChatMessageCallback) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>(), SelectedMessagesListener {
+
+    private val selectedMessages: HashSet<Int> = HashSet()
+
+    override fun selectMessage(mId: Int) {
+        selectedMessages.add(mId)
+    }
+
+    override fun deselectMessage(mId: Int) {
+        selectedMessages.remove(mId)
+    }
+
+    override fun isSelected(mId: Int): Boolean = selectedMessages.contains(mId)
 
     override fun onBindViewHolder(holder: MessageViewHolder, pos: Int) {
         val message = messages[pos]
@@ -76,7 +89,7 @@ class MessageAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_message, parent, false)
-        return MessageAdapter.MessageViewHolder(mContext, view, chatFkey, room, messageCallback)
+        return MessageAdapter.MessageViewHolder(mContext, view, chatFkey, room, messageCallback, this)
     }
 
     override fun getItemCount() = messages.size
@@ -84,7 +97,11 @@ class MessageAdapter(
     /**
      * ViewHolder that handles setting all content in itemView
      */
-    class MessageViewHolder(private val mContext: Context, itemView: View, private val chatFkey: String?, val room: ChatRoom?, val messageCallback: ChatMessageCallback) : RecyclerView.ViewHolder(itemView) {
+    class MessageViewHolder(private val mContext: Context,
+                            itemView: View, private val chatFkey: String?,
+                            val room: ChatRoom?, private val messageCallback: ChatMessageCallback,
+                            private val selectionListener: SelectedMessagesListener) : RecyclerView.ViewHolder(itemView) {
+
         private val root: LinearLayout = itemView.findViewById(R.id.message_root)
         private val rootMessageLayout = itemView.findViewById<ConstraintLayout>(R.id.message_root_container)
         private val timestampFormat = SimpleDateFormat("hh:mm aa", Locale.getDefault())
@@ -101,9 +118,9 @@ class MessageAdapter(
         private var isFullSize: Boolean = false
         private var origWidth = 0
         private var origHeight = 0
-        private var isSelected = false
+//        private var isSelected = false
 
-        private val footer: View = itemView.findViewById(R.id.message_footer_actions)
+//        private val footer: View = itemView.findViewById(R.id.message_footer_actions)
 
         private val footerOthers: View = itemView.findViewById(R.id.footer_actions_others)
         private val footerSelf: View = itemView.findViewById(R.id.footer_actions_self)
@@ -117,6 +134,18 @@ class MessageAdapter(
         private val actionReply: ImageButton = itemView.findViewById(R.id.action_others_reply)
 
         private var bgColor: Int = Color.WHITE
+
+        private fun toggleSelection(message: MessageEvent) {
+            if (!message.isDeleted) {
+                if (selectionListener.isSelected(message.messageId)) {
+                    selectionListener.deselectMessage(message.messageId)
+                }
+                else {
+                    selectionListener.selectMessage(message.messageId)
+                }
+                checkIfSelected(selectionListener.isSelected(message.messageId), message.messageStars > 0, message.userId.toInt())
+            }
+        }
 
         fun bindMessage(message: MessageEvent) {
             //Hide elements in case not used
@@ -139,6 +168,7 @@ class MessageAdapter(
 
             actionSelfDelete.setOnClickListener {
                 deleteMessage(message.messageId, chatFkey)
+                selectionListener.deselectMessage(message.messageId)
             }
 
             actionFlag.setOnClickListener {
@@ -188,14 +218,14 @@ class MessageAdapter(
             }
 
             itemView.setOnClickListener {
-                isSelected = !isSelected
-                checkIfSelected(message.messageStars > 0, message.userId.toInt())
+                toggleSelection(message)
             }
 
             messageView.setOnClickListener {
-                isSelected = !isSelected
-                checkIfSelected(message.messageStars > 0, message.userId.toInt())
+                toggleSelection(message)
             }
+
+            checkIfSelected(selectionListener.isSelected(message.messageId), message.messageStars > 0, message.userId.toInt())
 
             // Setting background color based on the SE chat the user is logged in.
             bgColor = if (room?.site == Client.SITE_STACK_OVERFLOW) {
@@ -372,7 +402,7 @@ class MessageAdapter(
             editIndicator.visibility = if (message.isEdited) View.VISIBLE else View.INVISIBLE
         }
 
-        private fun checkIfSelected(isStarred: Boolean, messageUid: Int) {
+        private fun checkIfSelected(isSelected: Boolean, isStarred: Boolean, messageUid: Int) {
             // TODO - Move this somewhere else.
             //Set the user ID depending on the site
             val curUserId: Int = if (room?.site == Client.SITE_STACK_OVERFLOW) {
@@ -396,7 +426,7 @@ class MessageAdapter(
                     footerOthers.visibility = View.VISIBLE
                 }
 
-                if (isStarred && (curUserId == messageUid))
+                if (isStarred && (curUserId != messageUid))
                     actionStar.setColorFilter(ContextCompat.getColor(mContext, R.color.star_starred))
                 else
                     actionStar.setColorFilter(Color.BLACK)
@@ -485,7 +515,7 @@ class MessageAdapter(
             //When you press okay, call the function to edit the message
             builder.setPositiveButton("OK") { dialog, _ ->
                 editMessage(input.text.toString(), message.messageId, chatFkey)
-
+                selectionListener.deselectMessage(message.messageId)
                 dialog.dismiss()
             }
 
