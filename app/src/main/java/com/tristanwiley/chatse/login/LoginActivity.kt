@@ -81,12 +81,12 @@ class LoginActivity : AppCompatActivity() {
         emailView.setText(prefs.getString(App.PREF_EMAIL, ""))
 
         //When the user presses submit inside the passwordView, attempt a login.
-        passwordView.setOnEditorActionListener({ _, id, _ ->
+        passwordView.setOnEditorActionListener { _, id, _ ->
             if (id == R.id.fab_submit || id == EditorInfo.IME_NULL) {
                 attemptLogin()
             }
             false
-        })
+        }
     }
 
     /**
