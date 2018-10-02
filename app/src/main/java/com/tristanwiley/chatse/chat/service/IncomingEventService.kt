@@ -99,7 +99,7 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
     }
 
     override fun onConnect(site: String, success: Boolean) {
-        siteStatuses.put(site, WebsocketConnectionStatus.ESTABLISHED)
+        siteStatuses[site] = WebsocketConnectionStatus.ESTABLISHED
     }
 
     @Throws(IOException::class)
@@ -160,7 +160,7 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
                 .addHeader("Sec-WebSocket-Extensions", "permessage-deflate")
                 .addHeader("Sec-WebSocket-Extensions", "client_max_window_bits")
                 .addHeader("Origin", site)
-                .url(wsUrl + "?l=0")
+                .url("$wsUrl?l=0")
                 .build()
         val wsCall = WebSocketCall.create(client.httpClient, wsRequest)
         wsCall.enqueue(ChatWebSocketListener(site, this))
