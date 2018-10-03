@@ -154,6 +154,7 @@ class LoginActivity : AppCompatActivity() {
                     loginToSE(client)
                     loginToSite(client, "https://stackoverflow.com", email, password)
                     runOnUiThread {
+                        dialog.dismiss()
                         prefs.edit().putBoolean(UserPreferenceKeys.IS_LOGGED_IN, true).apply()
                         this@LoginActivity.startActivity(Intent(this@LoginActivity, ChatActivity::class.java))
                         this@LoginActivity.finish()
