@@ -1,6 +1,5 @@
 package com.tristanwiley.chatse.login
 
-import android.app.ProgressDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -17,6 +16,8 @@ import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import com.tristanwiley.chatse.util.SharedPreferenceManager
 import com.tristanwiley.chatse.util.UserPreferenceKeys
+import com.tristanwiley.chatse.util.hide
+import com.tristanwiley.chatse.util.show
 import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
@@ -29,22 +30,11 @@ class LoginActivity : AppCompatActivity() {
 
     private val prefs = SharedPreferenceManager.sharedPreferences
 
-    //TODO: Replace deprecated version. Ticket is #50
-    lateinit var dialog: ProgressDialog
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
         login_tv_version.text = String.format(Locale.getDefault(), getString(R.string.app_version), BuildConfig.VERSION_NAME)
-
-        dialog = ProgressDialog(this)
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
-        dialog.setMessage("Attempting to log in")
-        dialog.isIndeterminate = true
-        dialog.setTitle("Loading")
-        dialog.setCancelable(false)
-        dialog.setCanceledOnTouchOutside(false)
 
         beta_text.setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/room-15/ChatSE/")))
@@ -80,7 +70,7 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        dialog.show()
+        progress_bar_logging_in.show()
 
         loginToSites(login_email.text.toString(), login_password.text.toString())
     }
@@ -142,7 +132,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                 } else {
                     runOnUiThread {
-                        dialog.dismiss()
+                        progress_bar_logging_in.hide()
                         fab_submit.isClickable = true
                         Toast.makeText(this@LoginActivity, "Failed to log in, try again!", Toast.LENGTH_LONG).show()
                     }

@@ -73,6 +73,19 @@
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/login_iv_logo" />
 
+                <ProgressBar
+                    android:id="@+id/progress_bar_logging_in"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/login_tv_header"
+                    app:layout_constraintStart_toEndOf="@id/login_tv_header"
+                    app:layout_constraintTop_toTopOf="@id/login_tv_header"
+                    tools:visibility="visible" />
+
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/login_til_user"
                     android:layout_width="0dp"
