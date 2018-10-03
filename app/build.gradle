@@ -47,6 +47,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+
     // Crashlytics Kit
     implementation('com.crashlytics.sdk.android:crashlytics:2.9.4@aar') {
         transitive = true
@@ -68,10 +69,12 @@ dependencies {
     implementation 'me.saket:better-link-movement-method:1.2'
     implementation 'com.github.gabrielemariotti.changeloglib:changelog:2.1.0'
     implementation 'com.github.bumptech.glide:glide:4.7.1'
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-core:1.9.5'
-    testImplementation 'com.squareup.okhttp:mockwebserver:2.4.0'
     kapt 'com.github.bumptech.glide:compiler:4.7.1'
+
+    // Testing
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.0.0-RC2"
+    testImplementation 'com.squareup.okhttp:mockwebserver:2.4.0'
 }
 
 apply plugin: 'kotlin-android-extensions'

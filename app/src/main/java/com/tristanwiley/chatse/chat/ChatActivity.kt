@@ -34,10 +34,11 @@ import com.tristanwiley.chatse.login.LoginActivity
 import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import com.tristanwiley.chatse.network.cookie.PersistentCookieStore
+import com.tristanwiley.chatse.util.SharedPreferenceManager
+import com.tristanwiley.chatse.util.UserPreferenceKeys
 import com.tristanwiley.chatse.views.DividerItemDecoration
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.room_nav_header.*
-import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.json.JSONException
@@ -62,13 +63,14 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     private lateinit var soRoomAdapter: RoomAdapter
     private lateinit var seRoomAdapter: RoomAdapter
     private var isBound = false
+    private val prefs = SharedPreferenceManager.sharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.activity_chat)
 
 /*        //If the user is still logged in then continue, otherwise logout
-        if (defaultSharedPreferences.getBoolean(App.PREF_HAS_CREDS, false)) {
+        if (prefs.getBoolean(App.PREF_HAS_CREDS, false)) {
             //If the user came from a deep link, continue
             if (intent.action == Intent.ACTION_VIEW) {
                 //Check if it's SO or SE
@@ -131,8 +133,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
      * Function to load user data and set it to the NavigationDrawer header
      */
     private fun loadUserData() {
-        val userID = defaultSharedPreferences.getInt("SOID", -1)
-        val seID = defaultSharedPreferences.getInt("SEID", -1)
+        val userID = prefs.getInt("SOID", -1)
+        val seID = prefs.getInt("SEID", -1)
 
         //Does the user have a SO account? What about SE?
         when {
@@ -145,7 +147,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                 val jsonResult = JSONObject(response.body().string())
                 uiThread {
                     userName.text = jsonResult.getString("name")
-                    userEmail.text = defaultSharedPreferences.getString("email", "")
+                    userEmail.text = prefs.getString("email", "")
                 }
             }
             seID != -1 -> doAsync {
@@ -157,7 +159,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                 val jsonResult = JSONObject(response.body().string())
                 uiThread {
                     userName.text = jsonResult.getString("name")
-                    userEmail.text = defaultSharedPreferences.getString("email", "")
+                    userEmail.text = prefs.getString("email", "")
                 }
             }
             else -> Log.e("ChatActivity", "Userid not found")
@@ -178,7 +180,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         }
 
         //Load a default room
-        loadChatFragment(ChatRoom(defaultSharedPreferences.getString("lastRoomSite", Client.SITE_STACK_OVERFLOW), defaultSharedPreferences.getInt("lastRoomNum", 15)))
+        loadChatFragment(ChatRoom(prefs.getString("lastRoomSite", Client.SITE_STACK_OVERFLOW), prefs.getInt("lastRoomNum", 15)))
     }
 
     /**
@@ -191,7 +193,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
             unbindService(this)
             isBound = false
         }
-        if (!defaultSharedPreferences.getBoolean(App.PREF_HAS_CREDS, false)) {
+        if (!prefs.getBoolean(UserPreferenceKeys.IS_LOGGED_IN, false)) {
             PersistentCookieStore(App.instance).removeAll()
             startActivity(Intent(applicationContext, LoginActivity::class.java))
             finish()
@@ -214,7 +216,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
      * Add all the rooms that the user is in to the NavigationDrawer
      */
     fun addRoomsToDrawer(fkey: String) {
-        val soID = defaultSharedPreferences.getInt("SOID", -1)
+        val soID = prefs.getInt("SOID", -1)
         soRoomList.clear()
         seRoomList.clear()
 
@@ -258,7 +260,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
             }
 
             //If the user has a StackExchange ID then load rooms
-            val seID = defaultSharedPreferences.getInt("SEID", -1)
+            val seID = prefs.getInt("SEID", -1)
             if (seID != -1) {
                 val client = ClientManager.client
 
@@ -433,7 +435,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                 }
             //Logout of app by clearing all SharedPreferences and loading the LoginActivity
                 R.id.action_logout -> {
-                    defaultSharedPreferences.edit().clear().apply()
+                    prefs.edit().clear().apply()
                     finish()
                 }
             //This is handled by the ChatFragment
@@ -453,7 +455,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         doAsync {
             addChatFragment(createChatFragment(room))
         }
-        defaultSharedPreferences.edit().putString("lastRoomSite", room.site).putInt("lastRoomNum", room.num).apply()
+        prefs.edit().putString("lastRoomSite", room.site).putInt("lastRoomNum", room.num).apply()
         drawer_layout.closeDrawers()
     }
 
