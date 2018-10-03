@@ -25,20 +25,5 @@ class UserPreferenceKeys {
          * Whether or not the user is logged in.
          */
         const val IS_LOGGED_IN = "is_logged_in"
-
-        /**
-         * Key for passing the room number as an intent extra.
-         */
-        const val EXTRA_ROOM_NUM = "room"
-
-        /**
-         * Key for passing the site name as an intent extra.
-         */
-        const val EXTRA_SITE = "site"
-
-        /**
-         * Key for passing the fkey as an intent extra.
-         */
-        const val EXTRA_FKEY = "fkey"
     }
 }
