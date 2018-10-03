@@ -4,12 +4,9 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
@@ -28,21 +25,10 @@ import org.jsoup.Jsoup
 import java.io.IOException
 import java.util.*
 
-
-/**
- * Activity to login the user.
- *
- * @property emailView: The EditText used to take in the user's email
- * @property passwordView: The EditText used to take in the user's password
- * @property dialog: The ProgressBar displayed while the authentication is being performed
- * @property prefs: Variable used to contain the default SharedPreferences for the app. Set to App.sharedPreferences
- */
 class LoginActivity : AppCompatActivity() {
+
     private val prefs = SharedPreferenceManager.sharedPreferences
-    lateinit var betaText: TextView
-    lateinit var emailView: EditText
-    lateinit var passwordView: EditText
-    lateinit var loginButton: FloatingActionButton
+
     //TODO: Replace deprecated version. Ticket is #50
     lateinit var dialog: ProgressDialog
 
@@ -50,7 +36,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login_beautiful)
 
-        activity_login_tv_version.text = String.format(Locale.getDefault(), getString(R.string.app_version), BuildConfig.VERSION_NAME)
+        login_tv_version.text = String.format(Locale.getDefault(), getString(R.string.app_version), BuildConfig.VERSION_NAME)
 
         dialog = ProgressDialog(this)
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
@@ -60,23 +46,15 @@ class LoginActivity : AppCompatActivity() {
         dialog.setCancelable(false)
         dialog.setCanceledOnTouchOutside(false)
 
-        // Set variables to the layout
-        emailView = findViewById(R.id.login_email)
-        passwordView = findViewById(R.id.login_password)
-        loginButton = findViewById(R.id.fab_submit)
-        betaText = findViewById(R.id.betaText)
-        betaText.setOnClickListener {
+        beta_text.setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/room-15/ChatSE/")))
         }
 
-        //If the loginButton is clicked attempt a login.
-        loginButton.setOnClickListener { attemptLogin() }
+        fab_submit.setOnClickListener { attemptLogin() }
 
-        //Set the emailView text to the email saved in the preferences.
-        emailView.setText(prefs.getString(UserPreferenceKeys.EMAIL, ""))
+        login_email.setText(prefs.getString(UserPreferenceKeys.EMAIL, ""))
 
-        //When the user presses submit inside the passwordView, attempt a login.
-        passwordView.setOnEditorActionListener { _, id, _ ->
+        login_password.setOnEditorActionListener { _, id, _ ->
             if (id == R.id.fab_submit || id == EditorInfo.IME_NULL) {
                 attemptLogin()
             }
@@ -88,20 +66,20 @@ class LoginActivity : AppCompatActivity() {
      * Receives the input from the email and password views.
      */
     private fun attemptLogin() {
-        loginButton.isClickable = false
+        fab_submit.isClickable = false
 
         // Reset errors.
-        emailView.error = null
-        passwordView.error = null
+        login_email.error = null
+        login_password.error = null
 
         if (!validateInputs()) {
-            loginButton.isClickable = true
+            fab_submit.isClickable = true
             return
         }
 
         dialog.show()
 
-        loginToSites(emailView.text.toString(), passwordView.text.toString())
+        loginToSites(login_email.text.toString(), login_password.text.toString())
     }
 
     /**
@@ -109,21 +87,21 @@ class LoginActivity : AppCompatActivity() {
      */
     private fun validateInputs(): Boolean {
         var isValid = true
-        val email = emailView.text.toString()
-        val password = passwordView.text.toString()
+        val email = login_email.text.toString()
+        val password = login_password.text.toString()
 
         if (!isEmailValid(email)) {
-            emailView.error = getString(R.string.err_invalid_email)
+            login_email.error = getString(R.string.err_invalid_email)
             isValid = false
         }
 
         if (email.isEmpty()) {
-            emailView.error = getString(R.string.err_blank_email)
+            login_email.error = getString(R.string.err_blank_email)
             isValid = false
         }
 
         if (password.isBlank()) {
-            passwordView.error = getString(R.string.err_blank_password)
+            login_email.error = getString(R.string.err_blank_password)
             isValid = false
         }
 
@@ -162,7 +140,7 @@ class LoginActivity : AppCompatActivity() {
                 } else {
                     runOnUiThread {
                         dialog.dismiss()
-                        loginButton.isClickable = true
+                        fab_submit.isClickable = true
                         Toast.makeText(this@LoginActivity, "Failed to log in, try again!", Toast.LENGTH_LONG).show()
                     }
                 }
