@@ -78,39 +78,33 @@ class LoginActivity : AppCompatActivity() {
      */
     private fun validateInputs(): Boolean {
         var isValid = true
+
         val email = login_email.text.toString()
         val password = login_password.text.toString()
-
-        if (!isEmailValid(email)) {
-            login_email.error = getString(R.string.err_invalid_email)
-            isValid = false
-        }
 
         if (email.isEmpty()) {
             login_email.error = getString(R.string.err_blank_email)
             isValid = false
+        } else if (!isEmailValid(email)) {
+            login_email.error = getString(R.string.err_invalid_email)
+            isValid = false
         }
 
         if (password.isBlank()) {
-            login_email.error = getString(R.string.err_blank_password)
+            login_password.error = getString(R.string.err_blank_password)
             isValid = false
         }
 
         return isValid
     }
 
-    private fun isEmailValid(email: String): Boolean {
-        return email.matches(Patterns.EMAIL_ADDRESS.toRegex())
-    }
+    private fun isEmailValid(email: String) = email.matches(Patterns.EMAIL_ADDRESS.toRegex())
 
     /**
-     * Function that uses Anko's doAsync to login to all sites
+     * Log in to all sites.
      */
-    private fun loginToSites(vararg params: String) {
+    private fun loginToSites(email: String, password: String) {
         doAsync {
-            val email = params[0]
-            val password = params[1]
-
             try {
                 val client = ClientManager.client
 
@@ -136,41 +130,36 @@ class LoginActivity : AppCompatActivity() {
     }
 
     /**
-     * Logins to site, takes in 4 params
-     * @param client = the OkHttp ClientManager.client
-     * @param site = the url for the site to login to
-     * @param email = the user's email as a String
-     * @param password = the user's password as a String
+     * Logs in to a site.
      */
     @Throws(IOException::class)
-    private fun loginToSite(client: Client, site: String,
-                            email: String, password: String): Boolean {
+    private fun loginToSite(client: Client, site: String, email: String, password: String): Boolean {
 
-        //Connect to /users/login and get the fkey, this key is necessary to login to the site.
+        // Connect to /users/login and get the fkey, this key is necessary to login to the site.
         val soFkey = Jsoup.connect("$site/users/login/")
                 .userAgent(Client.USER_AGENT).get()
                 .select("input[name=fkey]").attr("value")
 
-        //The request body is created by adding the email, password, and fkey to the request body
+        // The request body is created by adding the email, password, and fkey to the request body.
         val soLoginRequestBody = FormEncodingBuilder()
                 .add("email", email)
                 .add("password", password)
                 .add("fkey", soFkey)
                 .build()
 
-        //The login request is built by combining the URL and the request body created earlier
+        // The login request is built by combining the URL and the request body created earlier.
         val soLoginRequest = Request.Builder()
                 .url("$site/users/login/")
                 .post(soLoginRequestBody)
                 .build()
 
-        //The call is executed and the response is received to be parsed for future use.
+        // The call is executed and the response is received to be parsed for future use.
         val soLoginResponse = client.newCall(soLoginRequest).execute()
 
-        //The response document is pared into a Jsoup document
+        // The response document is pared into a Jsoup document.
         val responseDoc = Jsoup.parse(soLoginResponse.body().string())
 
-        //All script elements are received from the HTML
+        // All script elements are received from the HTML.
         val scriptElements = responseDoc.getElementsByTag("script")
 
         /** The scripts are filtered so we get the one we want. We want the one that contains the text of both "userId" and "accountId"
@@ -180,26 +169,25 @@ class LoginActivity : AppCompatActivity() {
         val initElements = scriptElements.filter { it.html().contains("userId") && it.html().contains("accountId") }
         val initElement: String
 
-        //Verify that there's the correct script tag, otherwise the login was bad
+        // Verify that there's the correct script tag, otherwise the login was bad.
         if (initElements.isNotEmpty()) {
             initElement = initElements[0].html()
         } else {
             return false
         }
 
-        //Verify this element contains the following text, meaning it's the one we want
+        // Verify this element contains the following text, meaning it's the one we want.
         if (initElement.contains("StackExchange.init(")) {
-            //Get only the JSON from the text and parse it as such
+            // Get only the JSON from the text and parse it as such.
             var json = initElement.replace("StackExchange.init(", "")
             json = json.substring(0, json.length - 2)
             val userObj = JSONObject(json).getJSONObject("user")
 
-            //If the JSON has the two Strings we want, parse them
+            // If the JSON has the two Strings we want, parse them.
             if (userObj.has("userId") && userObj.has("accountId")) {
                 val SOID = JSONObject(json).getJSONObject("user").getInt("userId")
                 val SEID = JSONObject(json).getJSONObject("user").getInt("accountId")
 
-                //Save the two IDs in the shared preferences
                 defaultSharedPreferences.edit().putInt("SOID", SOID).putInt("SEMAINID", SEID).putString("email", email).apply()
             } else {
                 return false
@@ -209,36 +197,35 @@ class LoginActivity : AppCompatActivity() {
     }
 
     /**
-     * Logins to site, takes in 1 params
-     * @param client = the OkHttp ClientManager.client
+     * Logs in to Stack Exchange.
      */
     @Throws(IOException::class)
     private fun loginToSE(client: Client) {
-        //Build the request for logging into StackExchange
+        // Build the request for logging into StackExchange.
         val loginPageRequest = Request.Builder()
                 .url("https://stackexchange.com/users/login/")
                 .build()
-        //Execute the request so we can parse the response
+        // Execute the request so we can parse the response.
         val loginPageResponse = client.newCall(loginPageRequest).execute()
 
-        //Parse the response and get the glorious fkey!
+        // Parse the response and get the glorious fkey!
         val doc = Jsoup.parse(loginPageResponse.body().string())
         loginPageResponse.body().close()
 
         val fkeyElements = doc.select("input[name=fkey]")
         val fkey = fkeyElements.attr("value")
 
-        //Make sure fkey is not empty
+        // Make sure fkey is not empty.
         if (fkey == "") throw IOException("Fatal: No fkey found.")
 
-        //Build a request to login to SE
+        // Build a request to login to SE.
         val data = FormEncodingBuilder()
                 .add("oauth_version", "")
                 .add("oauth_server", "")
                 .add("openid_identifier", "https://openid.stackexchange.com/")
                 .add("fkey", fkey)
 
-        //Login to SE and execute request
+        // Login to SE and execute request.
         val loginRequest = Request.Builder()
                 .url("https://stackexchange.com/users/authenticate/")
                 .post(data.build())
@@ -247,12 +234,13 @@ class LoginActivity : AppCompatActivity() {
         val body = response.body()
         body.close()
 
-        //Get the main StackExchange ID (which is different from the SE user's chat ID and set the chat ID by calling setSEChatId
+        // Get the main StackExchange ID (which is different from the SE user's chat ID and
+        // set the chat ID by calling setSEChatId.
         setSEChatId()
     }
 
     /**
-     * Logins to OpenId, takes in 1 params
+     * Logs in to OpenId, takes in 1 params
      * @param client = the OkHttp ClientManager.client
      */
     @Throws(IOException::class)
@@ -281,8 +269,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     /**
-     * Gets the user's chat ID for StackExchange which is different from their normal ID
-     * Sets it to the defaultSharedPreferences as "SEID"
+     * Gets the user's chat ID for StackExchange which is different from their normal ID and
+     * sets it to the defaultSharedPreferences as "SEID".
      */
     private fun setSEChatId() {
         val sePageRequest = Request.Builder()
@@ -293,7 +281,7 @@ class LoginActivity : AppCompatActivity() {
         val sePageDoc = Jsoup.parse(sePageResponse.body().string())
         sePageResponse.body().close()
 
-        //Get the URL from the topbar (to their profile)
+        // Get the URL from the topbar (to their profile).
         val element = sePageDoc.getElementsByClass("topbar-menu-links")[0].child(0)
 
         val url: String
@@ -303,7 +291,8 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        //Split the URL and get's their id which is between two slashes /theirid/their-profile-name
+        // Split the URL and get's their id which is between two slashes
+        // E.g. /theirid/their-profile-name.
         val res = url.split("/")[2]
         defaultSharedPreferences.edit().putInt("SEID", res.toInt()).apply()
     }
