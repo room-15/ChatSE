@@ -2,7 +2,6 @@ package com.tristanwiley.chatse.login
 
 import android.app.ProgressDialog
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -38,26 +37,16 @@ import java.util.*
  * @property prefs: Variable used to contain the default SharedPreferences for the app. Set to App.sharedPreferences
  */
 class LoginActivity : AppCompatActivity() {
+    private val prefs = App.sharedPreferences
     lateinit var betaText: TextView
     lateinit var emailView: EditText
     lateinit var passwordView: EditText
     lateinit var loginButton: FloatingActionButton
-    lateinit var prefs: SharedPreferences
     //TODO: Replace deprecated version. Ticket is #50
     lateinit var dialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        //Determine if the user has logged in already, if they have, proceed to the ChatActivity and finish the LoginActivity
-        prefs = App.sharedPreferences
-        if (prefs.getBoolean(App.PREF_HAS_CREDS, false)) {
-            startActivity(Intent(this, ChatActivity::class.java))
-            finish()
-            return
-        }
-
-        //If the user has not logged in already, display the chat login layout
         setContentView(R.layout.activity_login_beautiful)
 
         activity_login_tv_version.text = String.format(Locale.getDefault(),getString(R.string.app_version), BuildConfig.VERSION_NAME)
