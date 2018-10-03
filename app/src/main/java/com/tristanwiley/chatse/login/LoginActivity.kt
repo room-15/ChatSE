@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.util.Patterns
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import com.squareup.okhttp.FormEncodingBuilder
@@ -101,13 +102,8 @@ class LoginActivity : AppCompatActivity() {
         return isValid
     }
 
-    /**
-     * Function that determines if an email is valid.
-     * As of now only checks if email contains an @
-     * @return a boolean, true if the email is valid. False if not.
-     */
     private fun isEmailValid(email: String): Boolean {
-        return email.contains("@") //TODO Improve email prevalidation
+        return email.matches(Patterns.EMAIL_ADDRESS.toRegex())
     }
 
     /**
