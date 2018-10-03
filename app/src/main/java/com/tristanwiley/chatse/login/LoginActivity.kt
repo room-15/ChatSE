@@ -17,7 +17,7 @@ import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import com.tristanwiley.chatse.util.SharedPreferenceManager
 import com.tristanwiley.chatse.util.UserPreferenceKeys
-import kotlinx.android.synthetic.main.activity_login_beautiful.*
+import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
@@ -34,7 +34,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login_beautiful)
+        setContentView(R.layout.activity_login)
 
         login_tv_version.text = String.format(Locale.getDefault(), getString(R.string.app_version), BuildConfig.VERSION_NAME)
 
