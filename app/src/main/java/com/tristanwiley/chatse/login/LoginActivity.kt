@@ -54,11 +54,14 @@ class LoginActivity : AppCompatActivity() {
 
         login_email.setText(prefs.getString(UserPreferenceKeys.EMAIL, ""))
 
-        login_password.setOnEditorActionListener { _, id, _ ->
-            if (id == R.id.fab_submit || id == EditorInfo.IME_NULL) {
-                attemptLogin()
+        login_password.setOnEditorActionListener { _, actionId, _ ->
+            when (actionId) {
+                EditorInfo.IME_ACTION_DONE -> {
+                    attemptLogin()
+                    false
+                }
+                else -> false
             }
-            false
         }
     }
 
