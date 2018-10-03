@@ -215,7 +215,7 @@ class AboutActivity : AppCompatActivity() {
             // Github
             iconArray.add(AboutIconPoko(
                     R.drawable.ic_github_circle,
-                    "Github",
+                    getString(R.string.about_app_dev_github),
                     View.OnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(githubURL))) }
             ))
         }
@@ -224,7 +224,7 @@ class AboutActivity : AppCompatActivity() {
             // Website
             iconArray.add(AboutIconPoko(
                     R.drawable.ic_web_black_24dp,
-                    "Website",
+                    getString(R.string.about_app_dev_website),
                     View.OnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(websiteURL))) }
             ))
         }
@@ -233,7 +233,7 @@ class AboutActivity : AppCompatActivity() {
             // Website
             iconArray.add(AboutIconPoko(
                     R.drawable.ic_web_black_24dp,
-                    "StackOverflow",
+                    getString(R.string.about_app_dev_so),
                     View.OnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(stackoverflowURL))) }
             ))
         }
@@ -242,7 +242,7 @@ class AboutActivity : AppCompatActivity() {
             // Email
             iconArray.add(AboutIconPoko(
                     R.drawable.ic_email_black_24dp,
-                    "Email",
+                    getString(R.string.about_app_dev_email),
                     View.OnClickListener {
                         val emailIntent = Intent(android.content.Intent.ACTION_SEND)
                         emailIntent.type = "plain/text"
@@ -257,7 +257,7 @@ class AboutActivity : AppCompatActivity() {
             // Twitter
             iconArray.add(AboutIconPoko(
                     R.drawable.ic_twitter_circle,
-                    "Twitter",
+                    getString(R.string.about_app_dev_twitter),
                     View.OnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(twitterURL))) }
             ))
         }

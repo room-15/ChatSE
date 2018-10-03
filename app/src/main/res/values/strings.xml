@@ -45,6 +45,11 @@
     <string name="our_developers">Our developers</string>
     <string name="share_app">Share App</string>
     <string name="avatar">Avatar</string>
+    <string name="about_app_dev_github">Github</string>
+    <string name="about_app_dev_website">Website</string>
+    <string name="about_app_dev_so">Stack Overflow</string>
+    <string name="about_app_dev_email">Email</string>
+    <string name="about_app_dev_twitter">Twitter</string>
     <string name="beta_text">Thanks for using the alpha. Find bugs? Report them at https://github.com/room-15/ChatSE/</string>
 
     <!-- Content Description Strings -->
