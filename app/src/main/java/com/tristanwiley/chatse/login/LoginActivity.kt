@@ -2,7 +2,6 @@ package com.tristanwiley.chatse.login
 
 import android.app.ProgressDialog
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -14,12 +13,13 @@ import android.widget.TextView
 import android.widget.Toast
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
-import com.tristanwiley.chatse.App
 import com.tristanwiley.chatse.BuildConfig
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.chat.ChatActivity
 import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
+import com.tristanwiley.chatse.util.SharedPreferenceManager
+import com.tristanwiley.chatse.util.UserPreferenceKeys
 import kotlinx.android.synthetic.main.activity_login_beautiful.*
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
@@ -38,29 +38,19 @@ import java.util.*
  * @property prefs: Variable used to contain the default SharedPreferences for the app. Set to App.sharedPreferences
  */
 class LoginActivity : AppCompatActivity() {
+    private val prefs = SharedPreferenceManager.sharedPreferences
     lateinit var betaText: TextView
     lateinit var emailView: EditText
     lateinit var passwordView: EditText
     lateinit var loginButton: FloatingActionButton
-    lateinit var prefs: SharedPreferences
     //TODO: Replace deprecated version. Ticket is #50
     lateinit var dialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        //Determine if the user has logged in already, if they have, proceed to the ChatActivity and finish the LoginActivity
-        prefs = App.sharedPreferences
-        if (prefs.getBoolean(App.PREF_HAS_CREDS, false)) {
-            startActivity(Intent(this, ChatActivity::class.java))
-            finish()
-            return
-        }
-
-        //If the user has not logged in already, display the chat login layout
         setContentView(R.layout.activity_login_beautiful)
 
-        activity_login_tv_version.text = String.format(Locale.getDefault(),getString(R.string.app_version), BuildConfig.VERSION_NAME)
+        activity_login_tv_version.text = String.format(Locale.getDefault(), getString(R.string.app_version), BuildConfig.VERSION_NAME)
 
         dialog = ProgressDialog(this)
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
@@ -83,7 +73,7 @@ class LoginActivity : AppCompatActivity() {
         loginButton.setOnClickListener { attemptLogin() }
 
         //Set the emailView text to the email saved in the preferences.
-        emailView.setText(prefs.getString(App.PREF_EMAIL, ""))
+        emailView.setText(prefs.getString(UserPreferenceKeys.EMAIL, ""))
 
         //When the user presses submit inside the passwordView, attempt a login.
         passwordView.setOnEditorActionListener { _, id, _ ->
@@ -164,7 +154,7 @@ class LoginActivity : AppCompatActivity() {
                     loginToSE(client)
                     loginToSite(client, "https://stackoverflow.com", email, password)
                     runOnUiThread {
-                        prefs.edit().putBoolean(App.PREF_HAS_CREDS, true).apply()
+                        prefs.edit().putBoolean(UserPreferenceKeys.IS_LOGGED_IN, true).apply()
                         this@LoginActivity.startActivity(Intent(this@LoginActivity, ChatActivity::class.java))
                         this@LoginActivity.finish()
                     }
