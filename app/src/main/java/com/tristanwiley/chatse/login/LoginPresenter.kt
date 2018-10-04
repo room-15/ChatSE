@@ -1,6 +1,5 @@
 package com.tristanwiley.chatse.login
 
-import android.util.Log
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.App
@@ -13,6 +12,7 @@ import com.tristanwiley.chatse.util.UserPreferenceKeys
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import org.jsoup.Jsoup
+import timber.log.Timber
 import java.io.IOException
 import java.util.*
 import java.util.regex.Pattern
@@ -107,7 +107,7 @@ class LoginPresenter {
                     view.showLogInError()
                 }
             } catch (e: IOException) {
-                Log.e("LoginActivity", e.message)
+                Timber.e(e)
             }
         }
     }
