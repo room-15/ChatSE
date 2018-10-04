@@ -14,6 +14,7 @@ import org.json.JSONObject
 import org.jsoup.Jsoup
 import timber.log.Timber
 import java.io.IOException
+import java.lang.Exception
 import java.util.*
 import java.util.regex.Pattern
 
@@ -102,14 +103,19 @@ class LoginPresenter {
                     prefs.edit().putBoolean(UserPreferenceKeys.IS_LOGGED_IN, true).apply()
                     view.navigateToChat()
                 } else {
-                    view.setLoginInProgressVisibility(false)
-                    view.setLoginEnabled(true)
-                    view.showLogInError()
+                    handleLoginError()
                 }
             } catch (e: IOException) {
-                Timber.e(e)
+                handleLoginError(e)
             }
         }
+    }
+
+    private fun handleLoginError(e: Exception? = null) {
+        view.setLoginInProgressVisibility(false)
+        view.setLoginEnabled(true)
+        view.showLogInError()
+        Timber.e(e)
     }
 
     /**
