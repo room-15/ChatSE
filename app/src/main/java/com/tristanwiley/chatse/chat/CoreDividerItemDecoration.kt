@@ -47,7 +47,7 @@ class CoreDividerItemDecoration @JvmOverloads constructor(context: Context, orie
     /**
      * Draws the divider depending on the orientation of the RecyclerView.
      */
-    override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State?) {
+    override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         when (orientation) {
             VERTICAL_LIST -> drawVertical(c, parent)
             HORIZONTAL_LIST -> drawHorizontal(c, parent)
@@ -95,7 +95,7 @@ class CoreDividerItemDecoration @JvmOverloads constructor(context: Context, orie
     /**
      * Determines the offset of the divider based on the orientation of the list.
      */
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State?) {
+    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         when (orientation) {
             VERTICAL_LIST -> outRect.set(0, 0, 0, divider.intrinsicHeight)
             HORIZONTAL_LIST -> outRect.set(0, 0, divider.intrinsicWidth, 0)

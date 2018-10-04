@@ -3,15 +3,15 @@ package com.tristanwiley.chatse.login
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
-import com.tristanwiley.chatse.BaseActivity
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.chat.ChatActivity
 import com.tristanwiley.chatse.extensions.showIf
 import kotlinx.android.synthetic.main.activity_login.*
 
-class LoginActivity : BaseActivity(), LoginView {
+class LoginActivity : AppCompatActivity(), LoginView {
 
     private lateinit var presenter: LoginPresenter
 

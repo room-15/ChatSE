@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.about.pokos.DevPoko
 
@@ -35,6 +36,7 @@ class AboutDevCardAdapter(mContext: Context, val data: ArrayList<DevPoko>) : Rec
 
             Glide.with(itemView.context)
                     .load(item.imageRes)
+                    .apply(RequestOptions().circleCrop())
                     .into(picture)
 
             name.text = item.name

@@ -4,7 +4,7 @@
     tools:context=".ChatActivity">
     <item
         android:id="@+id/search_rooms"
-        android:icon="@drawable/ic_add"
+        android:icon="@drawable/ic_add_white_24dp"
         android:orderInCategory="0"
         android:title="@string/join_room"
         app:showAsAction="ifRoom" />
