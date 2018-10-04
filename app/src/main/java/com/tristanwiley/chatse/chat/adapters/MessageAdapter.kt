@@ -99,7 +99,7 @@ class MessageAdapter(
     override fun getItemCount() = messages.size
 
     override fun getItemId(position: Int): Long {
-        return messages[position].messageId.toLong()
+        return messages[position].id 
     }
     /**
      * ViewHolder that handles setting all content in itemView
