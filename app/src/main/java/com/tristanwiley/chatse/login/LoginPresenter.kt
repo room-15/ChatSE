@@ -1,7 +1,6 @@
 package com.tristanwiley.chatse.login
 
 import android.util.Log
-import android.util.Patterns
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.App
@@ -16,6 +15,7 @@ import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.io.IOException
 import java.util.*
+import java.util.regex.Pattern
 
 class LoginPresenter {
 
@@ -78,7 +78,7 @@ class LoginPresenter {
         else -> true
     }
 
-    private fun isEmailValid(email: String) = email.matches(Patterns.EMAIL_ADDRESS.toRegex())
+    private fun isEmailValid(email: String) = email.matches(EMAIL_PATTERN.toRegex())
 
     private fun validatePassword(password: String) = when {
         password.isBlank() -> {
@@ -282,6 +282,11 @@ class LoginPresenter {
 
     fun detachView() {
 
+    }
+
+    companion object {
+        // Redefined from android.util.Patterns.EMAIL_ADDRESS to avoid using android packages.
+        private val EMAIL_PATTERN = Pattern.compile("""[a-zA-Z0-9+._%\-]{1,256}@[a-zA-Z0-9][a-zA-Z0-9\-]{0,64}(\.[a-zA-Z0-9][a-zA-Z0-9\-]{0,25})+""")
     }
 
 }
