@@ -53,6 +53,8 @@ dependencies {
         transitive = true
     }
 
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+
     // Android
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support:appcompat-v7:27.1.1'
