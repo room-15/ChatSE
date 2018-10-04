@@ -25,12 +25,20 @@ import org.jetbrains.anko.doAsync
  */
 class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Context) : RecyclerView.Adapter<RoomAdapter.ListRowHolder>() {
 
+    init {
+        setHasStableIds(true)
+    }
+
     override fun onBindViewHolder(holder: ListRowHolder, position: Int) {
         val room = list[position]
         holder.bindMessage(room)
     }
 
     override fun getItemCount() = list.size
+
+    override fun getItemId(position: Int): Long {
+        return list[position].roomID
+    }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListRowHolder {

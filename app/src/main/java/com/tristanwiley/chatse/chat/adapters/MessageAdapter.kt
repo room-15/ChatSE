@@ -61,6 +61,10 @@ class MessageAdapter(
         private var messages: ArrayList<MessageEvent> = ArrayList(),
         private val messageCallback: ChatMessageCallback) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>(), SelectedMessagesListener {
 
+    init{
+        setHasStableIds(true)
+    }
+
     private val selectedMessages: HashSet<Int> = HashSet()
 
     override fun selectMessage(mId: Int) {
@@ -93,6 +97,10 @@ class MessageAdapter(
     }
 
     override fun getItemCount() = messages.size
+
+    override fun getItemId(position: Int): Long {
+        return messages[position].id
+    }
 
     /**
      * ViewHolder that handles setting all content in itemView
