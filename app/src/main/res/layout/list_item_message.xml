@@ -82,7 +82,7 @@
             app:layout_constraintLeft_toRightOf="@id/guideline_20"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.5"
-            app:srcCompat="@drawable/ic_edit_black_18dp" />
+            app:srcCompat="@drawable/ic_edit_black_24dp" />
 
         <TextView
             android:id="@+id/message_content"

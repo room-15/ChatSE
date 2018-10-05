@@ -14,15 +14,16 @@ repositories {
 
 android {
     compileSdkVersion 28
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    buildToolsVersion buildToolsVersion
     defaultConfig {
         applicationId 'com.tristanwiley.chatse'
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 3
         versionName "0.1.0_Alpha_$versionCode"
 
         vectorDrawables.useSupportLibrary = true
+        multiDexEnabled = true
 
         buildConfigField "String", "fabricApiKey", FABRIC_API_KEY
 
@@ -45,8 +46,8 @@ android {
     }
 
     configurations.all {
-        resolutionStrategy.force "com.android.support:animated-vector-drawable:$rootProject.ext.supportLibrary"
-        resolutionStrategy.force "com.android.support:support-v4:$rootProject.ext.supportLibrary"
+        resolutionStrategy.force "com.android.support:animated-vector-drawable:$supportLibrary"
+        resolutionStrategy.force "com.android.support:support-v4:$supportLibrary"
     }
 }
 
@@ -58,27 +59,27 @@ dependencies {
         transitive = true
     }
 
-    implementation "com.android.support:design:$rootProject.ext.supportLibrary"
-    implementation "com.android.support:appcompat-v7:$rootProject.ext.supportLibrary"
-    implementation "com.android.support:recyclerview-v7:$rootProject.ext.supportLibrary"
-    implementation "com.android.support:cardview-v7:$rootProject.ext.supportLibrary"
-    implementation "com.android.support:palette-v7:$rootProject.ext.supportLibrary"
-    implementation "com.android.support.constraint:constraint-layout:$rootProject.ext.constraintlayout"
-    implementation "com.squareup.okhttp:okhttp:$rootProject.ext.okhttp"
-    implementation "com.squareup.okhttp:okhttp-ws:$rootProject.ext.okhttp"
-    implementation "org.jetbrains.anko:anko-commons:$rootProject.ext.anko"
-    implementation "org.jsoup:jsoup:$rootProject.ext.jsoup"
-    implementation "com.fasterxml.jackson.core:jackson-databind:$rootProject.ext.jacksondatabinding"
-    implementation "org.unbescape:unbescape:$rootProject.ext.ubescope"
-    implementation "com.orhanobut:dialogplus:$rootProject.ext.dialog"
+    implementation "com.android.support:design:$supportLibrary"
+    implementation "com.android.support:appcompat-v7:$supportLibrary"
+    implementation "com.android.support:recyclerview-v7:$supportLibrary"
+    implementation "com.android.support:cardview-v7:$supportLibrary"
+    implementation "com.android.support:palette-v7:$supportLibrary"
+    implementation "com.android.support.constraint:constraint-layout:$constraintlayout"
+    implementation "com.squareup.okhttp:okhttp:$okhttp"
+    implementation "com.squareup.okhttp:okhttp-ws:$okhttp"
+    implementation "org.jetbrains.anko:anko-commons:$anko"
+    implementation "org.jsoup:jsoup:$jsoup"
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksondatabinding"
+    implementation "org.unbescape:unbescape:$ubescope"
+    implementation "com.orhanobut:dialogplus:$dialog"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "me.saket:better-link-movement-method:$rootProject.ext.saketbetterlinkmovement"
-    implementation "com.github.gabrielemariotti.changeloglib:$rootProject.ext.gabriel"
-    implementation "com.github.bumptech.glide:glide:$rootProject.ext.glide"
+    implementation "me.saket:better-link-movement-method:$saketbetterlinkmovement"
+    implementation "com.github.gabrielemariotti.changeloglib:$gabriel"
+    implementation "com.github.bumptech.glide:glide:$glide"
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:1.9.5'
-    testImplementation "com.squareup.okhttp:mockwebserver:$rootProject.ext.okhttp"
-    kapt "com.github.bumptech.glide:compiler:$rootProject.ext.glide"
- 
+    testImplementation "com.squareup.okhttp:mockwebserver:$okhttp"
+    kapt "com.github.bumptech.glide:compiler:$glide"
+
 }
- apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android-extensions'

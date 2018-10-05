@@ -1,113 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/about_dev_card"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="3dp"
+    card_view:cardElevation="4dp"
+    card_view:cardUseCompatPadding="true">
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/about_dev_card"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        card_view:cardCornerRadius="3dp"
-        card_view:cardElevation="4dp"
-        card_view:cardUseCompatPadding="true">
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/about_card_dev_header_image"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toTopOf="@+id/about_card_content"
+            app:layout_constraintDimensionRatio="16:9"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/material_bg2" />
 
         <android.support.constraint.ConstraintLayout
+            android:id="@+id/about_card_content"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/about_card_dev_header_image">
 
-            <ImageView
-                android:id="@+id/about_card_dev_header_image"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:scaleType="centerCrop"
-                app:layout_constraintBottom_toTopOf="@+id/about_card_content"
-                app:layout_constraintDimensionRatio="16:9"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/material_bg2" />
-
-            <android.support.constraint.ConstraintLayout
-                android:id="@+id/about_card_content"
+            <TextView
+                android:id="@+id/about_card_dev_name"
+                style="@style/Base.TextAppearance.AppCompat.Large"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="2"
+                android:paddingTop="46dp"
+                tools:text="Mauker"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/about_card_dev_job"
+                style="@style/Base.TextAppearance.AppCompat.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="2"
+                tools:text="Programmer"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/about_card_dev_name" />
+
+            <TextView
+                android:id="@+id/about_card_dev_about_me"
+                style="@style/Base.TextAppearance.AppCompat.Small"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="8"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                tools:text="Hello, I'm mauker! I'm an Android developer."
+                android:textColor="@color/primary_text"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/about_card_dev_job" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/about_card_dev_rv_icons"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:nestedScrollingEnabled="false"
+                android:paddingTop="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/about_card_dev_header_image">
-
-                <TextView
-                    android:id="@+id/about_card_dev_name"
-                    style="@style/Base.TextAppearance.AppCompat.Large"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:gravity="center"
-                    android:maxLines="2"
-                    android:paddingTop="46dp"
-                    android:text="Mauker"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/about_card_dev_job"
-                    style="@style/Base.TextAppearance.AppCompat.Medium"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:gravity="center"
-                    android:maxLines="2"
-                    android:text="Programmer"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/about_card_dev_name" />
-
-                <TextView
-                    android:id="@+id/about_card_dev_about_me"
-                    style="@style/Base.TextAppearance.AppCompat.Small"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:gravity="center"
-                    android:maxLines="8"
-                    android:paddingBottom="8dp"
-                    android:paddingTop="8dp"
-                    android:text="Hello, I'm mauker! I'm an Android developer."
-                    android:textColor="@color/primary_text"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/about_card_dev_job" />
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/about_card_dev_rv_icons"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:nestedScrollingEnabled="false"
-                    android:paddingTop="8dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/about_card_dev_about_me"
-                    app:layout_constraintVertical_bias="0.0" />
-
-            </android.support.constraint.ConstraintLayout>
-
+                app:layout_constraintTop_toBottomOf="@+id/about_card_dev_about_me"
+                app:layout_constraintVertical_bias="0.0" />
 
         </android.support.constraint.ConstraintLayout>
 
-    </android.support.v7.widget.CardView>
+        <ImageView
+            android:id="@+id/about_card_profile_picture"
+            android:layout_width="112dp"
+            android:layout_height="112dp"
+            tools:src="@drawable/dev_mauker"
+            app:layout_constraintTop_toBottomOf="@id/about_card_dev_header_image"
+            app:layout_constraintBottom_toBottomOf="@id/about_card_dev_header_image"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <com.tristanwiley.chatse.views.CircleImageView
-        android:id="@+id/about_card_profile_picture"
-        android:layout_width="112dp"
-        android:layout_height="112dp"
-        android:elevation="4dp"
-        app:layout_anchor="@id/about_card_content"
-        app:layout_anchorGravity="top|center_horizontal" />
 
-</android.support.design.widget.CoordinatorLayout>
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.v7.widget.CardView>
