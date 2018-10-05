@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 def FABRIC_API_KEY = '"' + fabricApiKey + '"'
@@ -97,5 +98,3 @@ dependencies {
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
     testImplementation "com.squareup.okhttp:mockwebserver:$mockWebServer"
 }
-
-apply plugin: 'kotlin-android-extensions'
