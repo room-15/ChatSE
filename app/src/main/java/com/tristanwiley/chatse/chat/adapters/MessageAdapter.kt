@@ -19,15 +19,12 @@ import android.support.v7.widget.RecyclerView
 import android.text.Html
 import android.text.util.Linkify
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
-import com.orhanobut.dialogplus.DialogPlus
-import com.orhanobut.dialogplus.ListHolder
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R

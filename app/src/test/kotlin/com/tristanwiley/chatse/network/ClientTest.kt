@@ -11,6 +11,7 @@ import com.squareup.okhttp.mockwebserver.MockResponse
 import com.squareup.okhttp.mockwebserver.MockWebServer
 import com.tristanwiley.chatse.getMockPrefs
 import com.tristanwiley.chatse.network.cookie.PersistentCookieStore
+import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -29,6 +30,7 @@ class ClientTest {
         assertEquals(expected, actual)
     }
 
+    @Ignore
     @Test
     fun testClientGetFromWeb() {
         val server = MockWebServer()
