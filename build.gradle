@@ -40,4 +40,7 @@ ext {
     changelogLib = '2.1.0'
     mockitoKotlin = '2.0.0-RC2'
     mockWebServer = '2.4.0'
+    rxJava = '2.2.2'
+    rxAndroid = '2.1.0'
+    timber = '4.7.1'
 }
