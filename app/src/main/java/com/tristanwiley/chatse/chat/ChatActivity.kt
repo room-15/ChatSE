@@ -67,7 +67,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
     private var isBound = false
     private val prefs = SharedPreferenceManager.sharedPreferences
 
-    private var room_num: Int? = -1
+    private var roomnum: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -185,7 +185,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
 
         //Load a default room
         loadChatFragment(ChatRoom(prefs.getString("lastRoomSite", Client.SITE_STACK_OVERFLOW), prefs.getInt("lastRoomNum", 15)))
-        room_num = 15
+        roomnum= prefs.getInt("lastRoomNum", 15)
     }
 
     /**
@@ -424,7 +424,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
                     //Join the room the user chose and load it into the container
                     builder.setPositiveButton("Join Room", { dialog, _ ->
                         loadChatFragment(ChatRoom(site, input.text.toString().toInt()))
-                        room_num = input.text.toString().toInt()
+                        roomnum = input.text.toString().toInt()
                         //Dismiss the dialog
                         dialog.dismiss()
                     })
@@ -458,9 +458,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
 
     override fun onItemClick(chatRoom: ChatRoom) {
 
-        val roomNo = chatRoom.num
-        if ((room_num!=-1) && room_num != roomNo) {
-             room_num = roomNo
+        val roomno = chatRoom.num
+        if ((roomnum!=-1) && roomnum != roomno) {
+            roomnum = roomno
             doAsync {
                 addChatFragment(createChatFragment(chatRoom))
             }
