@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.text.InputType
+import android.text.TextUtils
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.Menu
@@ -55,7 +56,8 @@ import java.io.IOException
  * @property soRoomAdapter: Adapter for StackOverflow Rooms the user is in
  * @property seRoomAdapter: Adapter for StackExchange Rooms the user is in
  */
-class ChatActivity : AppCompatActivity(), ServiceConnection {
+class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemClickListener {
+
     private lateinit var serviceBinder: IncomingEventServiceBinder
     private val soRoomList = arrayListOf<Room>()
     private val seRoomList = arrayListOf<Room>()
@@ -64,6 +66,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     private lateinit var seRoomAdapter: RoomAdapter
     private var isBound = false
     private val prefs = SharedPreferenceManager.sharedPreferences
+
+    private var room_num: Int? = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -181,6 +185,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
         //Load a default room
         loadChatFragment(ChatRoom(prefs.getString("lastRoomSite", Client.SITE_STACK_OVERFLOW), prefs.getInt("lastRoomNum", 15)))
+        room_num = 15
     }
 
     /**
@@ -419,6 +424,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     //Join the room the user chose and load it into the container
                     builder.setPositiveButton("Join Room", { dialog, _ ->
                         loadChatFragment(ChatRoom(site, input.text.toString().toInt()))
+                        room_num = input.text.toString().toInt()
                         //Dismiss the dialog
                         dialog.dismiss()
                     })
@@ -448,6 +454,20 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
 
     override fun onServiceDisconnected(name: ComponentName) {
         Log.d("ChatActivity", "Service disconnect")
+    }
+
+    override fun onItemClick(chatRoom: ChatRoom) {
+
+        val roomNo = chatRoom.num
+        if ((room_num!=-1) && room_num != roomNo) {
+             room_num = room_num
+            doAsync {
+                addChatFragment(createChatFragment(chatRoom))
+            }
+            prefs.edit().putString("lastRoomSite", chatRoom.site).putInt("lastRoomNum", chatRoom.num).apply()
+        }
+
+        drawer_layout.closeDrawers()
     }
 
     //Load the chat fragment by creating it and adding it
