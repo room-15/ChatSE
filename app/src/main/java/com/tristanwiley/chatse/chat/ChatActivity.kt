@@ -460,7 +460,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
 
         val roomNo = chatRoom.num
         if ((room_num!=-1) && room_num != roomNo) {
-             room_num = room_num
+             room_num = roomNo
             doAsync {
                 addChatFragment(createChatFragment(chatRoom))
             }
