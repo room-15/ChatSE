@@ -61,7 +61,7 @@ class MessageAdapter(
     init {
         setHasStableIds(true)
     }
-
+    
     private val selectedMessages: HashSet<Int> = HashSet()
 
     override fun selectMessage(mId: Int) {
