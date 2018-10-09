@@ -13,7 +13,7 @@ jobs:
 #      - run:
 #         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
 #         command: sudo chmod +x ./gradlew
-      - run/:
+      - run:
           name: Create file with fabric key (required for build)
           command: |
             touch gradle.properties
