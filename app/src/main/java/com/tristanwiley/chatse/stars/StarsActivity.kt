@@ -1,7 +1,6 @@
 package com.tristanwiley.chatse.stars
 
 import android.graphics.drawable.ColorDrawable
-
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
@@ -17,6 +16,8 @@ import com.tristanwiley.chatse.network.ClientManager
 import kotlinx.android.synthetic.main.activity_stars.*
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
+import timber.log.Timber
+
 
 class StarsActivity : AppCompatActivity() {
     private val eventList = arrayListOf<ChatEvent>()
@@ -49,6 +50,7 @@ class StarsActivity : AppCompatActivity() {
             val response = client.newCall(newMessageRequest).execute()
             val doc = Jsoup.parse(response.body().string())
             val messages = doc.getElementsByClass("monologue")
+            Timber.i("messages : ${messages.size}" )
             messages.forEach {
                 val event = ChatEvent()
                 var userID = -1
@@ -61,6 +63,18 @@ class StarsActivity : AppCompatActivity() {
                     event.userName = it.getElementsByClass("username")[0].text()
                 } else {
                     event.userName = it.getElementsByClass("username")[0].child(0).text()
+                }
+
+                if(it.getElementsByClass("message").isNotEmpty()) {
+                    val messagesDiv = it.getElementsByClass("message")
+                    if (messagesDiv != null) {
+                        val messageId = messagesDiv.attr("id")
+                        if (messageId.isNotEmpty()) {
+                            val id = messageId.substringAfter("message-").toInt()
+                            event.messageId = id
+                            Timber.i("messages : ${id}" )
+                        }
+                    }
                 }
 
                 event.contents = it.getElementsByClass("content")[0].html()

@@ -46,6 +46,10 @@ import kotlin.collections.ArrayList
  */
 class StarsMessageAdapter(private val mContext: Context, private val events: ArrayList<ChatEvent>, val room: ChatRoom) : RecyclerView.Adapter<StarsMessageAdapter.MessageViewHolder>() {
 
+    init{
+        setHasStableIds(true)
+    }
+    
     override fun onBindViewHolder(holder: MessageViewHolder, pos: Int) {
         val message = events[pos]
         holder.bindMessage(message)
@@ -57,6 +61,9 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
     }
 
     override fun getItemCount() = events.size
+
+    override fun getItemId(position: Int) = events[position].messageId.toLong()
+
     /**
      * ViewHolder that handles setting all content in itemView
      */
