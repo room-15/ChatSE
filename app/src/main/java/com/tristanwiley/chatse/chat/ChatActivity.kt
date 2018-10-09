@@ -461,11 +461,11 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
 
         val clickedRoomNo = chatRoom.num
         if ((currentroomNum != null) && currentroomNum != clickedRoomNo) {
-            currentroomNum = currentroomNum
+            currentroomNum = clickedRoomNo
             doAsync {
                 addChatFragment(createChatFragment(chatRoom))
             }
-            prefs.edit().putString("lastRoomSite", chatRoom.site).putInt("lastRoomNum",clickedRoomNo).apply()
+            prefs.edit().putString(RoomPreferenceKeys.LAST_ROOM_SITE, chatRoom.site).putInt(RoomPreferenceKeys.LAST_ROOM_NUM,clickedRoomNo).apply()
         }
 
         drawer_layout.closeDrawers()
