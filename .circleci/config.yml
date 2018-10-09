@@ -31,6 +31,12 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
+      - run:
+          name: Create file with fabric key (required for build)
+          command: |
+            touch gradle.properties
+            echo "fabricApiKey=000" >> gradle.properties
+
       - run: gradle dependencies
 
       - save_cache:
