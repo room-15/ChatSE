@@ -23,15 +23,18 @@ import org.jetbrains.anko.doAsync
  * @param list: MutableList of rooms
  * @param context: Application Context
  */
-class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Context) : RecyclerView.Adapter<RoomAdapter.ListRowHolder>() {
+class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Context, val roomClickListener: OnItemClickListener) : RecyclerView.Adapter<RoomAdapter.ListRowHolder>() {
+
+    interface OnItemClickListener {
+        fun onItemClick(chatRoom: ChatRoom)
+    }
 
     override fun onBindViewHolder(holder: ListRowHolder, position: Int) {
         val room = list[position]
-        holder.bindMessage(room)
+        holder.bindMessage(room,roomClickListener)
     }
 
     override fun getItemCount() = list.size
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListRowHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.drawer_list_item, parent, false)
@@ -42,7 +45,7 @@ class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Co
     class ListRowHolder(private val mContext: Context, itemView: View, val site: String) : RecyclerView.ViewHolder(itemView) {
         val name: TextView = itemView.findViewById(R.id.room_name)
 
-        fun bindMessage(room: Room) {
+        fun bindMessage(room: Room, roomClickListener: OnItemClickListener) {
 
             //Set the text to the itemView TextView
             name.text = room.name
@@ -50,7 +53,7 @@ class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Co
             //OnClick, load the chat fragment
             itemView.setOnClickListener {
                 val roomNum = room.roomID.toInt()
-                (mContext as ChatActivity).loadChatFragment(ChatRoom(site, roomNum))
+                roomClickListener.onItemClick(ChatRoom(site, roomNum))
             }
 
             /*

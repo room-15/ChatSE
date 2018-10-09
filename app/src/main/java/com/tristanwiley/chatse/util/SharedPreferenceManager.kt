@@ -27,3 +27,19 @@ class UserPreferenceKeys {
         const val IS_LOGGED_IN = "is_logged_in"
     }
 }
+
+class RoomPreferenceKeys {
+    companion object {
+
+        /**
+         * Last room site.
+         */
+        const val LAST_ROOM_SITE = "last_room_site"
+
+        /**
+         * Last room number.
+         */
+        const val LAST_ROOM_NUM = "last_room_num"
+    }
+}
+

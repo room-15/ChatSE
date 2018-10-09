@@ -34,6 +34,7 @@ import com.tristanwiley.chatse.login.LoginActivity
 import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import com.tristanwiley.chatse.network.cookie.PersistentCookieStore
+import com.tristanwiley.chatse.util.RoomPreferenceKeys
 import com.tristanwiley.chatse.util.SharedPreferenceManager
 import com.tristanwiley.chatse.util.UserPreferenceKeys
 import com.tristanwiley.chatse.views.DividerItemDecoration
@@ -55,7 +56,8 @@ import java.io.IOException
  * @property soRoomAdapter: Adapter for StackOverflow Rooms the user is in
  * @property seRoomAdapter: Adapter for StackExchange Rooms the user is in
  */
-class ChatActivity : AppCompatActivity(), ServiceConnection {
+class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemClickListener {
+
     private lateinit var serviceBinder: IncomingEventServiceBinder
     private val soRoomList = arrayListOf<Room>()
     private val seRoomList = arrayListOf<Room>()
@@ -64,6 +66,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
     private lateinit var seRoomAdapter: RoomAdapter
     private var isBound = false
     private val prefs = SharedPreferenceManager.sharedPreferences
+
+    private var currentroomNum: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,8 +97,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         } */
 
         //Create adapters for current user's rooms
-        soRoomAdapter = RoomAdapter(Client.SITE_STACK_OVERFLOW, soRoomList, this)
-        seRoomAdapter = RoomAdapter(Client.SITE_STACK_EXCHANGE, seRoomList, this)
+        soRoomAdapter = RoomAdapter(Client.SITE_STACK_OVERFLOW, soRoomList, this,this)
+        seRoomAdapter = RoomAdapter(Client.SITE_STACK_EXCHANGE, seRoomList, this,this)
 
         //Set adapters to RecyclerViews along with LayoutManagers
         stackoverflow_room_list.addItemDecoration(DividerItemDecoration(this))
@@ -180,7 +184,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         }
 
         //Load a default room
-        loadChatFragment(ChatRoom(prefs.getString("lastRoomSite", Client.SITE_STACK_OVERFLOW), prefs.getInt("lastRoomNum", 15)))
+
+        loadChatFragment(ChatRoom(prefs.getString(RoomPreferenceKeys.LAST_ROOM_SITE, Client.SITE_STACK_OVERFLOW), prefs.getInt(RoomPreferenceKeys.LAST_ROOM_NUM, 15)))
+        currentroomNum = prefs.getInt(RoomPreferenceKeys.LAST_ROOM_NUM, 15)
     }
 
     /**
@@ -419,6 +425,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
                     //Join the room the user chose and load it into the container
                     builder.setPositiveButton("Join Room", { dialog, _ ->
                         loadChatFragment(ChatRoom(site, input.text.toString().toInt()))
+                        currentroomNum = input.text.toString().toInt()
                         //Dismiss the dialog
                         dialog.dismiss()
                     })
@@ -450,12 +457,26 @@ class ChatActivity : AppCompatActivity(), ServiceConnection {
         Log.d("ChatActivity", "Service disconnect")
     }
 
+    override fun onItemClick(chatRoom: ChatRoom) {
+
+        val clickedRoomNo = chatRoom.num
+        if ((currentroomNum != null) && currentroomNum != clickedRoomNo) {
+            currentroomNum = clickedRoomNo
+            doAsync {
+                addChatFragment(createChatFragment(chatRoom))
+            }
+            prefs.edit().putString(RoomPreferenceKeys.LAST_ROOM_SITE, chatRoom.site).putInt(RoomPreferenceKeys.LAST_ROOM_NUM,clickedRoomNo).apply()
+        }
+
+        drawer_layout.closeDrawers()
+    }
+
     //Load the chat fragment by creating it and adding it
     fun loadChatFragment(room: ChatRoom) {
         doAsync {
             addChatFragment(createChatFragment(room))
         }
-        prefs.edit().putString("lastRoomSite", room.site).putInt("lastRoomNum", room.num).apply()
+        prefs.edit().putString(RoomPreferenceKeys.LAST_ROOM_SITE, room.site).putInt(RoomPreferenceKeys.LAST_ROOM_NUM, room.num).apply()
         drawer_layout.closeDrawers()
     }
 
