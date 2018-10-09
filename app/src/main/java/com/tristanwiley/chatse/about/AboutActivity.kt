@@ -130,13 +130,6 @@ class AboutActivity : AppCompatActivity() {
                 }
         ))
 
-        // Donate
-        headerArray.add(AboutIconPoko(
-                R.drawable.ic_favorite_black_24dp,
-                getString(R.string.buy_coffee),
-                View.OnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://ko-fi.com/A44341P5"))) }
-        ))
-
         rvHeader.adapter = AboutIconAdapter(this, headerArray)
 
         // Devs RV
