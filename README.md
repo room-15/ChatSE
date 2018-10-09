@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/room-15/ChatSE/tree/master.svg?style=shield)](https://circleci.com/gh/room-15/ChatSE/tree/master)
+
 # ChatSE
 
 Android app for Stack Exchange chat. Currently in development, see https://github.com/room-15/ChatSE/issues to view active issues. We'd love any community help.
