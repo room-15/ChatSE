@@ -49,6 +49,7 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
     init{
         setHasStableIds(true)
     }
+    
     override fun onBindViewHolder(holder: MessageViewHolder, pos: Int) {
         val message = events[pos]
         holder.bindMessage(message)
