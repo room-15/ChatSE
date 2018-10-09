@@ -16,7 +16,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.text.InputType
-import android.text.TextUtils
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.Menu
@@ -35,6 +34,7 @@ import com.tristanwiley.chatse.login.LoginActivity
 import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import com.tristanwiley.chatse.network.cookie.PersistentCookieStore
+import com.tristanwiley.chatse.util.RoomPreferenceKeys
 import com.tristanwiley.chatse.util.SharedPreferenceManager
 import com.tristanwiley.chatse.util.UserPreferenceKeys
 import com.tristanwiley.chatse.views.DividerItemDecoration
@@ -67,7 +67,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
     private var isBound = false
     private val prefs = SharedPreferenceManager.sharedPreferences
 
-    private var roomNum: Int = -1
+    private var currentroomNum: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,8 +97,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
         } */
 
         //Create adapters for current user's rooms
-        soRoomAdapter = RoomAdapter(Client.SITE_STACK_OVERFLOW, soRoomList, this)
-        seRoomAdapter = RoomAdapter(Client.SITE_STACK_EXCHANGE, seRoomList, this)
+        soRoomAdapter = RoomAdapter(Client.SITE_STACK_OVERFLOW, soRoomList, this,this@ChatActivity)
+        seRoomAdapter = RoomAdapter(Client.SITE_STACK_EXCHANGE, seRoomList, this,this@ChatActivity)
 
         //Set adapters to RecyclerViews along with LayoutManagers
         stackoverflow_room_list.addItemDecoration(DividerItemDecoration(this))
@@ -184,8 +184,9 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
         }
 
         //Load a default room
-        loadChatFragment(ChatRoom(prefs.getString("lastRoomSite", Client.SITE_STACK_OVERFLOW), prefs.getInt("lastRoomNum", 15)))
-        roomNum= prefs.getInt("lastRoomNum", 15)
+
+        loadChatFragment(ChatRoom(prefs.getString(RoomPreferenceKeys.LAST_ROOM_SITE, Client.SITE_STACK_OVERFLOW), prefs.getInt(RoomPreferenceKeys.LAST_ROOM_NUM, 15)))
+        currentroomNum = prefs.getInt(RoomPreferenceKeys.LAST_ROOM_NUM, 15)
     }
 
     /**
@@ -424,7 +425,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
                     //Join the room the user chose and load it into the container
                     builder.setPositiveButton("Join Room", { dialog, _ ->
                         loadChatFragment(ChatRoom(site, input.text.toString().toInt()))
-                        roomNum = input.text.toString().toInt()
+                        currentroomNum = input.text.toString().toInt()
                         //Dismiss the dialog
                         dialog.dismiss()
                     })
@@ -458,13 +459,13 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
 
     override fun onItemClick(chatRoom: ChatRoom) {
 
-        val roomNo = chatRoom.num
-        if ((roomNum!=-1) && roomNum != roomNo) {
-            roomNum = roomNo
+        val clickedRoomNo = chatRoom.num
+        if ((currentroomNum != null) && currentroomNum != clickedRoomNo) {
+            currentroomNum = currentroomNum
             doAsync {
                 addChatFragment(createChatFragment(chatRoom))
             }
-            prefs.edit().putString("lastRoomSite", chatRoom.site).putInt("lastRoomNum",roomNo).apply()
+            prefs.edit().putString("lastRoomSite", chatRoom.site).putInt("lastRoomNum",clickedRoomNo).apply()
         }
 
         drawer_layout.closeDrawers()
