@@ -61,7 +61,7 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
 
     override fun getItemCount() = events.size
 
-    override fun getItemId(position: Int): Long  = events[position].messageId.toLong()
+    override fun getItemId(position: Int) = events[position].messageId.toLong()
 
     /**
      * ViewHolder that handles setting all content in itemView
