@@ -476,7 +476,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
         doAsync {
             addChatFragment(createChatFragment(room))
         }
-        prefs.edit().putString("lastRoomSite", room.site).putInt("lastRoomNum", room.num).apply()
+        prefs.edit().putString(RoomPreferenceKeys.LAST_ROOM_SITE, room.site).putInt(RoomPreferenceKeys.LAST_ROOM_NUM, room.num).apply()
         drawer_layout.closeDrawers()
     }
 
