@@ -50,7 +50,7 @@ class StarsActivity : AppCompatActivity() {
             val response = client.newCall(newMessageRequest).execute()
             val doc = Jsoup.parse(response.body().string())
             val messages = doc.getElementsByClass("monologue")
-            Timber.i("messages :%s", messages.size)
+            Timber.i("messages : ${messages.size}" )
             messages.forEach {
                 val event = ChatEvent()
                 var userID = -1
@@ -72,7 +72,7 @@ class StarsActivity : AppCompatActivity() {
                         if (messageId.isNotEmpty()) {
                             val id = messageId.substringAfter("message-").toInt()
                             event.messageId = id
-                            Timber.i("message :%s", id)
+                            Timber.i("messages : ${id}" )
                         }
                     }
                 }
