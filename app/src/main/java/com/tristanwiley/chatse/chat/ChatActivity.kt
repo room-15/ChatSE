@@ -97,8 +97,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
         } */
 
         //Create adapters for current user's rooms
-        soRoomAdapter = RoomAdapter(Client.SITE_STACK_OVERFLOW, soRoomList, this,this@ChatActivity)
-        seRoomAdapter = RoomAdapter(Client.SITE_STACK_EXCHANGE, seRoomList, this,this@ChatActivity)
+        soRoomAdapter = RoomAdapter(Client.SITE_STACK_OVERFLOW, soRoomList, this,this)
+        seRoomAdapter = RoomAdapter(Client.SITE_STACK_EXCHANGE, seRoomList, this,this)
 
         //Set adapters to RecyclerViews along with LayoutManagers
         stackoverflow_room_list.addItemDecoration(DividerItemDecoration(this))
