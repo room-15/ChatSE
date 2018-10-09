@@ -23,31 +23,18 @@ import org.jetbrains.anko.doAsync
  * @param list: MutableList of rooms
  * @param context: Application Context
  */
-class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Context) : RecyclerView.Adapter<RoomAdapter.ListRowHolder>() {
-
+class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Context, val roomClickListener: OnItemClickListener) : RecyclerView.Adapter<RoomAdapter.ListRowHolder>() {
 
     interface OnItemClickListener {
-
         fun onItemClick(chatRoom: ChatRoom)
     }
 
-
-
-    private val roomClickListener:OnItemClickListener
-
-    init {
-        roomClickListener = context as OnItemClickListener
-    }
     override fun onBindViewHolder(holder: ListRowHolder, position: Int) {
         val room = list[position]
         holder.bindMessage(room,roomClickListener)
     }
 
     override fun getItemCount() = list.size
-
-
-
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListRowHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.drawer_list_item, parent, false)
@@ -67,7 +54,6 @@ class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Co
             itemView.setOnClickListener {
                 val roomNum = room.roomID.toInt()
                 roomClickListener.onItemClick(ChatRoom(site, roomNum))
-               // (mContext as ChatActivity).loadChatFragment(ChatRoom(site, roomNum))
             }
 
             /*
