@@ -4,9 +4,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
-def FABRIC_API_KEY = '"' + fabricApiKey + '"'
-def MANIFEST_FABRIC_API_KEY = fabricApiKey
-
 repositories {
     maven {
         url 'https://maven.fabric.io/public'
@@ -20,17 +17,11 @@ android {
         applicationId 'com.tristanwiley.chatse'
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 3
+        versionCode 4
         versionName "0.1.0_Alpha_$versionCode"
 
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled = true
-
-        buildConfigField "String", "fabricApiKey", FABRIC_API_KEY
-
-        manifestPlaceholders = [
-                "fabricApiKey": MANIFEST_FABRIC_API_KEY
-        ]
     }
     buildTypes {
         release {

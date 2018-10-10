@@ -50,7 +50,7 @@
 
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="${fabricApiKey}" />
+            android:value="9b47d59ac006c9074bed0516668b70beb9d5c67b" />
 
         <activity android:name=".stars.StarsActivity" />
     </application>
