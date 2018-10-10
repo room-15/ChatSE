@@ -28,3 +28,8 @@
 -dontwarn com.fasterxml.jackson.databind.**
 
 -dontwarn okio.**
+
+# Coroutines
+-keepclassmembernames class kotlinx.** {
+    volatile <fields>;
+}

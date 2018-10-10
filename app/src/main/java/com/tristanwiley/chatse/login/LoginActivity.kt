@@ -77,23 +77,17 @@ class LoginActivity : AppCompatActivity(), LoginView {
     }
 
     override fun navigateToChat() {
-        runOnUiThread {
-            val intent = Intent(this@LoginActivity, ChatActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
+        val intent = Intent(this@LoginActivity, ChatActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     override fun showLogInError() {
-        runOnUiThread {
-            Toast.makeText(this@LoginActivity, "Failed to log in, try again!", Toast.LENGTH_LONG).show()
-        }
+        Toast.makeText(this@LoginActivity, "Failed to log in, try again!", Toast.LENGTH_LONG).show()
     }
 
     override fun setLoginInProgressVisibility(isVisible: Boolean) {
-        runOnUiThread {
-            progress_bar_logging_in.showIf { isVisible }
-        }
+        progress_bar_logging_in.showIf { isVisible }
     }
 
     override fun onDestroy() {

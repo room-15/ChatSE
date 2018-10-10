@@ -5,17 +5,24 @@ import com.tristanwiley.chatse.BuildConfig
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.util.SharedPreferenceManager
 import com.tristanwiley.chatse.util.UserPreferenceKeys
-import com.tristanwiley.chatse.util.uiScheduler
-import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.experimental.CoroutineScope
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.experimental.launch
 import timber.log.Timber
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.coroutines.experimental.CoroutineContext
 
-class LoginPresenter {
+class LoginPresenter : CoroutineScope {
+    private val job = Job()
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
+
+    private val uiScope = CoroutineScope(coroutineContext)
 
     private lateinit var view: LoginView
-
-    private val disposables = CompositeDisposable()
 
     private val prefs = SharedPreferenceManager.sharedPreferences
 
@@ -59,16 +66,18 @@ class LoginPresenter {
             return
         }
 
-        val disposable = LoginUseCase()
-                .execute(LoginParams(email, password))
-                .observeOn(uiScheduler())
-                .subscribe({
-                    view.navigateToChat()
-                }, {
-                    handleLoginError()
-                    Timber.e(it)
-                })
-        disposables.add(disposable)
+        uiScope.launch {
+            try {
+                LoginUseCase().execute(LoginParams(email, password))
+                view.navigateToChat()
+            } catch (e: LoginFailedException) {
+                view.showLogInError()
+                Timber.e(e)
+            } finally {
+                view.setLoginInProgressVisibility(false)
+                view.setLoginEnabled(true)
+            }
+        }
     }
 
     private fun validateEmail(email: String) = when {
@@ -93,15 +102,8 @@ class LoginPresenter {
         else -> true
     }
 
-
-    private fun handleLoginError() {
-        view.setLoginInProgressVisibility(false)
-        view.setLoginEnabled(true)
-        view.showLogInError()
-    }
-
     fun detachView() {
-        disposables.clear()
+        job.cancel()
     }
 
     companion object {
