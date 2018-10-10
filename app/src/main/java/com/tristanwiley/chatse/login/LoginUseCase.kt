@@ -6,8 +6,7 @@ import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import com.tristanwiley.chatse.util.SharedPreferenceManager
 import com.tristanwiley.chatse.util.UserPreferenceKeys
-import com.tristanwiley.chatse.util.ioScheduler
-import io.reactivex.Completable
+import kotlinx.coroutines.experimental.*
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.io.IOException
@@ -16,21 +15,20 @@ class LoginUseCase {
 
     private val prefs = SharedPreferenceManager.sharedPreferences
 
-    fun execute(params: LoginParams): Completable =
-            Completable.fromAction {
-                loginToSites(params.email, params.password)
-            }
-                    .subscribeOn(ioScheduler())
+    suspend fun execute(params: LoginParams) = withContext(Dispatchers.IO) {
+        loginToSites(params.email, params.password)
+    }
 
     /**
      * Log in to all sites.
      */
-    private fun loginToSites(email: String, password: String) {
+    private suspend fun loginToSites(email: String, password: String) = coroutineScope {
         val client = ClientManager.client
-
         if (seOpenIdLogin(client, email, password)) {
-            loginToSE(client)
-            loginToSite(client, "https://stackoverflow.com", email, password)
+            val seLogin = async { loginToSE(client) }
+            val siteLogin = async { loginToSite(client, "https://stackoverflow.com", email, password) }
+
+            awaitAll(seLogin, siteLogin)
             prefs.edit().putBoolean(UserPreferenceKeys.IS_LOGGED_IN, true).apply()
         } else {
             throw LoginFailedException()

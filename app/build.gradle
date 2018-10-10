@@ -72,10 +72,8 @@ dependencies {
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-
-    // Rx
-    implementation "io.reactivex.rxjava2:rxjava:$rxJava"
-    implementation "io.reactivex.rxjava2:rxandroid:$rxAndroid"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.30.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:0.30.2'
 
     // Glide
     implementation "com.github.bumptech.glide:glide:$glide"
@@ -97,4 +95,10 @@ dependencies {
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
     testImplementation "com.squareup.okhttp:mockwebserver:$mockWebServer"
+}
+
+kotlin {
+    experimental {
+        coroutines = 'enable'
+    }
 }
