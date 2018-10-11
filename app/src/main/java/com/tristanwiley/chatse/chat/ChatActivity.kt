@@ -46,7 +46,7 @@ import org.json.JSONObject
 import java.io.IOException
 
 /**
- * ChatActivity is the main activity that sets the Fragment and Drawer layouts
+ * ChatActivity sets the Fragment and Drawer layouts
  *
  * @property serviceBinder: IncomingEventServiceBinder that is used to load rooms
  * @property soRoomList: A list of all the rooms the user is currently in for StackOverflow
@@ -66,34 +66,11 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
     private var isBound = false
     private val prefs = SharedPreferenceManager.sharedPreferences
 
-    private var currentroomNum: Int? = null
+    private var currentRoomNum: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.activity_chat)
-
-/*        //If the user is still logged in then continue, otherwise logout
-        if (prefs.getBoolean(App.PREF_HAS_CREDS, false)) {
-            //If the user came from a deep link, continue
-            if (intent.action == Intent.ACTION_VIEW) {
-                //Check if it's SO or SE
-                val isSO = intent.data.toString().contains(Client.SITE_STACK_OVERFLOW)
-                //Get room number
-                val roomNum = intent.data.path.split("/")[2].toInt()
-
-                //Figure out the site based on isSO
-                var site = Client.SITE_STACK_OVERFLOW
-                if (!isSO && roomNum != 0) {
-                    site = Client.SITE_STACK_EXCHANGE
-                }
-
-                //Load the site from the deep link
-                loadChatFragment(ChatRoom(site, roomNum))
-            }
-        } else {
-            startActivity(Intent(applicationContext, LoginActivity::class.java))
-            finish()
-        } */
 
         //Create adapters for current user's rooms
         soRoomAdapter = RoomAdapter(Client.SITE_STACK_OVERFLOW, soRoomList, this,this)
@@ -106,10 +83,6 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
         stackexchange_room_list.addItemDecoration(DividerItemDecoration(this))
         stackexchange_room_list.adapter = seRoomAdapter
         stackexchange_room_list.layoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
-
-//        //Notify data is changed
-//        soRoomAdapter.notifyDataSetChanged()
-//        seRoomAdapter.notifyDataSetChanged()
 
         //Set toolbar as SupportActionBar
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -185,7 +158,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
         //Load a default room
 
         loadChatFragment(ChatRoom(prefs.getString(RoomPreferenceKeys.LAST_ROOM_SITE, Client.SITE_STACK_OVERFLOW), prefs.getInt(RoomPreferenceKeys.LAST_ROOM_NUM, 15)))
-        currentroomNum = prefs.getInt(RoomPreferenceKeys.LAST_ROOM_NUM, 15)
+        currentRoomNum = prefs.getInt(RoomPreferenceKeys.LAST_ROOM_NUM, 15)
     }
 
     /**
@@ -220,7 +193,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
     /**
      * Add all the rooms that the user is in to the NavigationDrawer
      */
-    fun addRoomsToDrawer(fkey: String) {
+    private fun addRoomsToDrawer(fkey: String) {
         val soID = prefs.getInt("SOID", -1)
         soRoomList.clear()
         seRoomList.clear()
@@ -422,16 +395,16 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
                     builder.setView(l)
 
                     //Join the room the user chose and load it into the container
-                    builder.setPositiveButton("Join Room", { dialog, _ ->
+                    builder.setPositiveButton("Join Room") { dialog, _ ->
                         loadChatFragment(ChatRoom(site, input.text.toString().toInt()))
-                        currentroomNum = input.text.toString().toInt()
+                        currentRoomNum = input.text.toString().toInt()
                         //Dismiss the dialog
                         dialog.dismiss()
-                    })
-                    builder.setNegativeButton("Cancel", { dialog, _ ->
+                    }
+                    builder.setNegativeButton("Cancel") { dialog, _ ->
                         //Dismiss the dialog and cancel
                         dialog.cancel()
-                    })
+                    }
 
                     //Show the dialog
                     builder.show()
@@ -459,8 +432,8 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
     override fun onItemClick(chatRoom: ChatRoom) {
 
         val clickedRoomNo = chatRoom.num
-        if ((currentroomNum != null) && currentroomNum != clickedRoomNo) {
-            currentroomNum = clickedRoomNo
+        if ((currentRoomNum != null) && currentRoomNum != clickedRoomNo) {
+            currentRoomNum = clickedRoomNo
             doAsync {
                 addChatFragment(createChatFragment(chatRoom))
             }
@@ -471,7 +444,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
     }
 
     //Load the chat fragment by creating it and adding it
-    fun loadChatFragment(room: ChatRoom) {
+    private fun loadChatFragment(room: ChatRoom) {
         doAsync {
             addChatFragment(createChatFragment(room))
         }
@@ -564,4 +537,12 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
 }
 
 //A class for a room with all the things we get from /rooms/thumbs/{id}
-data class Room(val name: String, val roomID: Long, val description: String, val lastActive: Long?, var isFavorite: Boolean, val tags: String, val fkey: String)
+data class Room(
+        val name: String,
+        val roomID: Long,
+        val description: String,
+        val lastActive: Long?,
+        var isFavorite: Boolean,
+        val tags: String,
+        val fkey: String
+)
