@@ -37,7 +37,6 @@ import com.tristanwiley.chatse.network.cookie.PersistentCookieStore
 import com.tristanwiley.chatse.util.RoomPreferenceKeys
 import com.tristanwiley.chatse.util.SharedPreferenceManager
 import com.tristanwiley.chatse.util.UserPreferenceKeys
-import com.tristanwiley.chatse.views.DividerItemDecoration
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.room_nav_header.*
 import org.jetbrains.anko.doAsync

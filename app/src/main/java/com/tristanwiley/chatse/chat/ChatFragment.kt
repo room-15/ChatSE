@@ -217,7 +217,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
 //        messageList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))
         userList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         userList.adapter = usersAdapter
-        userList.addItemDecoration(CoreDividerItemDecoration(activity as ChatActivity, CoreDividerItemDecoration.Companion.VERTICAL_LIST))
+        userList.addItemDecoration(DividerItemDecoration(activity as ChatActivity, DividerItemDecoration.Companion.VERTICAL_LIST))
         usersAdapter.notifyDataSetChanged()
         //When you reach the top and swipe to load more, add 25 to the current loaded amount and load more
         loadMessagesLayout.setOnRefreshListener {

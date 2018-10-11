@@ -1,5 +1,6 @@
 package com.tristanwiley.chatse.chat
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Rect
@@ -8,13 +9,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 
-/**
- * Adapted from Adam's RecyclerViewUtils library:
- * TODO: I think this is a duplicate of the one in the views package. Consider consolidating and testing later.
- *
- * https://github.com/AdamMc331/RecyclerViewUtils/blob/develop/lib/src/main/java/com/adammcneilly/CoreDividerItemDecoration.kt
- */
-class CoreDividerItemDecoration @JvmOverloads constructor(context: Context, orientation: Int = VERTICAL_LIST) : RecyclerView.ItemDecoration() {
+@SuppressLint("DuplicateDivider")
+class DividerItemDecoration @JvmOverloads constructor(context: Context, orientation: Int = VERTICAL_LIST) : RecyclerView.ItemDecoration() {
     /**
      * The orientation of the list.
      */
