@@ -1,4 +1,7 @@
-[![CircleCI](https://circleci.com/gh/room-15/ChatSE/tree/master.svg?style=shield)](https://circleci.com/gh/room-15/ChatSE/tree/master)
+Branch|Status
+---|---
+master|[![CircleCI](https://circleci.com/gh/room-15/ChatSE/tree/master.svg?style=shield)](https://circleci.com/gh/room-15/ChatSE/tree/master)
+develop|[![CircleCI](https://circleci.com/gh/room-15/ChatSE/tree/develop.svg?style=shield)](https://circleci.com/gh/room-15/ChatSE/tree/develop)
 
 # ChatSE
 
@@ -10,19 +13,18 @@ The fkey is the most important String inside this application. It is used to aut
 
 # How can you help?
   
- I'm currently working on adding comments to this project, along with improving design and fixing bugs. If you'd like you help you can do a few things.
- 
-  - Add features: This can be done by monitoring network calls in Chrome when you click on say, leave room, and then implementing that using something similar to the above code.
-  - Add comments: I'm sure I won't be able to get through all this code and add comments alone. Even just a few comments here and there help a lot.
-  - Identify bugs and create an issue. I'll try to get through all bugs asap.
-  - Code cleanup, there's a lot of code. Cleaning it up so others can help is tedious, but the most rewarding.
+I'm currently working on adding comments to this project, along with improving design and fixing bugs. If you'd like you help you can do a few things.
+
+- Add features: This can be done by monitoring network calls in Chrome when you click on say, leave room, and then implementing that using something similar to the above code.
+- Add comments: I'm sure I won't be able to get through all this code and add comments alone. Even just a few comments here and there help a lot.
+- Identify bugs and create an issue. I'll try to get through all bugs asap.
+- Code cleanup, there's a lot of code. Cleaning it up so others can help is tedious, but the most rewarding.
   
 # Contributors
-  - [TristanWiley](https://github.com/TristanWiley) - I've revived this project to the best of my abilities and it's almost done
-  - [AnubianN00b](https://github.com/AnubianN00b) - Original creator of this project, ily <3
-  - [AdamMc331](https://github.com/AdamMc331) - My best friend and also helped work on the project.
-  - [Mauker](https://github.com/Mauker1) - r15 Dev Bro.
-  - [CptEric](https://github.com/tryadelion) - r15 Dev Bro.
+- [TristanWiley](https://github.com/TristanWiley) - I've revived this project to the best of my abilities and it's almost done
+- [AnubianN00b](https://github.com/AnubianN00b) - Original creator of this project, ily <3
+- [AdamMc331](https://github.com/AdamMc331) - My best friend and also helped work on the project.
+- [Mauker](https://github.com/Mauker1) - r15 Dev Bro.
+- [CptEric](https://github.com/tryadelion) - r15 Dev Bro.
   
 ~ Tristan Wiley
-      
