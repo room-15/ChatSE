@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.target.SimpleTarget
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
@@ -119,7 +120,15 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
                     Glide.with(itemView.context.applicationContext)
                             .asBitmap()
                             .load(imageLink)
-                            .into(object : SimpleTarget<Bitmap>() {
+                            .into(object : CustomViewTarget<ImageView,Bitmap>(userPicture) {
+                                override fun onLoadFailed(errorDrawable: Drawable?) {
+                                    // LoadFailed!. show error image
+                                }
+
+                                override fun onResourceCleared(placeholder: Drawable?) {
+                                    // show placeholder.
+                                }
+
                                 override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
                                     //Load it into the ImageView!
                                     userPicture.setImageBitmap(resource)
