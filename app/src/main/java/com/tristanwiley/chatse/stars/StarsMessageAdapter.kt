@@ -24,7 +24,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomViewTarget
-import com.bumptech.glide.request.target.SimpleTarget
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.chat.ChatRoom
