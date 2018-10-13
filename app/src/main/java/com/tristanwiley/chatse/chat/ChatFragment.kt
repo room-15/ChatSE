@@ -216,7 +216,8 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
 
         messageAdapter = MessageAdapter(context!!, chatFkey, room, messageCallback = this)
         usersAdapter = UsersAdapter(context!!, events)
-        messageList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, true)
+        val layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, true)
+        messageList.layoutManager = layoutManager
         messageList.adapter = messageAdapter
 //        messageList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))
         userList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
@@ -231,6 +232,24 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
                 handleNewEvents(messages.get("events"))
             }
         }
+
+        messageAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+
+                val totalItemCount = messageAdapter.itemCount -1
+                val lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition()
+
+                if(lastVisiblePosition == totalItemCount){
+                    // We have reached the end of the recycler view.
+                    // no need to scroll
+                }
+                else if (positionStart == 0) {
+                    layoutManager.scrollToPosition(0)
+                }
+            }
+
+        })
 
         //Get handle new events
         doAsync {
@@ -439,13 +458,6 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
                     events.addEvent(it, (this.activity as ChatActivity), room)
                 }
 
-        //Update adapters so we know to check for new events
-        (activity as ChatActivity).runOnUiThread {
-            usersAdapter.update()
-            usersAdapter.notifyDataSetChanged()
-            loadMessagesLayout.isRefreshing = false
-        }
-
         // fetch url for each message based on user Id
         (activity as ChatActivity).runOnUiThread {
             val messageList = events.messagePresenter.getEventsList()
@@ -476,10 +488,13 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
                             messageEvent.emailHash = imageLink
                             messageEvent.isFetchedUrl = true
                             messageAdapter.add(messageEvent)
+                            loadMessagesLayout.isRefreshing = false
                         }
                     }
                 }
             }
+            usersAdapter.update()
+            usersAdapter.notifyDataSetChanged()
 
         }
     }
