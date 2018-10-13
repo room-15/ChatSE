@@ -15,7 +15,9 @@ import android.support.transition.TransitionManager
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.graphics.Palette
+import android.support.v7.util.SortedList
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.util.SortedListAdapterCallback
 import android.text.Html
 import android.text.util.Linkify
 import android.util.Log
@@ -30,7 +32,6 @@ import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.chat.ChatMessageCallback
 import com.tristanwiley.chatse.chat.ChatRoom
-import com.tristanwiley.chatse.event.EventList
 import com.tristanwiley.chatse.event.presenter.message.MessageEvent
 import com.tristanwiley.chatse.extensions.loadUrl
 import com.tristanwiley.chatse.network.Client
@@ -39,8 +40,6 @@ import kotlinx.android.synthetic.main.list_item_message.view.*
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
-import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.text.SimpleDateFormat
 import java.util.*
@@ -52,16 +51,24 @@ import kotlin.collections.HashSet
  */
 class MessageAdapter(
         private val mContext: Context,
-        private val events: EventList,
         private val chatFkey: String?,
         val room: ChatRoom?,
-        private var messages: ArrayList<MessageEvent> = ArrayList(),
         private val messageCallback: ChatMessageCallback) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>(), SelectedMessagesListener {
+
+    private val sortedList: SortedList<MessageEvent>
 
     init {
         setHasStableIds(true)
+        this.sortedList = SortedList<MessageEvent>(MessageEvent::class.java, object : SortedListAdapterCallback<MessageEvent>(this) {
+            override fun compare(item1: MessageEvent, item2: MessageEvent): Int = item1.compareTo(item2)
+
+            override fun areContentsTheSame(oldItem: MessageEvent, newItem: MessageEvent): Boolean = (oldItem.hashCode() == newItem.hashCode())
+
+            override fun areItemsTheSame(item1: MessageEvent, item2: MessageEvent): Boolean = (item1 == item2)
+
+        })
     }
-    
+
     private val selectedMessages: HashSet<Int> = HashSet()
 
     override fun selectMessage(mId: Int) {
@@ -75,17 +82,15 @@ class MessageAdapter(
     override fun isSelected(mId: Int): Boolean = selectedMessages.contains(mId)
 
     override fun onBindViewHolder(holder: MessageViewHolder, pos: Int) {
-        val message = messages[pos]
+        val message = sortedList[pos]
         holder.bindMessage(message)
     }
 
     /**
      * Called when we want to update the messages (there's a new message)
      */
-    fun update() {
-        messages.clear()
-        messages.addAll(events.messagePresenter.getEventsList())
-        this.notifyDataSetChanged()
+    fun add(messageEvent: MessageEvent) {
+        sortedList.add(messageEvent)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
@@ -93,9 +98,9 @@ class MessageAdapter(
         return MessageAdapter.MessageViewHolder(mContext, view, chatFkey, room, messageCallback, this)
     }
 
-    override fun getItemCount() = messages.size
+    override fun getItemCount() = sortedList.size()
 
-    override fun getItemId(position: Int) = messages[position].hashCode().toLong()
+    override fun getItemId(position: Int) = sortedList[position].hashCode().toLong()
 
     /**
      * ViewHolder that handles setting all content in itemView
@@ -142,8 +147,7 @@ class MessageAdapter(
             if (!message.isDeleted) {
                 if (selectionListener.isSelected(message.messageId)) {
                     selectionListener.deselectMessage(message.messageId)
-                }
-                else {
+                } else {
                     selectionListener.selectMessage(message.messageId)
                 }
                 checkIfSelected(selectionListener.isSelected(message.messageId), message.messageStars > 0, message.userId.toInt())
@@ -189,38 +193,17 @@ class MessageAdapter(
                 checkIfSelected(selectionListener.isSelected(message.messageId), message.messageStars > 0, message.userId.toInt())
             }
 
-            //Load the profile pictures! Create a request to get the url for the picture
-            doAsync {
-                val client = ClientManager.client
-                val request = Request.Builder()
-                        .url("${room?.site}/users/thumbs/${message.userId}")
-                        .build()
-                val response = client.newCall(request).execute()
-                val jsonResult = JSONObject(response.body().string())
-
-                //Get the emailHash attribute which contains either a link to Imgur or a hash for Gravatar
-                val hash = jsonResult.getString("email_hash").replace("!", "")
-                var imageLink = hash
-                //If Gravatar, create link
-                if (!hash.contains(".")) {
-                    imageLink = "https://www.gravatar.com/avatar/$hash"
-                } else if (!hash.contains("http")) {
-                    imageLink = room?.site + hash
-                }
-
-                uiThread {
-                    Glide.with(itemView.context.applicationContext)
-                            .asBitmap()
-                            .load(imageLink)
-                            .into(object : SimpleTarget<Bitmap>() {
-                                override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                                    //Load it into the ImageView!
-                                    userPicture.setImageBitmap(resource)
-                                    userBarBottom.setBackgroundColor(getDominantColor(resource))
-                                }
-                            })
-                }
-            }
+            //Load the profile pictures!.
+            Glide.with(itemView.context.applicationContext)
+                    .asBitmap()
+                    .load(message.emailHash)
+                    .into(object : SimpleTarget<Bitmap>() {
+                        override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
+                            //Load it into the ImageView!
+                            userPicture.setImageBitmap(resource)
+                            userBarBottom.setBackgroundColor(getDominantColor(resource))
+                        }
+                    })
 
             itemView.setOnClickListener {
                 toggleSelection(message)
@@ -354,7 +337,7 @@ class MessageAdapter(
                             //Set the text to nothing just in case
                             messageView.text = ""
                         }
-                    //For Youtube videos, display the image and some text, linking the view to the video on Youtube
+                        //For Youtube videos, display the image and some text, linking the view to the video on Youtube
                         "youtube" -> {
                             itemView.setOnClickListener {
                                 mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.oneboxExtra)))
@@ -364,7 +347,7 @@ class MessageAdapter(
                             itemView.message_image.loadUrl(message.oneboxContent)
                             messageView.text = message.content
                         }
-                    //for twitter tweets, display the profile pic, profile name, and render the text. might need some css
+                        //for twitter tweets, display the profile pic, profile name, and render the text. might need some css
                         "tweet" -> {
                             val twitterUrl = Jsoup.parse(message.oneboxContent).getElementsByTag("a")[1].attr("href")
                             messageView.setOnClickListener {
@@ -383,7 +366,7 @@ class MessageAdapter(
                             }
 
                         }
-                    //Other oneboxed items just display the HTML until we implement them all
+                        //Other oneboxed items just display the HTML until we implement them all
                         else -> {
                             Log.d("Onebox", "Type: ${message.oneboxType}")
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -426,8 +409,7 @@ class MessageAdapter(
                 // Show self actions
                 if (messageUid == curUserId) {
                     footerSelf.visibility = View.VISIBLE
-                }
-                else {
+                } else {
                     footerOthers.visibility = View.VISIBLE
                 }
 
@@ -435,8 +417,7 @@ class MessageAdapter(
                     actionStar.setColorFilter(ContextCompat.getColor(mContext, R.color.star_starred))
                 else
                     actionStar.setColorFilter(Color.BLACK)
-            }
-            else {
+            } else {
                 rootMessageLayout.setBackgroundColor(bgColor)
                 footerSelf.visibility = View.GONE
                 footerOthers.visibility = View.GONE

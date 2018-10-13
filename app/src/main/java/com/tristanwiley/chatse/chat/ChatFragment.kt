@@ -13,6 +13,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.ActivityCompat.startActivityForResult
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
@@ -42,8 +43,10 @@ import com.tristanwiley.chatse.chat.adapters.UsersAdapter
 import com.tristanwiley.chatse.chat.service.IncomingEventListener
 import com.tristanwiley.chatse.event.ChatEventGenerator
 import com.tristanwiley.chatse.event.EventList
+import com.tristanwiley.chatse.event.presenter.message.MessageEvent
 import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
+import com.tristanwiley.chatse.network.ClientManager.client
 import com.tristanwiley.chatse.stars.StarsActivity
 import kotlinx.android.synthetic.main.fragment_chat.view.*
 import kotlinx.android.synthetic.main.picker_footer.view.*
@@ -51,6 +54,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.json.JSONObject
 import org.jsoup.Jsoup
+import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -210,7 +214,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
         userList = (activity as ChatActivity).findViewById(R.id.room_users)
         loadMessagesLayout = view.findViewById(R.id.load_messages_layout)
 
-        messageAdapter = MessageAdapter(context!!, events, chatFkey, room, messageCallback = this)
+        messageAdapter = MessageAdapter(context!!, chatFkey, room, messageCallback = this)
         usersAdapter = UsersAdapter(context!!, events)
         messageList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, true)
         messageList.adapter = messageAdapter
@@ -233,7 +237,6 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
             val messages = getMessagesObject(client, room, 50)
             handleNewEvents(messages.get("events"))
         }
-
         //Get focus of EditText input
         input.requestFocus()
         return view
@@ -390,7 +393,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
         //If the data isn't null
         if (data != null) {
             when (requestCode) {
-            //If from the camera
+                //If from the camera
                 0 -> {
                     if (data.extras != null) {
                         //Get the photo from the data as a Bitmap
@@ -409,7 +412,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
                         uploadToImgur(photoBytes)
                     }
                 }
-            //If from the gallery
+                //If from the gallery
                 1 -> {
                     if (data.data != null) {
                         val photoBytes = getImageBytes(data.data)
@@ -438,10 +441,46 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
 
         //Update adapters so we know to check for new events
         (activity as ChatActivity).runOnUiThread {
-            messageAdapter.update()
             usersAdapter.update()
             usersAdapter.notifyDataSetChanged()
             loadMessagesLayout.isRefreshing = false
+        }
+
+        // fetch url for each message based on user Id
+        (activity as ChatActivity).runOnUiThread {
+            val messageList = events.messagePresenter.getEventsList()
+            for (messageEvent in messageList) {
+                //val messageEvent = messageList[i]
+                val userId = messageEvent.userId
+                val index = messageList.indexOf(messageEvent)
+                if (!messageEvent.isFetchedUrl) {
+                    doAsync {
+                        val client = ClientManager.client
+                        val request = Request.Builder()
+                                .url("${room.site}/users/thumbs/$userId")
+                                .build()
+                        val response = client.newCall(request).execute()
+                        val jsonResult = JSONObject(response.body().string())
+
+                        //Get the emailHash attribute which contains either a link to Imgur or a hash for Gravatar
+                        val hash = jsonResult.getString("email_hash").replace("!", "")
+                        var imageLink = hash
+                        //If Gravatar, create link
+                        if (!hash.contains(".")) {
+                            imageLink = "https://www.gravatar.com/avatar/$hash"
+                        } else if (!hash.contains("http")) {
+                            imageLink = room.site + hash
+                        }
+                        (activity as ChatActivity).runOnUiThread {
+                            Timber.i("Index :$index and url :$imageLink and context ${messageEvent.content}")
+                            messageEvent.emailHash = imageLink
+                            messageEvent.isFetchedUrl = true
+                            messageAdapter.add(messageEvent)
+                        }
+                    }
+                }
+            }
+
         }
     }
 
@@ -586,6 +625,4 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
             return fragment
         }
     }
-
-
 }

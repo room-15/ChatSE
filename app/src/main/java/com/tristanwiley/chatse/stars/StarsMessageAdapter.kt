@@ -46,10 +46,10 @@ import kotlin.collections.ArrayList
  */
 class StarsMessageAdapter(private val mContext: Context, private val events: ArrayList<ChatEvent>, val room: ChatRoom) : RecyclerView.Adapter<StarsMessageAdapter.MessageViewHolder>() {
 
-    init{
+    init {
         setHasStableIds(true)
     }
-    
+
     override fun onBindViewHolder(holder: MessageViewHolder, pos: Int) {
         val message = events[pos]
         holder.bindMessage(message)
@@ -92,42 +92,18 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
             if (userPicture.drawable != placeholderDrawable)
                 userPicture.setImageResource(R.drawable.box)
 
-            //Load the profile pictures! Create a request to get the url for the picture
+            //Load the profile pictures!
 
-            doAsync {
-                val client = ClientManager.client
-
-                val soChatPageRequest = Request.Builder()
-                        .url("${room.site}/users/thumbs/${message.userId}")
-                        .build()
-                val response = client.newCall(soChatPageRequest).execute()
-                val jsonData = response.body().string()
-                val result = JSONObject(jsonData)
-
-                //Get the emailHash attribute which contains either a link to Imgur or a hash for Gravatar
-                val hash = result.getString("email_hash").replace("!", "")
-                var imageLink = hash
-                //If Gravatar, create link
-                if (!hash.contains(".")) {
-                    imageLink = "https://www.gravatar.com/avatar/$hash"
-                } else if (!hash.contains("http")) {
-                    imageLink = room.site + hash
-                }
-
-                uiThread {
-                    //Load it into the ImageView!
-                    Glide.with(itemView.context.applicationContext)
-                            .asBitmap()
-                            .load(imageLink)
-                            .into(object : SimpleTarget<Bitmap>() {
-                                override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                                    //Load it into the ImageView!
-                                    userPicture.setImageBitmap(resource)
-                                    userBarBottom.setBackgroundColor(getDominantColor(resource))
-                                }
-                            })
-                }
-            }
+            Glide.with(itemView.context.applicationContext)
+                    .asBitmap()
+                    .load(message.emailHash)
+                    .into(object : SimpleTarget<Bitmap>() {
+                        override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
+                            //Load it into the ImageView!
+                            userPicture.setImageBitmap(resource)
+                            userBarBottom.setBackgroundColor(getDominantColor(resource))
+                        }
+                    })
 
             if (room.site == Client.SITE_STACK_OVERFLOW) {
                 if (message.userId == mContext.defaultSharedPreferences.getInt("SOID", -1)) {
@@ -243,7 +219,7 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
                         //Set the text to nothing just in case
                         messageView.text = ""
                     }
-                //For Youtube videos, display the image and some text, linking the view to the video on Youtube
+                    //For Youtube videos, display the image and some text, linking the view to the video on Youtube
                     "youtube" -> {
                         itemView.setOnClickListener {
                             mContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(message.oneboxContent)))
@@ -254,7 +230,7 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
 
                         messageView.text = message.contents
                     }
-                //for twitter tweets, display the profile pic, profile name, and render the text. might need some css
+                    //for twitter tweets, display the profile pic, profile name, and render the text. might need some css
                     "tweet" -> {
                         val twitterUrl = Jsoup.parse(message.oneboxContent).getElementsByTag("a")[1].attr("href")
                         messageView.setOnClickListener {
@@ -273,14 +249,14 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
                         }
                         BetterLinkMovementMethod.linkify(Linkify.ALL, messageView)
                     }
-                //Other oneboxed items just display the HTML until we implement them all
+                    //Other oneboxed items just display the HTML until we implement them all
                     else -> {
                         Log.d("Onebox", "Type: ${message.oneboxType}")
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             messageView.text = Html.fromHtml(message.contents, Html.FROM_HTML_MODE_LEGACY)
                         } else {
                             @Suppress("DEPRECATION")
-                             messageView.text = Html.fromHtml(message.contents)
+                            messageView.text = Html.fromHtml(message.contents)
                         }
                     }
                 }
