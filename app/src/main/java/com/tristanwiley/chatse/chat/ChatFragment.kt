@@ -462,7 +462,6 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
         (activity as ChatActivity).runOnUiThread {
             val messageList = events.messagePresenter.getEventsList()
             for (messageEvent in messageList) {
-                //val messageEvent = messageList[i]
                 val userId = messageEvent.userId
                 val index = messageList.indexOf(messageEvent)
                 if (!messageEvent.isFetchedUrl) {
