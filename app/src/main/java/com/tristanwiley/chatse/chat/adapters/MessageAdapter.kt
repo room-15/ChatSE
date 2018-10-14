@@ -273,7 +273,7 @@ class MessageAdapter(
                         val spanString = SpannableString(content)
                         spanString.setSpan(QuoteSpan(ContextCompat.getColor(mContext,R.color.color_accent), 5, 40), 0, spanString.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                         messageView.text = spanString
-                    }else {
+                    } else {
                         messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.primary_text))
                         //If Android version is 24 and above use the updated version, otherwise use the deprecated version
                         val doc = Jsoup.parseBodyFragment("<span>" + message.content + "</span>")
