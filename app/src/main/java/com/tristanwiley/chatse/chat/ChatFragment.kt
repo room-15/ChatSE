@@ -237,14 +237,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
 
-                val totalItemCount = messageAdapter.itemCount -1
-                val lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition()
-
-                if(lastVisiblePosition == totalItemCount){
-                    // We have reached the end of the recycler view.
-                    // no need to scroll
-                }
-                else if (positionStart == 0) {
+                if (positionStart == 0) {
                     layoutManager.scrollToPosition(0)
                 }
             }
@@ -482,7 +475,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
                         } else if (!hash.contains("http")) {
                             imageLink = room.site + hash
                         }
-                        (activity as ChatActivity).runOnUiThread {
+                        (activity as? ChatActivity)?.runOnUiThread {
                             Timber.i("Index :$index and url :$imageLink and context ${messageEvent.content}")
                             messageEvent.emailHash = imageLink
                             messageEvent.isFetchedUrl = true
