@@ -475,7 +475,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
                         } else if (!hash.contains("http")) {
                             imageLink = room.site + hash
                         }
-                        (activity as? ChatActivity)?.runOnUiThread {
+                        (activity as ChatActivity).runOnUiThread {
                             Timber.i("Index :$index and url :$imageLink and context ${messageEvent.content}")
                             messageEvent.emailHash = imageLink
                             messageEvent.isFetchedUrl = true
