@@ -2,6 +2,7 @@ package com.tristanwiley.chatse
 
 import android.app.Application
 import com.crashlytics.android.Crashlytics
+import com.tristanwiley.chatse.log.CrashlyticsTimberTree
 import io.fabric.sdk.android.Fabric
 import timber.log.Timber
 
@@ -12,10 +13,12 @@ class App : Application() {
         super.onCreate()
         instance = this
 
-        Fabric.with(this, Crashlytics())
-
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
+        }
+        else {
+            Fabric.with(this, Crashlytics())
+            Timber.plant(CrashlyticsTimberTree)
         }
     }
 
