@@ -13,7 +13,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
-import android.support.v4.app.ActivityCompat.startActivityForResult
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
@@ -43,10 +42,8 @@ import com.tristanwiley.chatse.chat.adapters.UsersAdapter
 import com.tristanwiley.chatse.chat.service.IncomingEventListener
 import com.tristanwiley.chatse.event.ChatEventGenerator
 import com.tristanwiley.chatse.event.EventList
-import com.tristanwiley.chatse.event.presenter.message.MessageEvent
 import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
-import com.tristanwiley.chatse.network.ClientManager.client
 import com.tristanwiley.chatse.stars.StarsActivity
 import kotlinx.android.synthetic.main.fragment_chat.view.*
 import kotlinx.android.synthetic.main.picker_footer.view.*
@@ -54,7 +51,6 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.json.JSONObject
 import org.jsoup.Jsoup
-import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -237,8 +233,13 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
 
-                if (positionStart == 0) {
-                    layoutManager.scrollToPosition(0)
+                val chatMessageCount = messageAdapter.itemCount
+                val lastVisiblePosition = layoutManager.findFirstCompletelyVisibleItemPosition()
+                // If the recycler view is initially being loaded or the
+                // user is at the bottom of the list, scroll to the bottom
+                // of the list to show the newly added message.
+                if (lastVisiblePosition == -1 ||  chatMessageCount - 1 >= positionStart  && lastVisiblePosition == positionStart) {
+                    messageList.scrollToPosition(positionStart)
                 }
             }
 
@@ -476,7 +477,6 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
                             imageLink = room.site + hash
                         }
                         (activity as ChatActivity).runOnUiThread {
-                            Timber.i("Index :$index and url :$imageLink and context ${messageEvent.content}")
                             messageEvent.emailHash = imageLink
                             messageEvent.isFetchedUrl = true
                             messageAdapter.add(messageEvent)
