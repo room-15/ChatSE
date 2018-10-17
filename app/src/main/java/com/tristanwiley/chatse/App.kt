@@ -12,7 +12,9 @@ class App : Application() {
         super.onCreate()
         instance = this
 
-        Fabric.with(this, Crashlytics())
+        if (BuildConfig.enableCrashlytics) {
+            Fabric.with(this, Crashlytics())
+        }
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
