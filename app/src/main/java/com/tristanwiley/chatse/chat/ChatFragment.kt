@@ -457,7 +457,6 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
             val messageList = events.messagePresenter.getEventsList()
             for (messageEvent in messageList) {
                 val userId = messageEvent.userId
-                val index = messageList.indexOf(messageEvent)
                 if (!messageEvent.isFetchedUrl) {
                     doAsync {
                         val client = ClientManager.client
