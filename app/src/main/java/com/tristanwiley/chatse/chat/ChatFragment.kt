@@ -181,11 +181,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
                                 //When you click on the gallery button, open a camera intent and get the result in onActivityResult
                                 //Request external storage permission
                                 if (ContextCompat.checkSelfPermission(activity as ChatActivity, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                                         ActivityCompat.requestPermissions(activity as ChatActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
-                                    } else {
-                                        openFileChooser()
-                                    }
                                 } else {
                                     openFileChooser()
                                 }
@@ -343,12 +339,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
                             tagview.layoutParams = layoutparam
 
                             //Set the background to a rectangle to look like it does on the web
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                tagview.background = ContextCompat.getDrawable(context as Context, R.drawable.tag_background)
-                            } else {
-                                @Suppress("DEPRECATION")
-                                tagview.setBackgroundDrawable(ContextCompat.getDrawable(context as Context, R.drawable.tag_background))
-                            }
+                            tagview.background = ContextCompat.getDrawable(context as Context, R.drawable.tag_background)
 
                             //Add the tag to the layout
                             tagsLayout.addView(tagview)
