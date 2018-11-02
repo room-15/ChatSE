@@ -17,6 +17,9 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.graphics.Palette
 import android.support.v7.widget.RecyclerView
 import android.text.Html
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.QuoteSpan
 import android.text.util.Linkify
 import android.util.Log
 import android.view.LayoutInflater
@@ -42,6 +45,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.json.JSONObject
 import org.jsoup.Jsoup
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -271,16 +275,24 @@ class MessageAdapter(
             } else {
                 //If it's just a plain message, then set the text from HTML
                 if (!message.onebox) {
-                    messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.primary_text))
-                    //If Android version is 24 and above use the updated version, otherwise use the deprecated version
-                    val doc = Jsoup.parseBodyFragment("<span>" + message.content + "</span>")
-                    val parsedHTML = doc.body().unwrap().toString()
+                    if(message.content!!.startsWith("> ")) {
+                        Timber.i("Message Content :${message.content}")
+                        val content = message.content!!.replaceFirst("> ","")
+                        val spanString = SpannableString(content)
+                        spanString.setSpan(QuoteSpan(ContextCompat.getColor(mContext,R.color.color_accent), 5, 40), 0, spanString.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        messageView.text = spanString
+                    } else{
+                        messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.primary_text))
+                        //If Android version is 24 and above use the updated version, otherwise use the deprecated version
+                        val doc = Jsoup.parseBodyFragment("<span>" + message.content + "</span>")
+                        val parsedHTML = doc.body().unwrap().toString()
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        messageView.text = Html.fromHtml(parsedHTML, Html.FROM_HTML_MODE_LEGACY)
-                    } else {
-                        @Suppress("DEPRECATION")
-                        messageView.text = Html.fromHtml(parsedHTML)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            messageView.text = Html.fromHtml(parsedHTML, Html.FROM_HTML_MODE_LEGACY)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            messageView.text = Html.fromHtml(parsedHTML)
+                        }
                     }
                     BetterLinkMovementMethod.linkify(Linkify.ALL, messageView)
                 } else {
