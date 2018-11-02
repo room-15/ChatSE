@@ -24,6 +24,8 @@ class MessageEvent(baseEvent: ChatEvent) : Comparable<MessageEvent> {
     var starTimestamp: String = baseEvent.starTimestamp
     internal var previous: MessageEvent? = null
 
+    var isFetchedUrl: Boolean = false
+
     val isDeleted: Boolean
         get() = content == null || content == ""
 

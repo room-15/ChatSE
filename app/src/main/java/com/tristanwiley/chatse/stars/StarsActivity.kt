@@ -9,12 +9,14 @@ import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
+import com.tristanwiley.chatse.chat.ChatActivity
 import com.tristanwiley.chatse.chat.ChatRoom
 import com.tristanwiley.chatse.event.ChatEvent
 import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import kotlinx.android.synthetic.main.activity_stars.*
 import org.jetbrains.anko.doAsync
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import timber.log.Timber
 
@@ -112,15 +114,40 @@ class StarsActivity : AppCompatActivity() {
                 event.starTimestamp = it.getElementsByClass("timestamp")[0].text()
                 eventList.add(event)
             }
-
+            lateinit var messageAdapter:StarsMessageAdapter
             runOnUiThread {
-                val messageAdapter = StarsMessageAdapter(applicationContext, eventList, room)
+                 messageAdapter = StarsMessageAdapter(applicationContext, eventList, room)
                 starsRecyclerView.layoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, true)
                 starsRecyclerView.adapter = messageAdapter
             }
+
+            // fetch url for each message based on user Id
+            for((index,event) in eventList.withIndex())
+                doAsync {
+                    val client = ClientManager.client
+                    val request = Request.Builder()
+                            .url("${room?.site}/users/thumbs/${event.userId}")
+                            .build()
+                    val response = client.newCall(request).execute()
+                    val jsonResult = JSONObject(response.body().string())
+
+                    //Get the emailHash attribute which contains either a link to Imgur or a hash for Gravatar
+                    val hash = jsonResult.getString("email_hash").replace("!", "")
+                    var imageLink = hash
+                    //If Gravatar, create link
+                    if (!hash.contains(".")) {
+                        imageLink = "https://www.gravatar.com/avatar/$hash"
+                    } else if (!hash.contains("http")) {
+                        imageLink = room?.site + hash
+                    }
+                    event.emailHash = imageLink
+
+                    // tell adapter about url fetched at index so that glide loads the same
+                    runOnUiThread {
+                        messageAdapter.notifyItemChanged(index)
+                    }
+                }
         }
-
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
