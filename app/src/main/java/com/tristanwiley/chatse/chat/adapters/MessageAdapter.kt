@@ -216,7 +216,6 @@ class MessageAdapter(
                                     userBarBottom.setBackgroundColor(getDominantColor(resource))
                                 }
                             })
-              }
  
             itemView.setOnClickListener {
                 toggleSelection(message)
