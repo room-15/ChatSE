@@ -9,7 +9,9 @@ Android app for Stack Exchange chat. Currently in development, see https://githu
 
 # What the fkey is the fkey?
 
-The fkey is the most important String inside this application. It is used to authenticate most calls (along with Cookie information). On any chat it is a unique ID that is passed to ensure that the user is the one making these calls.
+The fkey is the most important String inside this application. It is used to authenticate most calls (along with Cookie information). On any chat it is a unique ID that is passed to ensure that the user is the one making these calls. This key is persistent for each session. If you create a new tab while logged into the same account, your fkey will be the same. However, if you log in on a different machine, your fkey will be different there.
+
+The fkey is a hidden HTML input at the end of the body with an id of `fkey`.
 
 # How can you help?
   

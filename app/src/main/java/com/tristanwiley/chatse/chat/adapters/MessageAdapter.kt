@@ -19,6 +19,9 @@ import android.support.v7.util.SortedList
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.util.SortedListAdapterCallback
 import android.text.Html
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.QuoteSpan
 import android.text.util.Linkify
 import android.util.Log
 import android.view.LayoutInflater
@@ -26,7 +29,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.CustomViewTarget
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
@@ -41,6 +44,7 @@ import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -193,18 +197,27 @@ class MessageAdapter(
                 checkIfSelected(selectionListener.isSelected(message.messageId), message.messageStars > 0, message.userId.toInt())
             }
 
-            //Load the profile pictures!.
+            //Load the profile pictures!
             Glide.with(itemView.context.applicationContext)
-                    .asBitmap()
-                    .load(message.emailHash)
-                    .into(object : SimpleTarget<Bitmap>() {
-                        override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                            //Load it into the ImageView!
-                            userPicture.setImageBitmap(resource)
-                            userBarBottom.setBackgroundColor(getDominantColor(resource))
-                        }
-                    })
+                            .asBitmap()
+                            .load(message.emailHash)
+                            .into(object : CustomViewTarget<ImageView,Bitmap>(userPicture) {
+                                override fun onLoadFailed(errorDrawable: Drawable?) {
+                                    // LoadFailed!. show error image
+                                }
 
+                                override fun onResourceCleared(placeholder: Drawable?) {
+                                    // show placeholder.
+                                }
+
+                                override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
+                                    //Load it into the ImageView!
+                                    userPicture.setImageBitmap(resource)
+                                    userBarBottom.setBackgroundColor(getDominantColor(resource))
+                                }
+                            })
+              }
+ 
             itemView.setOnClickListener {
                 toggleSelection(message)
             }
@@ -246,16 +259,24 @@ class MessageAdapter(
             } else {
                 //If it's just a plain message, then set the text from HTML
                 if (!message.onebox) {
-                    messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.primary_text))
-                    //If Android version is 24 and above use the updated version, otherwise use the deprecated version
-                    val doc = Jsoup.parseBodyFragment("<span>" + message.content + "</span>")
-                    val parsedHTML = doc.body().unwrap().toString()
+                    if(message.content!!.startsWith("> ")) {
+                        Timber.i("Message Content :${message.content}")
+                        val content = message.content!!.replaceFirst("> ","")
+                        val spanString = SpannableString(content)
+                        spanString.setSpan(QuoteSpan(ContextCompat.getColor(mContext,R.color.color_accent), 5, 40), 0, spanString.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        messageView.text = spanString
+                    } else{
+                        messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.primary_text))
+                        //If Android version is 24 and above use the updated version, otherwise use the deprecated version
+                        val doc = Jsoup.parseBodyFragment("<span>" + message.content + "</span>")
+                        val parsedHTML = doc.body().unwrap().toString()
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        messageView.text = Html.fromHtml(parsedHTML, Html.FROM_HTML_MODE_LEGACY)
-                    } else {
-                        @Suppress("DEPRECATION")
-                        messageView.text = Html.fromHtml(parsedHTML)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            messageView.text = Html.fromHtml(parsedHTML, Html.FROM_HTML_MODE_LEGACY)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            messageView.text = Html.fromHtml(parsedHTML)
+                        }
                     }
                     BetterLinkMovementMethod.linkify(Linkify.ALL, messageView)
                 } else {
