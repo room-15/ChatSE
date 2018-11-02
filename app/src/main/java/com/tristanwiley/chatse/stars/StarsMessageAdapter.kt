@@ -111,7 +111,6 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
                                     userBarBottom.setBackgroundColor(getDominantColor(resource))
                                 }
                             })
-                }
 
             if (room.site == Client.SITE_STACK_OVERFLOW) {
                 if (message.userId == mContext.defaultSharedPreferences.getInt("SOID", -1)) {
