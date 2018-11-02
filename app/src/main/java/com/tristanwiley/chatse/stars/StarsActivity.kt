@@ -124,12 +124,12 @@ class StarsActivity : AppCompatActivity() {
             // fetch url for each message based on user Id
             for((index,event) in eventList.withIndex())
                 doAsync {
-                    val client = ClientManager.client
+                    val okHttpClient = ClientManager.client
                     val request = Request.Builder()
                             .url("${room?.site}/users/thumbs/${event.userId}")
                             .build()
-                    val response = client.newCall(request).execute()
-                    val jsonResult = JSONObject(response.body().string())
+                    val okHttpResponse = okHttpClient.newCall(request).execute()
+                    val jsonResult = JSONObject(okHttpResponse.body().string())
 
                     //Get the emailHash attribute which contains either a link to Imgur or a hash for Gravatar
                     val hash = jsonResult.getString("email_hash").replace("!", "")
