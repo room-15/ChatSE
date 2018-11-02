@@ -87,9 +87,3 @@ dependencies {
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
     testImplementation "com.squareup.okhttp:mockwebserver:$mockWebServer"
 }
-
-kotlin {
-    experimental {
-        coroutines = 'enable'
-    }
-}
