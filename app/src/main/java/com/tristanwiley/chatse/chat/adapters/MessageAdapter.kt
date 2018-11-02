@@ -262,7 +262,12 @@ class MessageAdapter(
                         Timber.i("Message Content :${message.content}")
                         val content = message.content!!.replaceFirst("> ","")
                         val spanString = SpannableString(content)
-                        spanString.setSpan(QuoteSpan(ContextCompat.getColor(mContext,R.color.color_accent), 5, 40), 0, spanString.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        // QuoteSpan with constructor with color, stripeWidth and gapWidth only available in api 28
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            spanString.setSpan(QuoteSpan(ContextCompat.getColor(mContext, R.color.color_accent), 5, 40), 0, spanString.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        } else {
+                            spanString.setSpan(QuoteSpan(ContextCompat.getColor(mContext, R.color.color_accent)), 0, spanString.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        }
                         messageView.text = spanString
                     } else{
                         messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.primary_text))
