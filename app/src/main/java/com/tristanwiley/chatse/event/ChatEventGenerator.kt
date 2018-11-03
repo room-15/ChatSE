@@ -3,6 +3,7 @@ package com.tristanwiley.chatse.event
 import android.util.Log
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import timber.log.Timber
 import java.io.IOException
 
 /**
@@ -22,7 +23,7 @@ class ChatEventGenerator {
         try {
             c = mapper.readValue<ChatEvent>(json.toString(), ChatEvent::class.java)
         } catch (e: IOException) {
-            Log.e("ChatEventGenerator", "Failed to map json", e)
+            Timber.e("ChatEventGenerator Failed to map json ${e.printStackTrace()}")
         }
 
         return c

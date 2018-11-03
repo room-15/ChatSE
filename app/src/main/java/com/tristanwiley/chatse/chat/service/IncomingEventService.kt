@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.support.v4.app.NotificationCompat
-import android.util.Log
 import com.fasterxml.jackson.databind.JsonNode
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
@@ -20,6 +19,7 @@ import com.tristanwiley.chatse.network.Client
 import org.json.JSONException
 import org.json.JSONObject
 import org.jsoup.Jsoup
+import timber.log.Timber
 
 import java.io.IOException
 import java.util.*
@@ -37,7 +37,7 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("IncomingEventService", "onDestroy")
+        Timber.d("IncomingEventService onDestroy")
     }
 
     fun registerListener(room: ChatRoom, listener: IncomingEventListener) {
@@ -68,8 +68,8 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
         for (holder in listeners) {
             if (holder.room.site != site) continue
             if (!root.has("r" + holder.room.num)) {
-                Log.e("Current Room Element", holder.room.num.toString())
-                Log.e("No room element", root.toString())
+                Timber.e("Current Room Element ${holder.room.num}")
+                Timber.e("No room element ${root.toString()}")
                 return
             }
             val roomNode = root.get("r" + holder.room.num)
@@ -119,11 +119,11 @@ class IncomingEventService : Service(), ChatWebSocketListener.ServiceWebsocketLi
     @Throws(IOException::class, JSONException::class)
     internal fun joinRoom(client: Client, room: ChatRoom, chatFkey: String) {
         if (!siteStatuses.containsKey(room.site)) {
-            siteStatuses.put(room.site, WebsocketConnectionStatus.DISCONNECTED)
+            siteStatuses[room.site] = WebsocketConnectionStatus.DISCONNECTED
         }
         val wsUrl = registerRoom(client, room, chatFkey)
         if (siteStatuses[room.site] != WebsocketConnectionStatus.ESTABLISHED) {
-            siteStatuses.put(room.site, WebsocketConnectionStatus.CREATING)
+            siteStatuses[room.site] = WebsocketConnectionStatus.CREATING
             initWs(client, wsUrl, room.site)
         }
         val soRequestBody = FormEncodingBuilder()

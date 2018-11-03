@@ -21,7 +21,7 @@ class DividerItemDecoration @JvmOverloads constructor(
 
     init {
         val attrs = context.obtainStyledAttributes(ATTRS)
-        divider = attrs.getDrawable(DIVIDER_POSITION)
+        divider = attrs.getDrawable(DIVIDER_POSITION)!!
         attrs.recycle()
     }
 

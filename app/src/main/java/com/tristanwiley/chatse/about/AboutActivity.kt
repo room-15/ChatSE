@@ -109,9 +109,7 @@ class AboutActivity : AppCompatActivity() {
                     AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme_SO))
                             .setTitle(getString(R.string.about_app_header_changelog))
                             .setView(R.layout.fragment_changelog)
-                            .setPositiveButton("Close",
-                                    { dialog, _ -> dialog.dismiss() }
-                            )
+                            .setPositiveButton("Close") { dialog, _ -> dialog.dismiss() }
                             .create()
                             .show()
                 }

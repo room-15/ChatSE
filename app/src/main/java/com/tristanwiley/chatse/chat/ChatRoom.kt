@@ -8,7 +8,7 @@ import android.os.Parcelable
  */
 class ChatRoom(val site: String, val num: Int) : Parcelable {
 
-    private constructor(source: Parcel) : this(source.readString(), source.readInt())
+    private constructor(source: Parcel) : this(source.readString()!!, source.readInt())
 
     override fun toString(): String {
         return "Room $num"

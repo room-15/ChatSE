@@ -22,7 +22,7 @@ class Client internal constructor(val httpClient: OkHttpClient, private val cook
             val originalRequest = chain.request()
             val requestWithUserAgent = originalRequest.newBuilder()
                     .removeHeader("User-Agent")
-                    .addHeader("User-Agent", Client.Companion.USER_AGENT)
+                    .addHeader("User-Agent", Client.USER_AGENT)
                     .build()
             chain.proceed(requestWithUserAgent)
         })
@@ -89,16 +89,16 @@ class Client internal constructor(val httpClient: OkHttpClient, private val cook
         /**
          * The UserAgent for all calls.
          */
-        val USER_AGENT = "Mozilla/5.0 (Windows NT 6.2; WOW64)" + "AppleWebKit/537.36 (KHTML, like Gecko)" + "Chrome/44.0.2403.155 Safari/537.36"
+        const val USER_AGENT = "Mozilla/5.0 (Windows NT 6.2; WOW64)" + "AppleWebKit/537.36 (KHTML, like Gecko)" + "Chrome/44.0.2403.155 Safari/537.36"
 
         /**
          * URL to the stack exchange site.
          */
-        val SITE_STACK_EXCHANGE = "https://chat.stackexchange.com"
+        const val SITE_STACK_EXCHANGE = "https://chat.stackexchange.com"
 
         /**
          * URL to the stack overflow site.
          */
-        val SITE_STACK_OVERFLOW = "https://chat.stackoverflow.com"
+        const val SITE_STACK_OVERFLOW = "https://chat.stackoverflow.com"
     }
 }

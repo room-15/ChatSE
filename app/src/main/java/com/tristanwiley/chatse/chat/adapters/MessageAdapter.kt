@@ -23,7 +23,6 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.QuoteSpan
 import android.text.util.Linkify
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -382,7 +381,7 @@ class MessageAdapter(
                             messageView.setPadding(15, 15, 15, 15)
                             messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
                             messageView.setLinkTextColor(ContextCompat.getColor(itemView.context, R.color.accent_twitter))
-                            Log.d("Onebox", "Type: ${message.oneboxType}")
+                            Timber.d("Onebox Type: ${message.oneboxType}")
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 messageView.text = Html.fromHtml(message.content, Html.FROM_HTML_MODE_LEGACY)
                             } else {
@@ -393,7 +392,7 @@ class MessageAdapter(
                         }
                         //Other oneboxed items just display the HTML until we implement them all
                         else -> {
-                            Log.d("Onebox", "Type: ${message.oneboxType}")
+                            Timber.d("Onebox Type: ${message.oneboxType}")
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 messageView.text = Html.fromHtml(message.content, Html.FROM_HTML_MODE_LEGACY)
                             } else {
@@ -498,7 +497,7 @@ class MessageAdapter(
          * Function to edit the message
          * @param message: MessageEvent of the message to edit
          * @param mContext: Application context
-         * @param plusDialog: DialogPlus so we can dismiss
+         * plusDialog: DialogPlus so we can dismiss
          */
         private fun showEditDialog(message: MessageEvent, mContext: Context) {
             //Create AlertDialog
@@ -567,7 +566,7 @@ class MessageAdapter(
         fun getDominantColor(bitmap: Bitmap): Int {
             val swatchesTemp = Palette.from(bitmap).generate().swatches
             val swatches = ArrayList<Palette.Swatch>(swatchesTemp)
-            Collections.sort(swatches) { swatch1, swatch2 -> swatch2.population - swatch1.population }
+            swatches.sortWith(Comparator { swatch1, swatch2 -> swatch2.population - swatch1.population })
             return if (swatches.size > 0) swatches[0].rgb else ContextCompat.getColor(mContext, (R.color.primary))
         }
     }

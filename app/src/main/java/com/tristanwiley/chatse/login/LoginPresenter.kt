@@ -31,7 +31,7 @@ class LoginPresenter : CoroutineScope {
         view = _view
 
         view.setVersionText(String.format(Locale.getDefault(), App.instance.getString(R.string.app_version), BuildConfig.VERSION_NAME))
-        view.setEmailText(prefs.getString(UserPreferenceKeys.EMAIL, ""))
+        view.setEmailText(prefs.getString(UserPreferenceKeys.EMAIL, "")!!)
     }
 
     fun onBetaClicked() {

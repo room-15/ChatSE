@@ -1,7 +1,6 @@
 package com.tristanwiley.chatse.event.presenter.message
 
 import android.content.Context
-import android.util.Log
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.chat.ChatRoom
 import com.tristanwiley.chatse.event.ChatEvent
@@ -10,6 +9,7 @@ import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
+import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -95,7 +95,7 @@ class MessageEventPresenter : EventPresenter<MessageEvent> {
                     val newMessage = MessageEvent(event)
                     val originalMessage = messages.floor(newMessage)
                     if (originalMessage != newMessage) {
-                        Log.w("MessageEventPresenter", "Attempting to edit nonexistent message")
+                        Timber.w("MessageEventPresenter Attempting to edit nonexistent message")
                         return
                     }
                     newMessage.previous = originalMessage

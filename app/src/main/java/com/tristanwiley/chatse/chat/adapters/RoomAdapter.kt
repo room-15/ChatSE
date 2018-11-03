@@ -10,7 +10,6 @@ import android.widget.TextView
 import com.squareup.okhttp.FormEncodingBuilder
 import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
-import com.tristanwiley.chatse.chat.ChatActivity
 import com.tristanwiley.chatse.chat.ChatRoom
 import com.tristanwiley.chatse.chat.Room
 import com.tristanwiley.chatse.network.ClientManager
@@ -72,17 +71,17 @@ class RoomAdapter(val site: String, val list: MutableList<Room>, val context: Co
                 AlertDialog.Builder(mContext)
                         .setTitle("Modify Room")
                         .setMessage("Would you like to modify room #${room.roomID}, ${room.name}?")
-                        .setPositiveButton("Leave Room", { dialog, _ ->
+                        .setPositiveButton("Leave Room") { dialog, _ ->
                             leaveRoom(room.roomID, room.fkey)
                             dialog.dismiss()
-                        })
-                        .setNegativeButton(favoriteToggleString, { dialog, _ ->
+                        }
+                        .setNegativeButton(favoriteToggleString) { dialog, _ ->
                             toggleFavoriteRoom(room, room.fkey)
                             dialog.dismiss()
-                        })
-                        .setNeutralButton("Cancel", { dialog, _ ->
+                        }
+                        .setNeutralButton("Cancel") { dialog, _ ->
                             dialog.cancel()
-                        })
+                        }
                         .show()
                 true
             }
