@@ -43,7 +43,9 @@
             <!-- android:scheme="https" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".about.AboutActivity" />
+        <activity
+            android:theme="@style/AppTheme.About"
+            android:name=".about.AboutActivity" />
 
         <service
             android:name=".chat.service.IncomingEventService"
