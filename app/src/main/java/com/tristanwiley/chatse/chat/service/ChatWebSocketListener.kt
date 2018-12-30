@@ -1,6 +1,5 @@
 package com.tristanwiley.chatse.chat.service
 
-import android.util.Log
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.squareup.okhttp.Response
@@ -8,6 +7,7 @@ import com.squareup.okhttp.ws.WebSocket
 import com.squareup.okhttp.ws.WebSocketListener
 import okio.Buffer
 import okio.BufferedSource
+import timber.log.Timber
 
 import java.io.IOException
 
@@ -18,7 +18,7 @@ class ChatWebSocketListener(private val site: String, private val listener: Chat
     private val mapper = ObjectMapper()
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
-        Log.i("ChatWebSocketListener", "websocket open: " + site)
+        Timber.i("ChatWebSocketListener websocket open: $site")
         listener.onConnect(site, true)
     }
 
@@ -35,17 +35,17 @@ class ChatWebSocketListener(private val site: String, private val listener: Chat
             val root = mapper.readTree(message)
             listener.onNewEvents(site, root)
         } catch (e: IOException) {
-            Log.e("ChatWebSocketListener", e.message)
+            Timber.e("ChatWebSocketListener${e.message}")
         }
 
     }
 
     override fun onPong(payload: Buffer) {
-        Log.i("ChatWebSocketListener", "websocket pong: $site")
+        Timber.i("ChatWebSocketListener web socket pong: $site")
     }
 
     override fun onClose(code: Int, reason: String) {
-        Log.i("ChatWebSocketListener", "websocket close: $site: $code, $reason")
+        Timber.i("ChatWebSocketListenerweb socket close: $site: $code, $reason")
     }
 
     interface ServiceWebsocketListener {

@@ -107,9 +107,9 @@ class UsersAdapter(private val mContext: Context, private val events: EventList,
                         builder.setView(layout)
 
                         //Create cancel button to cancel dialog
-                        builder.setNegativeButton("Cancel", { dialog, _ ->
+                        builder.setNegativeButton("Cancel") { dialog, _ ->
                             dialog.cancel()
-                        })
+                        }
 
                         //Show Dialog
                         builder.show()

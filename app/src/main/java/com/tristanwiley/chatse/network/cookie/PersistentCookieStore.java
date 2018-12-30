@@ -28,8 +28,6 @@ package com.tristanwiley.chatse.network.cookie;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
-
 import java.net.CookieStore;
 import java.net.HttpCookie;
 import java.net.URI;
@@ -41,6 +39,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import timber.log.Timber;
 
 public class PersistentCookieStore implements CookieStore {
     private static final String TAG = PersistentCookieStore.class
@@ -84,7 +84,7 @@ public class PersistentCookieStore implements CookieStore {
                         : uri.getScheme(), domain,
                         cookie.getPath() == null ? "/" : cookie.getPath(), null);
             } catch (URISyntaxException e) {
-                Log.w(TAG, e);
+                Timber.tag(TAG).w(e);
             }
         }
         return cookieUri;
@@ -112,7 +112,7 @@ public class PersistentCookieStore implements CookieStore {
                 // targetCookies.remove(cookie)
                 targetCookies.add(cookie);
             } catch (URISyntaxException e) {
-                Log.w(TAG, e);
+                Timber.tag(TAG).w(e);
             }
         }
     }

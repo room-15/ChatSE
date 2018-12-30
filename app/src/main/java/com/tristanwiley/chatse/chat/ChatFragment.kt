@@ -23,7 +23,6 @@ import android.support.v7.widget.RecyclerView
 import android.text.Html
 import android.text.util.Linkify
 import android.util.Base64
-import android.util.Log
 import android.view.*
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -51,6 +50,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.json.JSONObject
 import org.jsoup.Jsoup
+import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -181,11 +181,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
                                 //When you click on the gallery button, open a camera intent and get the result in onActivityResult
                                 //Request external storage permission
                                 if (ContextCompat.checkSelfPermission(activity as ChatActivity, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                                         ActivityCompat.requestPermissions(activity as ChatActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
-                                    } else {
-                                        openFileChooser()
-                                    }
                                 } else {
                                     openFileChooser()
                                 }
@@ -343,12 +339,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
                             tagview.layoutParams = layoutparam
 
                             //Set the background to a rectangle to look like it does on the web
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                tagview.background = ContextCompat.getDrawable(context as Context, R.drawable.tag_background)
-                            } else {
-                                @Suppress("DEPRECATION")
-                                tagview.setBackgroundDrawable(ContextCompat.getDrawable(context as Context, R.drawable.tag_background))
-                            }
+                            tagview.background = ContextCompat.getDrawable(context as Context, R.drawable.tag_background)
 
                             //Add the tag to the layout
                             tagsLayout.addView(tagview)
@@ -511,7 +502,7 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
             try {
                 newMessage(client, room, chatFkey, content)
             } catch (e: IOException) {
-                Log.e("handleNewEvents", e.message)
+                Timber.e("handleNewEvents ${e.message}")
             }
         }
     }
@@ -616,15 +607,15 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
 
     companion object {
 
-        private val EXTRA_ROOM = "room"
-        private val EXTRA_NAME = "name"
-        private val EXTRA_FKEY = "fkey"
+        private const val EXTRA_ROOM = "room"
+        private const val EXTRA_NAME = "name"
+        private const val EXTRA_FKEY = "fkey"
 
         fun createInstance(room: ChatRoom, name: String, fkey: String): ChatFragment {
             val b = Bundle(3)
-            b.putParcelable(ChatFragment.Companion.EXTRA_ROOM, room)
-            b.putString(ChatFragment.Companion.EXTRA_NAME, name)
-            b.putString(ChatFragment.Companion.EXTRA_FKEY, fkey)
+            b.putParcelable(ChatFragment.EXTRA_ROOM, room)
+            b.putString(ChatFragment.EXTRA_NAME, name)
+            b.putString(ChatFragment.EXTRA_FKEY, fkey)
 
             val fragment = ChatFragment()
             fragment.arguments = b

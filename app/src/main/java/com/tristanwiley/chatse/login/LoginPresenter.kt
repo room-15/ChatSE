@@ -5,14 +5,15 @@ import com.tristanwiley.chatse.BuildConfig
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.util.SharedPreferenceManager
 import com.tristanwiley.chatse.util.UserPreferenceKeys
-import kotlinx.coroutines.experimental.CoroutineScope
-import kotlinx.coroutines.experimental.Dispatchers
-import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 import java.util.regex.Pattern
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
+
 
 class LoginPresenter : CoroutineScope {
     private val job = Job()
@@ -30,7 +31,7 @@ class LoginPresenter : CoroutineScope {
         view = _view
 
         view.setVersionText(String.format(Locale.getDefault(), App.instance.getString(R.string.app_version), BuildConfig.VERSION_NAME))
-        view.setEmailText(prefs.getString(UserPreferenceKeys.EMAIL, ""))
+        view.setEmailText(prefs.getString(UserPreferenceKeys.EMAIL, "")!!)
     }
 
     fun onBetaClicked() {

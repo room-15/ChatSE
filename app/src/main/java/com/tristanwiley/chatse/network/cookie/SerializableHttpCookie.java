@@ -44,6 +44,8 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.net.HttpCookie;
 
+import timber.log.Timber;
+
 class SerializableHttpCookie implements Serializable {
     private static final String TAG = SerializableHttpCookie.class
             .getSimpleName();
@@ -68,7 +70,7 @@ class SerializableHttpCookie implements Serializable {
             ObjectOutputStream outputStream = new ObjectOutputStream(os);
             outputStream.writeObject(this);
         } catch (IOException e) {
-            Log.d(TAG, "IOException in encodeCookie", e);
+            Timber.d(e, "IOException in encodeCookie");
             return null;
         }
 
@@ -85,9 +87,9 @@ class SerializableHttpCookie implements Serializable {
                     byteArrayInputStream);
             cookie = ((SerializableHttpCookie) objectInputStream.readObject()).cookie;
         } catch (IOException e) {
-            Log.d(TAG, "IOException in decodeCookie", e);
+            Timber.d(e, "IOException in decodeCookie");
         } catch (ClassNotFoundException e) {
-            Log.d(TAG, "ClassNotFoundException in decodeCookie", e);
+            Timber.d(e, "ClassNotFoundException in decodeCookie");
         }
 
         return cookie;
@@ -105,7 +107,7 @@ class SerializableHttpCookie implements Serializable {
         } catch (Exception e) {
             // NoSuchFieldException || IllegalAccessException ||
             // IllegalArgumentException
-            Log.w(TAG, e);
+            Timber.tag(TAG).w(e);
         }
         return false;
     }
@@ -119,7 +121,7 @@ class SerializableHttpCookie implements Serializable {
         } catch (Exception e) {
             // NoSuchFieldException || IllegalAccessException ||
             // IllegalArgumentException
-            Log.w(TAG, e);
+            Timber.tag(TAG).w(e);
         }
     }
 
@@ -129,7 +131,7 @@ class SerializableHttpCookie implements Serializable {
             fieldHttpOnly = cl.getDeclaredField("httpOnly");
             fieldHttpOnly.setAccessible(true);
         } catch (NoSuchFieldException e) {
-            Log.d("initFieldHttpOnly", e.getMessage());
+            Timber.d(e);
         }
     }
 

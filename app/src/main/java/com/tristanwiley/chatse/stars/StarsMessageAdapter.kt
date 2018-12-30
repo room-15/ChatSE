@@ -16,7 +16,6 @@ import android.support.v7.graphics.Palette
 import android.support.v7.widget.RecyclerView
 import android.text.Html
 import android.text.util.Linkify
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,20 +23,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomViewTarget
-import com.squareup.okhttp.Request
 import com.tristanwiley.chatse.R
 import com.tristanwiley.chatse.chat.ChatRoom
 import com.tristanwiley.chatse.event.ChatEvent
 import com.tristanwiley.chatse.extensions.loadUrl
 import com.tristanwiley.chatse.network.Client
-import com.tristanwiley.chatse.network.ClientManager
 import kotlinx.android.synthetic.main.list_item_message.view.*
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import org.jetbrains.anko.defaultSharedPreferences
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
-import org.json.JSONObject
 import org.jsoup.Jsoup
+import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -247,7 +242,7 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
                         messageView.setPadding(15, 15, 15, 15)
                         messageView.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
                         messageView.setLinkTextColor(ContextCompat.getColor(itemView.context, R.color.accent_twitter))
-                        Log.d("Onebox", "Type: ${message.oneboxType}")
+                        Timber.d("Onebox Type: ${message.oneboxType}")
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             messageView.text = Html.fromHtml(message.oneboxContent, Html.FROM_HTML_MODE_LEGACY)
                         } else {
@@ -258,7 +253,7 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
                     }
                     //Other oneboxed items just display the HTML until we implement them all
                     else -> {
-                        Log.d("Onebox", "Type: ${message.oneboxType}")
+                        Timber.d("Onebox Type: ${message.oneboxType}")
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             messageView.text = Html.fromHtml(message.contents, Html.FROM_HTML_MODE_LEGACY)
                         } else {
@@ -281,7 +276,7 @@ class StarsMessageAdapter(private val mContext: Context, private val events: Arr
         fun getDominantColor(bitmap: Bitmap): Int {
             val swatchesTemp = Palette.from(bitmap).generate().swatches
             val swatches = ArrayList<Palette.Swatch>(swatchesTemp)
-            Collections.sort(swatches) { swatch1, swatch2 -> swatch2.population - swatch1.population }
+            swatches.sortWith(Comparator { swatch1, swatch2 -> swatch2.population - swatch1.population })
             return if (swatches.size > 0) swatches[0].rgb else ContextCompat.getColor(mContext, (R.color.primary))
         }
     }

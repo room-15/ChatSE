@@ -6,6 +6,10 @@
         <item name="colorAccent">@color/color_accent</item>
     </style>
 
+    <style name="AppTheme.About" parent="AppTheme">
+        <item name="android:windowBackground">@color/light_gray</item>
+    </style>
+
     <style name="AppTheme.SO" parent="AppTheme">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>

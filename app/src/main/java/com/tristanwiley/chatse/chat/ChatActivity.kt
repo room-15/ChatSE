@@ -16,7 +16,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.text.InputType
-import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.Menu
 import android.view.MenuItem
@@ -43,6 +42,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.json.JSONException
 import org.json.JSONObject
+import timber.log.Timber
 import java.io.IOException
 
 /**
@@ -138,7 +138,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
                     userEmail.text = prefs.getString("email", "")
                 }
             }
-            else -> Log.e("ChatActivity", "Userid not found")
+            else -> Timber.e("ChatActivity UserId not found")
         }
     }
 
@@ -146,7 +146,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
      * When network is connected add the rooms to the drawer
      */
     override fun onServiceConnected(name: ComponentName, binder: IBinder) {
-        Log.d("onServiceConnected", "Service connect")
+        Timber.d("onServiceConnected Service connect")
         serviceBinder = binder as IncomingEventServiceBinder
 
         //Asynchronously add rooms to drawer
@@ -157,7 +157,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
 
         //Load a default room
 
-        loadChatFragment(ChatRoom(prefs.getString(RoomPreferenceKeys.LAST_ROOM_SITE, Client.SITE_STACK_OVERFLOW), prefs.getInt(RoomPreferenceKeys.LAST_ROOM_NUM, 15)))
+        loadChatFragment(ChatRoom(prefs.getString(RoomPreferenceKeys.LAST_ROOM_SITE, Client.SITE_STACK_OVERFLOW)!!, prefs.getInt(RoomPreferenceKeys.LAST_ROOM_NUM, 15)))
         currentRoomNum = prefs.getInt(RoomPreferenceKeys.LAST_ROOM_NUM, 15)
     }
 
@@ -208,7 +208,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
                         .build()
                 val response = client.newCall(soChatPageRequest).execute()
                 val jsonData = response.body().string()
-                Log.wtf("JSON", jsonData)
+                Timber.wtf("JSON $jsonData")
                 val result = JSONObject(jsonData)
 
                 runOnUiThread {
@@ -426,7 +426,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
-        Log.d("ChatActivity", "Service disconnect")
+        Timber.d("ChatActivity Service disconnect")
     }
 
     override fun onItemClick(chatRoom: ChatRoom) {
