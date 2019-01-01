@@ -14,7 +14,8 @@
 
     <!-- Removed:
         android:animateLayoutChanges="true" -->
-    <android.support.constraint.ConstraintLayout
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/message_root_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,14 +24,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/message_footer_actions">
 
-        <android.support.constraint.Guideline
+        <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.2" />
 
-        <android.support.constraint.Guideline
+        <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_80"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -173,10 +174,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Action footer -->
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/message_footer_actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -186,7 +187,7 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <!-- Self Actions -->
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/footer_actions_self"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -233,10 +234,10 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 style="@style/Base.Widget.AppCompat.Button.Borderless"/>
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Other Actions -->
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
@@ -286,8 +287,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 style="@style/Base.Widget.AppCompat.Button.Borderless"/>
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>
