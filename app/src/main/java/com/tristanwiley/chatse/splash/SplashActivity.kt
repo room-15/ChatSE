@@ -2,7 +2,7 @@ package com.tristanwiley.chatse.splash
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.tristanwiley.chatse.chat.ChatActivity
 import com.tristanwiley.chatse.login.LoginActivity
 import com.tristanwiley.chatse.util.SharedPreferenceManager

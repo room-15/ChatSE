@@ -9,12 +9,12 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.widget.Toolbar
 import android.text.InputType
 import android.view.ContextThemeWrapper
 import android.view.Menu
@@ -33,9 +33,7 @@ import com.tristanwiley.chatse.login.LoginActivity
 import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import com.tristanwiley.chatse.network.cookie.PersistentCookieStore
-import com.tristanwiley.chatse.util.RoomPreferenceKeys
-import com.tristanwiley.chatse.util.SharedPreferenceManager
-import com.tristanwiley.chatse.util.UserPreferenceKeys
+import com.tristanwiley.chatse.util.*
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.room_nav_header.*
 import org.jetbrains.anko.doAsync
@@ -92,9 +90,21 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
         supportActionBar?.setBackgroundDrawable(ColorDrawable(ContextCompat.getColor(applicationContext, R.color.stackoverflow_orange)))
 
         //On the toggle button pressed open the NavigationDrawer
-        val toggle = ActionBarDrawerToggle(
-                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawer_layout.addDrawerListener(toggle)
+        //On the toggle button pressed open the NavigationDrawer
+        val toggle = object : ActionBarDrawerToggle(this, drawer_layout,
+                toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+
+            override fun onDrawerClosed(drawerView: View) {
+                super.onDrawerClosed(drawerView)
+            }
+
+            // Close soft keyboard when drawer is opened
+            override fun onDrawerOpened(drawerView: View) {
+                super.onDrawerOpened(drawerView)
+                this@ChatActivity.hideKeyboard()
+            }
+        }
+
         toggle.syncState()
 
         //Load the user data for the NavigationDrawer header

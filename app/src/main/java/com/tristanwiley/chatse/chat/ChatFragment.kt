@@ -12,14 +12,14 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.text.Html
 import android.text.util.Linkify
 import android.util.Base64
@@ -208,11 +208,11 @@ class ChatFragment : Fragment(), IncomingEventListener, ChatMessageCallback {
 
         messageAdapter = MessageAdapter(context!!, chatFkey, room, messageCallback = this)
         usersAdapter = UsersAdapter(context!!, events)
-        val layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, true)
+        val layoutManager = LinearLayoutManager(activity, RecyclerView.VERTICAL, true)
         messageList.layoutManager = layoutManager
         messageList.adapter = messageAdapter
 //        messageList.addItemDecoration(CoreDividerItemDecoration(activity, CoreDividerItemDecoration.VERTICAL_LIST))
-        userList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+        userList.layoutManager = LinearLayoutManager(activity, RecyclerView.VERTICAL, false)
         userList.adapter = usersAdapter
         userList.addItemDecoration(DividerItemDecoration(activity as ChatActivity))
         usersAdapter.notifyDataSetChanged()

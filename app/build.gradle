@@ -52,14 +52,16 @@ dependencies {
     }
 
     implementation "com.jakewharton.timber:timber:$timber"
+    implementation 'com.google.android.material:material:1.0.0'
 
     // Android
-    implementation "com.android.support:design:$supportLibrary"
-    implementation "com.android.support:appcompat-v7:$supportLibrary"
-    implementation "com.android.support:recyclerview-v7:$supportLibrary"
-    implementation "com.android.support:cardview-v7:$supportLibrary"
-    implementation "com.android.support:palette-v7:$supportLibrary"
-    implementation "com.android.support.constraint:constraint-layout:$constraintLayout"
+    implementation 'com.google.android.material:material:1.1.0-alpha02'
+    implementation 'androidx.appcompat:appcompat:1.1.0-alpha01'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha01'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.palette:palette:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha3'
+    implementation 'androidx.constraintlayout:constraintlayout-solver:2.0.0-alpha3'
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
