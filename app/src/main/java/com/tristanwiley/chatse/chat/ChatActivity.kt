@@ -36,6 +36,7 @@ import com.tristanwiley.chatse.network.cookie.PersistentCookieStore
 import com.tristanwiley.chatse.util.RoomPreferenceKeys
 import com.tristanwiley.chatse.util.SharedPreferenceManager
 import com.tristanwiley.chatse.util.UserPreferenceKeys
+import com.tristanwiley.chatse.util.Utilities
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.room_nav_header.*
 import org.jetbrains.anko.doAsync
@@ -92,9 +93,21 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
         supportActionBar?.setBackgroundDrawable(ColorDrawable(ContextCompat.getColor(applicationContext, R.color.stackoverflow_orange)))
 
         //On the toggle button pressed open the NavigationDrawer
-        val toggle = ActionBarDrawerToggle(
-                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawer_layout.addDrawerListener(toggle)
+        //On the toggle button pressed open the NavigationDrawer
+        val toggle = object : ActionBarDrawerToggle(this, drawer_layout,
+                toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+
+            override fun onDrawerClosed(drawerView: View) {
+                super.onDrawerClosed(drawerView)
+            }
+
+            // Close soft keyboard when drawer is opened
+            override fun onDrawerOpened(drawerView: View) {
+                super.onDrawerOpened(drawerView)
+                Utilities.hideKeyboard(this@ChatActivity)
+            }
+        }
+
         toggle.syncState()
 
         //Load the user data for the NavigationDrawer header
