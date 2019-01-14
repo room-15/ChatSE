@@ -33,10 +33,7 @@ import com.tristanwiley.chatse.login.LoginActivity
 import com.tristanwiley.chatse.network.Client
 import com.tristanwiley.chatse.network.ClientManager
 import com.tristanwiley.chatse.network.cookie.PersistentCookieStore
-import com.tristanwiley.chatse.util.RoomPreferenceKeys
-import com.tristanwiley.chatse.util.SharedPreferenceManager
-import com.tristanwiley.chatse.util.UserPreferenceKeys
-import com.tristanwiley.chatse.util.Utilities
+import com.tristanwiley.chatse.util.*
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.room_nav_header.*
 import org.jetbrains.anko.doAsync
@@ -104,7 +101,7 @@ class ChatActivity : AppCompatActivity(), ServiceConnection, RoomAdapter.OnItemC
             // Close soft keyboard when drawer is opened
             override fun onDrawerOpened(drawerView: View) {
                 super.onDrawerOpened(drawerView)
-                Utilities.hideKeyboard(this@ChatActivity)
+                this@ChatActivity.hideKeyboard()
             }
         }
 
